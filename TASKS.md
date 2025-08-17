@@ -43,3 +43,7 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
     Action: Create a GitHub Actions workflow that automates the execution of the agent's tasks. This workflow should be triggerable on a specific event (e.g., a new issue being labeled for the agent).
     Acceptance: A new workflow file, agent_workflow.yml, is added to the .github/workflows/ directory. This workflow successfully runs the git interaction script and creates a pull request.
     Dependencies: 7
+    
+9) - Test Agent Automation
+   Action: This is a test task for the GitHub Actions workflow to pick up.
+   Acceptance: The agent creates a file named `task_9_output.md` and opens a PR.
