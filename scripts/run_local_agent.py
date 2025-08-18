@@ -19,7 +19,7 @@ TOOL_REGISTRY = {
     "run_shell_command": {"function_name": "run_shell_command", "dangerous": True},
 }
 
-class AgentTools: # (Class is unchanged)
+class AgentTools:
     def __init__(self, repo_path: str, git_manager: GitManager):
         self.repo_path = repo_path
         self.git_manager = git_manager
@@ -49,8 +49,6 @@ class UnifiedEngine:
 
     def _build_prompt(self, context: dict, available_tools: list) -> list:
         context_str = "\n".join(f"--- START of {name} ---\n{content}\n--- END of {name} ---\n" for name, content in context.items())
-        
-        # Dynamically generate the tool list for the prompt
         tool_descriptions = {
             "write_file": "`write_file(path, content)`: Writes or overwrites a file.",
             "create_pull_request": "`create_pull_request(title, body)`: Creates a pull request.",
@@ -59,26 +57,22 @@ class UnifiedEngine:
             "run_shell_command": "`run_shell_command(command)`: Executes a shell command (e.g., for git)."
         }
         tools_list_str = "\n".join(f"- {tool_descriptions[tool]}" for tool in available_tools)
-
         system_prompt = f"""
 You are an autonomous AI agent. Your goal is to advance a software project by completing one task.
 You operate by generating a plan and a sequence of tool calls in a single JSON response.
-
 You have access to the following tools:
 {tools_list_str}
-
 Your process:
 1. Analyze the context and `TASKS.md`.
 2. Identify the next pending task.
 3. Formulate a plan and the sequence of tool calls to complete it, ending with `finish`.
 4. If no tasks are eligible, call `finish(reason="HALT: No eligible tasks found.")`.
-
 Respond with a single JSON object.
 """
         user_prompt = f"### PROJECT CONTEXT\n{context_str}\n\nGenerate the JSON response to complete the next task."
         return [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
 
-    def _make_api_call(self, model: str, messages: list) -> str: # Unchanged
+    def _make_api_call(self, model: str, messages: list) -> str:
         print(f"Sending prompt to model '{model}' via LiteLLM...")
         try:
             response = litellm.completion(model=model, messages=messages, timeout=300, response_format={"type": "json_object"})
@@ -89,7 +83,7 @@ Respond with a single JSON object.
             print(f"Error: API call via LiteLLM failed: {e}", file=sys.stderr)
             sys.exit(1)
 
-    def _parse_response(self, response: str) -> list: # Unchanged
+    def _parse_response(self, response: str) -> list:
         print("\n--- LLM Response Received ---\n")
         print(response)
         try:
@@ -114,23 +108,30 @@ class Agent:
         print(f"Agent initialized. Mode: {self.mode}, Dangerous tools allowed: {self.allow_dangerous}")
 
     def _get_available_tools(self) -> list:
-        return [
-            name for name, details in TOOL_REGISTRY.items()
-            if not details["dangerous"] or self.allow_dangerous
-        ]
+        return [name for name, details in TOOL_REGISTRY.items() if not details["dangerous"] or self.allow_dangerous]
 
-    def run(self): # (Main loop logic unchanged)
+    def run(self):
         run_count = 0
         while True:
-            run_count += 1; print(f"\n--- Starting Cycle {run_count} ---")
-            should_continue = self._execute_cycle()
-            if not should_continue or self.mode == 'single': break
+            run_count += 1
+            print(f"\n--- Starting Cycle {run_count} ---")
+            
+            # ** THE FIX IS HERE (Part 1/2) **
+            # We pass `run_count` as an argument.
+            should_continue = self._execute_cycle(run_count)
+            
+            if not should_continue or self.mode == 'single':
+                break
         print("\n--- Agent has finished all work. ---")
 
-    def _execute_cycle(self) -> bool:
+    # ** THE FIX IS HERE (Part 2/2) **
+    # The method now accepts `run_count`.
+    def _execute_cycle(self, run_count: int) -> bool:
         repo_url = self._get_repo_url()
         git_manager = GitManager(repo_url=repo_url)
-        if not git_manager.setup_repository(branch_name=f"agent/cycle-{run_count}"): return False
+        
+        if not git_manager.setup_repository(branch_name=f"agent/cycle-{run_count}"):
+            return False
 
         tools_instance = AgentTools(git_manager.repo_path, git_manager)
         context = self._gather_context(git_manager.repo_path)
@@ -147,28 +148,25 @@ class Agent:
         for call in tool_calls:
             tool_name = call.get("tool_name")
             arguments = call.get("arguments", {})
-            
-            # Security check: Is this tool allowed in the current mode?
             if tool_name not in self.available_tools:
                 print(f"Error: Agent attempted to call disallowed tool '{tool_name}'. Halting.")
                 return False
-
             tool_method = getattr(tools_instance, tool_name, None)
             if not tool_method:
                 print(f"Error: Unknown tool implementation '{tool_name}'.")
                 continue
-
             print(f"Calling Tool: {tool_name}({arguments})")
             try:
                 result = tool_method(**arguments)
                 print(f"Tool Result: {result}")
-                if tool_name in ['ask_question', 'finish'] and "HALT" in result: return False
+                if tool_name in ['ask_question', 'finish'] and "HALT" in result:
+                    return False
             except Exception as e:
                 print(f"Error executing tool '{tool_name}': {e}")
                 return False
         return True
 
-    def _gather_context(self, repo_path: str): # (Unchanged)
+    def _gather_context(self, repo_path: str):
         files = ["SPEC.md", "SPECIFICATION_GUIDE.md", "TASK_FORMAT.md", "TASKS.md", "AGENT_PRINCIPLES.md"]
         context = {}
         for filename in files:
@@ -176,10 +174,10 @@ class Agent:
                 with open(os.path.join(repo_path, filename), "r") as f:
                     context[filename] = f.read()
             except FileNotFoundError:
-                pass # Silently ignore missing context files
+                pass
         return context
 
-    def _get_repo_url(self): # (Unchanged)
+    def _get_repo_url(self):
         try:
             result = subprocess.run(["git", "config", "--get", "remote.origin.url"], check=True, capture_output=True, text=True)
             url = result.stdout.strip()
@@ -189,14 +187,12 @@ class Agent:
             print("Error: Could not determine git remote URL.", file=sys.stderr)
             sys.exit(1)
 
-
 if __name__ == "__main__":
     load_dotenv()
     parser = argparse.ArgumentParser(description="Autonomous AI Agent for Specification Programming.")
     parser.add_argument('--model', type=str, default='ollama/llama3', help="The LiteLLM model string.")
     parser.add_argument('--mode', choices=['single', 'continuous'], default='single', help="Execution mode.")
-    parser.add_argument('--allow-dangerous-tools', action='store_true',
-                        help="Allow the agent to use dangerous tools like `run_shell_command`.")
+    parser.add_argument('--allow-dangerous-tools', action='store_true', help="Allow the agent to use dangerous tools like `run_shell_command`.")
     args = parser.parse_args()
     
     agent = Agent(model=args.model, mode=args.mode, allow_dangerous=args.allow_dangerous_tools)
