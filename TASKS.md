@@ -63,10 +63,10 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Acceptance: A folder /plans with a plan file for each task exists.
    Dependencies: 12
 
-14) - File organisation
-   Action: Create a scheme for organising files within the repository.
-   Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored, and all the files adhere to this file organisation.
-   Notes: Perhaps new tools are necessary for this that allow renaming of files etc - this should be. Right now `FILE_ORGANISATION.md` exists, but maybe it should be upgraded.
+14) + Specify file organisation scheme
+   Action: Create a specification that defines a clear and logical scheme for organising files and directories within the repository.
+   Acceptance: The file `docs/FILE_ORGANISATION.md` exists and details the target structure and naming conventions for the project.
+   Notes: The actual refactoring of the repository to adhere to this scheme is handled in a separate task, as it depends on new file management tools for the agent.
 
 15) ? Feature definitions
    Action: Create a features specifications.
@@ -100,3 +100,17 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
     Acceptance: The file `MOBILE_APP.md` exists detailing the development process and user interface design for the mobile application.
     Notes: The purpose of this is to allow users to interact with the agent through a mobile device. It could include voice commands, touch gestures, or other input methods depending on the target audience and platform.
     Dependencies: 20
+
+21) - Refactor repository to align with file organisation scheme
+    Action: Move all existing files to their correct locations as defined in `docs/FILE_ORGANISATION.md`.
+    Acceptance: The project's file structure perfectly matches the structure defined in the file organisation specification. All files listed in the "Files to Move" section of `docs/FILE_ORGANISATION.md` are in their new locations.
+    Dependencies: 14, 22
+    Notes: This task requires agent capabilities to move and/or delete files, which are to be developed in Task 22.
+
+22) - Implement file management tools for the agent
+    Action: Enhance the agent's capabilities by implementing tools for file system manipulation, specifically for moving and deleting files. This will likely involve updating `TOOL_ARCHITECTURE.md` and the orchestrator script.
+    Acceptance:
+     - The agent has access to new tools: `move_file(source_path, destination_path)` and `delete_file(path)`.
+     - `TOOL_ARCHITECTURE.md` is updated to include the specifications for these new tools.
+     - The orchestrator is updated to correctly execute these new tool calls.
+    Dependencies: 14
