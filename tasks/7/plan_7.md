@@ -71,7 +71,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Acceptance: The tool uses correct naming and returns all files matching the pattern as text.
    Output: `scripts/tools/retrieve_context_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
-   Depdendencies: 7.15
+   Dependencies: 7.15
 
 7.11) + The tool for renaming files
    Action: Create a tool called `rename_files` to rename and move files.
@@ -80,7 +80,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Context: `docs/TOOL_ARCHITECTURE.md`
 
 7.12) + The tool for creating a git PR
-   Action: Create a tool called `submit_for_review` to create Git Pull Requests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
+   Action: Create a tool called `submit_for_review` to create Git Pull Requests. The orchestrator script handles branch creation (e.g., agent/cycle-N) and the tool handles committing and creating the PR.
    Acceptance: The tool uses correct naming and creates a pull request. There is also a helper file that manages all git operations.
    Output: `scripts/tools/submit_for_review.py`, `scripts/git_manager.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
@@ -110,3 +110,8 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
 2) Update `tasks/TASKS.md` with status change
 3) Submit for review
 4) Finish
+
+## Administrative Steps
+- Update `tasks/TASKS.md` status for Task 7 to `+` upon completion.
+- Submit for review.
+- Finish.
