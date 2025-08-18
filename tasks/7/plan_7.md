@@ -66,11 +66,12 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/write_file.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.10) + The tool for getting project context file
+7.10) - The tool for getting project context file
    Action: Create a tool called `retrieve_context_files` to return wanted files as text and resume the agent's work.
    Acceptance: The tool uses correct naming and returns all files matching the pattern as text.
    Output: `scripts/tools/retrieve_context_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
+   Depdendencies: 7.15
 
 7.11) + The tool for renaming files
    Action: Create a tool called `rename_files` to rename and move files.
@@ -78,8 +79,8 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/rename_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.12) - The tool for creating a git PR
-   Action: Create a tool called `write_file` to create Git Pull Requests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
+7.12) + The tool for creating a git PR
+   Action: Create a tool called `submit_for_review` to create Git Pull Requests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
    Acceptance: The tool uses correct naming and creates a pull request. There is also a helper file that manages all git operations.
    Output: `scripts/tools/submit_for_review.py`, `scripts/git_manager.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
