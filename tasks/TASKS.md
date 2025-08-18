@@ -40,7 +40,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 9) - Running specific tasks and features
    Action: `scripts/run_local_agent.py` is run with the optional argument `-t {task_id}` and `-f {feature_id}` (only if task_id is given). This will cause the agent to execute the specified task and the given feature.
-   Acceptance: The agent executes the specified task or a feature in a task and outputs the result. The agent must create a branch for this that follows the convention `features/{task_id}_{feature_id}` or `tasks/{task_id}` if no feature is specified. The information in this task should be included as a feature in task 7. After completion, this whole task should be removed.
+   Acceptance: The agent executes the specified task or a feature in a task and outputs the result. The agent must create a branch for this that follows the convention `features/{task_id}_{feature_id}` or `tasks/{task_id}` if no feature is specified. This should be achieved by simply giving an appropriate prompt (referencing the corresponding `tasks/plan_{task_id}.md`) to the agent instead of telling it to read `SPEC.md`. The information in this task should be included as a feature in task 7. After completion, this whole task should be removed.
 
 17) ? Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.
