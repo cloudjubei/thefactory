@@ -40,7 +40,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/run_local_agent.py`
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
 
-7.6) - Orchestrator can parse and call tools
+7.6) + Orchestrator can parse and call tools
    Action: The script parses the agent's response JSON and in turn executes tools.
    Acceptance: An appropriate JSON response triggers a tool call.
    Output: `scripts/run_local_agent.py`
@@ -66,7 +66,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/write_file.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.10) - The tool for getting project context file
+7.10) + The tool for getting project context file
    Action: Create a tool called `retrieve_context_files` to return wanted files as text and resume the agent's work.
    Acceptance: The tool uses correct naming and returns requested files as text.
    Output: `scripts/tools/retrieve_context_files.py`

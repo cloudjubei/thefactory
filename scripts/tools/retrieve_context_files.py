@@ -1,56 +1,68 @@
+# scripts/tools/retrieve_context_files.py
+
+from typing import List, Dict, Any
 import os
-import json
-from typing import List, Dict
 
 
-def retrieve_context_files_tool(repo_path: str, paths: List[str]) -> str:
+def _safe_join(base_dir: str, relative_path: str) -> str:
     """
-    Retrieve and return the content of the files at the given relative paths.
+    Safely join base_dir with relative_path, preventing directory traversal.
+    Returns the absolute normalized path.
+    Raises ValueError if the resulting path escapes base_dir.
+    """
+    # Normalize and join
+    norm_rel = os.path.normpath(relative_path).lstrip(os.sep)
+    abs_path = os.path.abspath(os.path.join(base_dir, norm_rel))
+    base_abs = os.path.abspath(base_dir)
+
+    # Ensure the path is within the repo directory
+    if not abs_path.startswith(base_abs + os.sep) and abs_path != base_abs:
+        raise ValueError("Attempted to access path outside of repository")
+    return abs_path
+
+
+def retrieve_context_files_tool(base_dir: str, paths: List[str]) -> Dict[str, Any]:
+    """
+    Retrieve the contents of specified files within the repository.
 
     Args:
-        repo_path: Absolute path to the cloned repository root.
-        paths: List of relative file paths to read.
+        base_dir: Absolute path to the repository root (provided by orchestrator).
+        paths: List of relative file paths to retrieve.
 
     Returns:
-        JSON string with structure:
-        {
-          "ok": bool,
-          "files": { "path": "content", ... },
-          "missing": ["path", ...],
-          "errors": ["message", ...]
-        }
+        Dict with keys:
+        - ok (bool): True if operation succeeded (even with some file errors), False only on invalid input.
+        - files (list): List of {path, content} for successfully read files.
+        - errors (list): List of {path, error} for files that couldn't be read.
     """
-    result: Dict[str, object] = {"ok": True, "files": {}, "missing": [], "errors": []}
+    result = {
+        "ok": True,
+        "files": [],
+        "errors": []
+    }
 
     if not isinstance(paths, list):
-        result["ok"] = False
-        result["errors"].append("Invalid argument: 'paths' must be a list of strings.")
-        return json.dumps(result)
+        return {"ok": False, "files": [], "errors": [{"path": "__input__", "error": "paths must be a list"}]}
 
-    base_abs = os.path.abspath(repo_path)
-
-    for rel in paths:
+    for p in paths:
         try:
-            if not isinstance(rel, str) or rel.strip() == "":
-                result["errors"].append("Encountered an empty or non-string path.")
-                result["ok"] = False
-                continue
-            abs_path = os.path.abspath(os.path.join(base_abs, rel))
-            if not abs_path.startswith(base_abs + os.sep):
-                result["errors"].append(f"Path escapes repository root: {rel}")
-                result["ok"] = False
-                continue
+            if not isinstance(p, str) or p.strip() == "":
+                raise ValueError("path must be a non-empty string")
+            abs_path = _safe_join(base_dir, p)
             if not os.path.exists(abs_path):
-                result["missing"].append(rel)
+                result["errors"].append({"path": p, "error": "file does not exist"})
                 continue
             if os.path.isdir(abs_path):
-                result["errors"].append(f"Path is a directory, not a file: {rel}")
-                result["ok"] = False
+                result["errors"].append({"path": p, "error": "path is a directory"})
                 continue
-            with open(abs_path, "r", encoding="utf-8") as f:
-                result["files"][rel] = f.read()
+            # Read as UTF-8 text; replace undecodable bytes to avoid crashes
+            with open(abs_path, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read()
+            result["files"].append({"path": p, "content": content})
         except Exception as e:
-            result["errors"].append(f"Failed to read {rel}: {e}")
-            result["ok"] = False
+            result["errors"].append({"path": p if isinstance(p, str) else str(p), "error": str(e)})
 
-    return json.dumps(result)
+    return result
+
+
+__all__ = ["retrieve_context_files_tool"]
