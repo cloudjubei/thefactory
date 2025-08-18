@@ -7,7 +7,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
 - Specs: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`, `docs/PLAN_SPECIFICATION.md`, `docs/FILE_ORGANISATION.md`
 
 ## Features
-7.1) - Orchestrator script
+7.1) + Orchestrator script
    Action: Ensure scripts satisfies all requirements.
    Acceptance: Behavior matches `docs/TOOL_ARCHITECTURE.md` and `docs/AGENT_PRINCIPLES.md`.
    Output: `scripts/run_local_agent.py`
@@ -40,7 +40,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/run_local_agent.py`
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
 
-7.6) - Orchestrator can parse and call tools
+7.6) + Orchestrator can parse and call tools
    Action: The script parses the agent's response JSON and in turn executes tools.
    Acceptance: An appropriate JSON response triggers a tool call. It must be possible to have a multi-way conversation with an LLM, not just one shot.
    Output: `scripts/run_local_agent.py`
@@ -54,7 +54,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
    Dependencies: 7.5
 
-7.8) - Orchestrator can run specific task/feature
+7.8) + Orchestrator can run specific task/feature
    Action: The script has CLI options `--task {task_id}` and `--feature {feature_id}` to run specific tasks/features via prompt construction referencing `tasks/plan_{task_id}.md`.
    Acceptance: Orchestrator accepts `--task` and optional `--feature` and executes accordingly; output confirms execution.
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
@@ -66,14 +66,14 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/write_file.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.10) - The tool for getting project context file
+7.10) + The tool for getting project context file
    Action: Create a tool called `retrieve_context_files` to return wanted files as text and resume the agent's work.
    Acceptance: The tool uses correct naming and returns all files matching the pattern as text. This tool is special compared to the other ones, as it has to respond back to the LLM and allow it to continue.
    Output: `scripts/tools/retrieve_context_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
 7.11) + The tool for renaming files
-   Action: Create a tool called `rename_files` to rename and move files.
+   Action: Create a tool called `write_file` to rename and move files.
    Acceptance: The tool uses correct naming and is able to rename existing files or move and potentially rename them.
    Output: `scripts/tools/rename_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
