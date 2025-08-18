@@ -2,10 +2,8 @@
 
 ```
 ID) STATUS Title
-   Action: What needs to be done and why
-   Acceptance: How to verify the task is complete
-   Context: Specification files needed for this task to be completed
-   Output: [Optional] What artifacts/changes will be produced
+   Action: High level description of what needs to be done
+   Acceptance: High level description of how to verify the task is complete
    Notes: [Optional] Additional information about the task
 ```
 
@@ -34,16 +32,7 @@ Concrete, testable conditions that define task completion. These should be:
 - **Specific**: No room for interpretation  
 - **Complete**: When all criteria are met, the task is done
 
-Good acceptance criteria answers: "How do I know this task is finished?"
-
-### Context
-List of files that contain detailed instructions for completing the task. Format, comma and space separate list of filenames: `SPEC_FILE.md`, `IMPLEMENTATION_GUIDE.md`
-
-### Dependencies
-Lists task IDs that must be completed before this task can begin. Format, comma and space separate list of IDs: `2, 5`
-
-### Output
-Describes what will be created or changed. Could be files, documentation, code, or process changes.
+Good acceptance criteria answers: "What must be achieved for this task to be finished? How can this be verified?"
 
 ### Notes
 Any extra notes about the task that explain reasoning or give extra hints about how to accomplish the task. Especially useful for `unknown` tasks that usually require a discussion.
@@ -65,30 +54,21 @@ Tasks should reference, not repeat, specification documents.
 ### Simple Task
 ```
 4) - Create specification template
-   Description: Create a reusable template for writing new specifications
+   Action: Create a reusable template for writing new specifications
    Acceptance: TEMPLATE.md exists and includes all sections from SPECIFICATION_GUIDE.md. Each section holds a placeholder example.
 ```
 
-### Complex Task
-```
-5) - Implement specification validation
-   Description: Create a tool that validates specifications against our guide
-   Acceptance: Script can identify at least 3 issues in a bad spec and passes a good spec
-   Dependencies: 4
-   Output: validate_spec.js script
-```
 
 ### In-Progress Task
 ```
 6) ~ Document existing specifications
-   Description: Find and document 3 real-world specification examples
+   Action: Find and document 3 real-world specification examples
    Acceptance: EXAMPLES/ directory contains 3 .md files with annotated specifications
-   Output: EXAMPLES/ directory with README.md
 ```
 
 ## Tips for Writing Good Tasks
 
-1. **One deliverable per task** - If you need multiple outputs, create multiple tasks
+1. **One high-level deliverable per task** - If you need multiple outputs, create multiple tasks
 2. **Concrete over abstract** - "Create X file" not "Improve documentation"
 3. **Testable completion** - Anyone should be able to verify if it's done
 
