@@ -29,7 +29,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
    Acceptance: The documentation exists.
 
-7) - Agent Orchestrator
+7) + Agent Orchestrator
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent. 
    Acceptance: A script exists that allows interaction with an agent.
 
