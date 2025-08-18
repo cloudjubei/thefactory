@@ -49,6 +49,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 11) - Running in docker
    Action: Create a workflow to running the project in docker, i.e. isolated environment.
    Acceptance: The file `docs/docker/RUNNING_DOCKER_README.md` exists detailing the steps involved in running the project in a container environment. A `docs/docker/Dockerfile` exists that a user can copy and use. Ideally a script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in the API keys in a prepare `.env` file that the script will look into and set everything up.
+   Remember, this is a regular task and requires a plan and features just like any other task.
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
 12) - Running on cloud
