@@ -20,6 +20,18 @@ class AgentTools:
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
         with open(full_path, "w") as f: f.write(content)
         return f"Successfully wrote {len(content)} bytes to {path}"
+    def retrieve_context_files(self, paths: list):
+        content = {}
+        for path in paths:
+            full_path = os.path.join(self.repo_path, path)
+            try:
+                with open(full_path, "r") as f:
+                    content[path] = f.read()
+            except FileNotFoundError:
+                content[path] = f"Error: File '{path}' not found."
+            except Exception as e:
+                content[path] = f"Error reading file '{path}': {str(e)}"
+        return json.dumps(content)
     def submit_for_review(self, task_id: int, task_title: str):
         print("Submitting changes for review...")
         commit_message = f"feat(agent): Complete Task {task_id} - {task_title}"
@@ -48,6 +60,7 @@ You operate by generating a plan and a sequence of tool calls in a single JSON r
 
 You have access to the following SAFE tools:
 - `write_file(path, content)`
+- `retrieve_context_files(paths: list)`
 - `submit_for_review(task_id, task_title)`
 - `ask_question(question_text)`
 - `finish(reason)`
@@ -159,7 +172,7 @@ class Agent:
     
     # ... _gather_context and _get_repo_url are unchanged ...
     def _gather_context(self, repo_path: str):
-        files = ["SPEC.md", "SPECIFICATION_GUIDE.md", "TASK_FORMAT.md", "TASKS.md", "AGENT_PRINCIPLES.md", "scripts/run_local_agent.py"]
+        files = ["SPEC.md", "SPECIFICATION_GUIDE.md", "TASK_FORMAT.md", "TASKS.md", "AGENT_PRINCIPLES.md", "TOOL_ARCHITECTURE.md", "PLAN_SPECIFICATION.md", "FILE_ORGANISATION.md", "scripts/run_local_agent.py"]
         context = {}
         for filename in files:
             try:
