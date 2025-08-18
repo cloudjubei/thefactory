@@ -73,3 +73,10 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 16) ? Create a way to easily launch MCP servers
    Action: Our agents will need to access functionality that isn't local, it seems MCP servers are the current best way of doing so. Let's have a methodology/workflow to launch these easily.
+
+17) - using LM Studio
+   Action: Use LM Studio's server API to call different models. This is a local agent launch mode.
+
+18) - explore other ways to launch agents locally
+   Action: Explore alternative methods for launching agents locally, considering factors like scalability, efficiency, and ease of integration. This task aims to identify potential alternatives to the current approach and evaluate their suitability based on specific criteria.
+   Acceptance: A comprehensive analysis report outlining the explored options, their pros and cons, and recommendations for future consideration.
