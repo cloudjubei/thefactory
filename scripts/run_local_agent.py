@@ -187,7 +187,17 @@ class Agent:
     
     # ... _gather_context and _get_repo_url are unchanged ...
     def _gather_context(self, repo_path: str):
-        files = ["SPEC.md", "SPECIFICATION_GUIDE.md", "TASK_FORMAT.md", "TASKS.md", "AGENT_PRINCIPLES.md", "TOOL_ARCHITECTURE.md", "PLAN_SPECIFICATION.md", "FILE_ORGANISATION.md", "scripts/run_local_agent.py"]
+        files = [
+            "docs/SPEC.md",
+            "docs/SPECIFICATION_GUIDE.md",
+            "docs/TASK_FORMAT.md",
+            "tasks/TASKS.md",
+            "docs/AGENT_PRINCIPLES.md",
+            "docs/TOOL_ARCHITECTURE.md",
+            "docs/PLAN_SPECIFICATION.md",
+            "docs/FILE_ORGANISATION.md",
+            "scripts/run_local_agent.py"
+        ]
         context = {}
         for filename in files:
             try:
