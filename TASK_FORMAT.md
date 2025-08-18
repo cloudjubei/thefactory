@@ -6,6 +6,7 @@ ID) STATUS Title
    Acceptance: How to verify the task is complete
    Dependencies: [Optional] Tasks that must be completed first
    Output: [Optional] What artifacts/changes will be produced
+   Notes: [Optional] Additional information about the task
 ```
 
 ## Field Definitions
@@ -17,6 +18,8 @@ Positive integers in incremental order.
 - `+` Completed - a task that is done
 - `~` In Progress - a task that is being worked on
 - `-` Pending - a task that requires work
+- `?` Unknown - a task that is unclear, requires clarification of further discussion
+- `/` Blocked - a task that was started, but cannot proceed due to external factors
 - `=` Perpetual - a task that is always Pending, but low priority
 
 ### Title

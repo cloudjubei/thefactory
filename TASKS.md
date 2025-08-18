@@ -8,7 +8,7 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Action: Create the founding SPEC.md document
    Acceptance: SPEC.md exists with WHAT, CORE IDEAS and ACTIONS sections
 
-2) = Specification documentation
+2) + Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
    Acceptance: SPECIFICATION_GUIDE.md exists describing format, SPEC.md adheres to this format
 
@@ -16,11 +16,11 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Description: Create the initial task list for the project
    Acceptance: TASKS.md exists with at least 3 tasks and at least 1 pending task
 
-4) = Task format
+4) + Task format
    Action: Analyse the tasks and what requirements they need to provide. All the format and specification for that should be included in the documentation.
    Acceptance: TASK_FORMAT.md exists describing the format, TASKS.md adheres to this format
 
-5) = Specification template
+5) + Specification template
    Action: Create a reusable template for writing new specifications
    Acceptance: TEMPLATE.md exists with all required sections from SPECIFICATION_GUIDE.md, with examples for each
    Dependencies: 2
@@ -41,7 +41,7 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
 
 9) + Provide Orchestrator Dependencies
     Action: Create a dependency file that lists the external Python libraries required by the Orchestrator script.
-    Acceptance: The file `requirements.txt` exists and contains the necessary libraries (`litellm`, `python-dotenv`).
+    Acceptance: The file `requirements.txt` exists and contains all external libraries required to run `scripts/run_local_agent.py`.
     Dependencies: 8
 
 10) + Provide Orchestrator Configuration Template
@@ -62,3 +62,34 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Action: Create a plan for each task.
    Acceptance: A folder /plans with a plan file for each task exists.
    Dependencies: 12
+
+14) - File organisation
+   Action: Create a scheme for organising files within the repository.
+   Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored.
+
+15) ? Tackle growth
+   Action: Create a system for representing tasks and their plans.
+   Acceptance: A folder /tasks with a task file for each task exists.
+   Dependencies: 13
+   Notes: The project is growing and there's a definite need to organise things better than just having everything in one place. Maybe a special DSL is required, or a different scheme to more succinctly describe thing. This file is great for now, but once there are 1000s of tasks, we'll need something else - we need to prepare for that.
+
+16) ? Running in isolation/container
+   Action: Create a workflow to running the agent in a container, i.e. isolated environment.
+   Acceptance: The file `RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the agent in a container environment.
+   Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
+
+17) ? Running on cloud
+   Action: Create a workflow to running the agent on cloud services such as AWS or Azure.
+   Acceptance: The file `RUNNING_ON_CLOUD.md` exists detailing the steps involved in running the agent on cloud services.
+   Dependencies: 16
+   Notes: Once Task 16 is established, it should be possible to also host this project somewhere and have it perpetually run on a cloud service.
+
+18) ? Run tests
+   Action: Create a test framework for testing the agent's functionality.
+   Acceptance: The file `TESTING.md` exists detailing the steps involved in testing the agent's functionality.
+   Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
+
+19) ? Feature definitions
+   Action: Create a features specifications.
+   Acceptance: The file `FEATURE_DEFINITIONS.md` exists detailing the features of the agent and how they will be implemented.
+   Notes: The purpose of this is to make task organisations better. Each task can be a set of sub-tasks, i.e. features, that each can have their own plan and can be run independently. A task is only complete once all of its features are complete. Until now it would be possible to achieve a similar effect by having multiple small tasks, but there's a very important thing that is lost here - the context for the whole overarching task. A feature might only need a very small context to be completed or it might need to know about the context of all of the other features to be completed well. A feature can have a nested sub-feature. This way a task will remain a very high level concept - detailing the absolute top level project goals, whereas a feature will focus more on details but still staying away from implementation specifics.
