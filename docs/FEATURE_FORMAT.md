@@ -7,13 +7,9 @@ Features are atomic, testable pieces of work that collectively satisfy a task. T
 - Each task has a dedicated plan file located at `tasks/{task_id}/plan_{task_id}.md`.
 - Features for that task are enumerated in that plan file.
 
-## Numbering
-- Use `{task_id}.{n}` where `n` is a positive integer starting at 1.
-- Examples: `7.1`, `7.2`, `19.5`.
-
 ## Format
 ```
-{task_id}.ID) STATUS Title
+ID) STATUS Title
    Action: What needs to be done and why
    Acceptance: Objective, testable criteria to verify completion
    Context: [Optional] Specification files (and sections) this feature relies on
@@ -25,7 +21,9 @@ Features are atomic, testable pieces of work that collectively satisfy a task. T
 ## Field Definitions
 
 ### ID
-Positive integers in incremental order.
+- Use `{task_id}.{n}` where `n` is a positive integer starting at 1 and `task_id` is the ID of the parent task.
+- All the features under one task share an incrementing counter.
+- Examples: `7.1`, `7.2`, `7.3`.
 
 ### Title
 A succinct higher level name for the feature
@@ -44,14 +42,15 @@ Concrete, testable conditions that define feature completion. These should be:
 - Specific: No room for interpretation
 - Complete: When all criteria are met, the feature is done
 
-Good acceptance criteria answer: "What must be achieved for this feature to be finished? How can this be verified?"
+Good acceptance criteria answers: "What must be achieved for this feature to be finished? How can this be verified?"
 
 ### Context
 List of files that contain any relevant information needed for completing the feature. Format: comma-and-space separated list of filenames, optionally with sections.
 Example: `docs/TOOL_ARCHITECTURE.md`, `docs/AGENT_PRINCIPLES.md`
 
 ### Dependencies
-Lists feature IDs that must be completed before this feature can begin. Format: comma-and-space separated list of IDs. Example: `7.5, 7.9`
+Lists feature IDs that must be completed before this feature can begin. Format: comma-and-space separated list of IDs.
+Example: `7.5, 7.9`
 
 ### Output
 Describes what will be created or changed. Could be files, documentation, code, or process changes.
