@@ -5,38 +5,38 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 ## Current Tasks
 
 1) + Initial spec document
-   Action: Create the founding SPEC.md document
-   Acceptance: SPEC.md exists with WHAT, CORE IDEAS and ACTIONS sections
+   Action: Create the founding `docs/SPEC.md` document
+   Acceptance: `docs/SPEC.md` exists with WHAT, CORE IDEAS and ACTIONS sections
    Context: None
 
 2) + Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
-   Acceptance: SPECIFICATION_GUIDE.md exists describing format, SPEC.md adheres to this format
+   Acceptance: `docs/SPECIFICATION_GUIDE.md` exists describing format, `docs/SPEC.md` adheres to this format
    Context: docs/SPEC.md
 
 3) + Task format
    Action: Analyse the tasks and what requirements they need to provide. All the format and specification for that should be included in the documentation.
-   Acceptance: TASK_FORMAT.md exists describing the format, TASKS.md adheres to this format
+   Acceptance: `docs/TASK_FORMAT.md` exists describing the format, `docs/TASKS.md` adheres to this format
    Context: docs/SPEC.md
 
 4) + Specification template
    Action: Create a reusable template for writing new specifications
-   Acceptance: TEMPLATE.md exists with all required sections from SPECIFICATION_GUIDE.md, with examples for each
+   Acceptance: `TEMPLATE.md` exists with all required sections from `docs/SPECIFICATION_GUIDE.md`, with examples for each
    Context: docs/SPECIFICATION_GUIDE.md
 
 5) + Define Core Agent Terminology and Principles
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent".
-   Acceptance: The file `AGENT_PRINCIPLES.md` exists and contains the required definitions.
+   Acceptance: The file `docs/AGENT_PRINCIPLES.md` exists and contains the required definitions.
    Context: docs/SPEC.md
 
 6) + Specify the Agent's Tool-Based Architecture
    Action: Create the complete technical specification for the agent's tool-based architecture.
-   Acceptance: The file `TOOL_ARCHITECTURE.md` exists and defines the JSON contract, the full suite of tools, and the safety/execution modes.
+   Acceptance: The file `docs/TOOL_ARCHITECTURE.md` exists and defines the JSON contract, the full suite of tools, and the safety/execution modes.
    Context: docs/AGENT_PRINCIPLES.md
 
 7) + Implement the Agent Orchestrator
    Action: Create the Python script that functions as the Agent's Orchestrator.
-   Acceptance: The `scripts/run_local_agent.py` script is implemented and its functionality is fully compliant with the contracts and principles defined in `AGENT_PRINCIPLES.md` and `TOOL_ARCHITECTURE.md`.
+   Acceptance: The `scripts/run_local_agent.py` script is implemented and its functionality is fully compliant with the contracts and principles defined in `docs/AGENT_PRINCIPLES.md` and `docs/TOOL_ARCHITECTURE.md`.
    Context: docs/AGENT_PRINCIPLES.md, docs/TOOL_ARCHITECTURE.md
 
 8) + Provide Orchestrator Dependencies
@@ -51,30 +51,28 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 10) + Create Final User Setup and Usage Guide
     Action: Write the comprehensive guide for setting up and running the agent.
-    Acceptance: The file `LOCAL_SETUP.md` exists and provides clear, accurate instructions for the entire setup and execution process.
+    Acceptance: The file `docs/LOCAL_SETUP.md` exists and provides clear, accurate instructions for the entire setup and execution process.
     Context: scripts/run_local_agent.py, requirements.txt, .env.example
 
 11) + Plan specification
     Action: Create a plan specification that describes how each task should be executed.
-    Acceptance: The file `PLAN_SPECIFICATION.md` exists and details the steps involved in creating a task plan.
+    Acceptance: The file `docs/PLAN_SPECIFICATION.md` exists and details the steps involved in creating a task plan.
     Context: docs/SPECIFICATION_GUIDE.md, docs/TASK_FORMAT.md
 
 12) + File organisation specification
    Action: Create a scheme for organising files within the repository.
-   Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored
+   Acceptance: The file `docs/FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored
    Context: docs/SPEC.md, tasks/TASKS.md
 
-13) - Feature specification
-   Action: Create a features specification.
-   Acceptance: The file `FEATURES_SPECIFICATION.md` exists detailing the features of the agent and how they will be implemented. A feature should be defined as closely to a task as possible - i.e. following the same format. `docs/FILE_ORGANISATION.md` is updated to reflect these new files, where they exist and how they are referenced. `docs/TASK_FORMAT.md` is updated to reflect that tasks have features. `tasks/TASKS.md` is updated to now have a set of features for each task.
-   Context: tasks/TASKS.md, docs/TASK_FORMAT.md, docs/FILE_ORGANISATION.md
-   Notes: The purpose of this is to make task organisations better. Each task can be a set of sub-tasks, i.e. features, that each can have their own plan and can be run independently. A task is only complete once all of its features are complete. Until now it would be possible to achieve a similar effect by having multiple small tasks, but there's a very important thing that is lost here - the context for the whole overarching task. A feature might only need a very small context to be completed or it might need to know about the context of all of the other features to be completed well. A feature can have a nested sub-feature. This way a task will remain a very high level concept - detailing the absolute top level project goals, whereas a feature will focus more on details but still staying away from implementation specifics.
+13) - Tasks, Plans and Features
+   Action: Update `tasks/TASKS.md`, `docs/TASK_FORMAT.md`, `docs/PLAN_SPECIFICATION.md`, `docs/FEATURE_FORMAT.md`, `docs/SPEC.md`, `docs/FILE_ORGANISATION.md`.
+   Acceptance: The agent always when taking on a task creates a `plan_{id}.md` inside `tasks\{id}` folder. The plan holds details about all the features that make up the task. `TASKS.md` stays high level and `TASK_FORMAT.md` is also updated if any changes occur. `FEATURE_FORMAT.md` is updated to include any relevant information. `PLAN_SPECIFICATION.md` is updated to highlight what an agent must do to proceed with any task. An agent's path is the following: read `SPEC.md`, then (because it's an action inside) read `PLAN_SPCIFICATION.md`, and then the next action is to take on a task from `TASKS.md`. The file `FILE_ORGANISATION.md` is updated to hold the information about tasks and plans.
+   Context: `tasks/TASKS.md`, `docs/TASK_FORMAT.md`, `docs/PLAN_SPECIFICATION.md`, `docs/FEATURE_FORMAT.md`, `docs/SPEC.md`, `docs/FILE_ORGANISATION.md`
 
 14) - Plans update
-   Action: Update plans for all tasks and features.
-   Acceptance: The file `docs/PLAN_SPECIFICATION.md` is updated to reflect what is the the expected behavior for an agent to carry out for each task. The file `docs/SPEC.md` is updated so that the first acton to do is to read the `docs/PLAN_SPECIFICATION.md`. The file `tasks/TASKS.md` is updated to reflect the changes made to the `docs/PLAN_SPECIFICATION.md`, including any updates to the actions and acceptance criteria.
-   Notes: Each agent must always first compose a plan for a task before executing it. This in turn means that the plan must also encompass all features that a task is composed of. This is the only way to ensure that the agent can execute a task correctly.
-   Context: docs/PLAN_SPECIFICATION.md, tasks/TASKS.md, docs/SPEC.md
+   Action: Follow `tasks/TASKS.md`, `docs/TASK_FORMAT.md`, `docs/PLAN_SPECIFICATION.md`, `docs/FEATURE_FORMAT.md` to create plans for each task.
+   Acceptance: For each task inside `TASKS.md` there exists a folder `tasks/{task_id}`, which contains a `plan_{task_id}.md`. Inside the plan file there will be a list of features that make up the task and any other relevant contextual information.
+   Context: `tasks/TASKS.md`, `docs/TASK_FORMAT.md`, `docs/PLAN_SPECIFICATION.md`, `docs/FEATURE_FORMAT.md`
 
 15) - Cleanup
    Action: Ensure that everything follows all current specifications. Look at all the files provided in the context, the current tasks, features and plans. Ensure that there are no inconsistencies between the files and that the files are up to date.

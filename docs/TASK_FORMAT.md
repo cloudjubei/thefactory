@@ -5,7 +5,6 @@ ID) STATUS Title
    Action: What needs to be done and why
    Acceptance: How to verify the task is complete
    Context: Specification files needed for this task to be completed
-   Dependencies: [Optional] Tasks that must be completed first
    Output: [Optional] What artifacts/changes will be produced
    Notes: [Optional] Additional information about the task
 ```
