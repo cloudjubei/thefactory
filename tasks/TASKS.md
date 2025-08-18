@@ -30,8 +30,8 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: The documentation exists.
 
 7) - Agent Orchestrator
-   Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent. Read `tasks/7/plan_7.md` and check if all the features are implemented and all the action steps carried out. If so, close this task and update this message and status accordingly.
-   Acceptance: A script exists that allows interaction with an agent.
+   Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
+   Acceptance: A script exists that allows interaction with an agent. As the first step the agent must provide information about the task and features it will work on, so the appropriate context (especially `tasks\{task_id}\plan_{task_id}.md`) can be provided to it if it exists.
 
 17) ? Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.
