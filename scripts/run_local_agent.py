@@ -32,6 +32,20 @@ class AgentTools:
             except Exception as e:
                 content[path] = f"Error reading file '{path}': {str(e)}"
         return json.dumps(content)
+    def rename_files(self, operations: list, overwrite: bool = False, dry_run: bool = False):
+        """
+        Rename or move files/directories within the repository safely.
+        - operations: list of {"from_path": str, "to_path": str}
+        - overwrite: bool (default False)
+        - dry_run: bool (default False)
+        Returns a JSON string summarizing results.
+        """
+        try:
+            from rename_files import rename_files as _do_renames
+        except Exception as e:
+            return json.dumps({"ok": False, "error": f"Failed to import rename_files module: {e}"})
+        result = _do_renames(operations=operations, base_dir=self.repo_path, overwrite=overwrite, dry_run=dry_run)
+        return json.dumps(result)
     def submit_for_review(self, task_id: int, task_title: str):
         print("Submitting changes for review...")
         commit_message = f"feat(agent): Complete Task {task_id} - {task_title}"
@@ -61,6 +75,7 @@ You operate by generating a plan and a sequence of tool calls in a single JSON r
 You have access to the following SAFE tools:
 - `write_file(path, content)`
 - `retrieve_context_files(paths: list)`
+- `rename_files(operations: list, overwrite: bool, dry_run: bool)`
 - `submit_for_review(task_id, task_title)`
 - `ask_question(question_text)`
 - `finish(reason)`
@@ -86,7 +101,7 @@ The key for a tool's parameters MUST be "arguments".
     c.  `submit_for_review` with the correct `task_id` and `task_title`.
     d.  `finish` to end the cycle.
 
-If no tasks are eligible, your ONLY tool call is `finish(reason="HALT: No eligible tasks found.")`.
+If no tasks are eligible, your ONLY tool call is `finish(reason=\"HALT: No eligible tasks found.\")`.
 Respond with a single, valid JSON object.
 """
         user_prompt = f"### PROJECT CONTEXT\n{context_str}\n\nGenerate the JSON response to complete the next task."
