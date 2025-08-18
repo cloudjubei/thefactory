@@ -29,8 +29,8 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
    Acceptance: The documentation exists.
 
-7) - Agent Orchestrator
-   Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent. Read `tasks/7/plan_7.md` and check if all the features are implemented and all the action steps carried out. If so, close this task and update this message and status accordingly.
+7) + Agent Orchestrator
+   Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent. The script `scripts/run_local_agent.py` exists and provides all required functionality including tool-based architecture, single/continuous modes, and agent interaction capabilities as specified in the acceptance criteria.
    Acceptance: A script exists that allows interaction with an agent.
 
 8) - Cleanup
