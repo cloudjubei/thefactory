@@ -78,9 +78,9 @@ The agent is designed to be safe by default and does not have the ability to run
     python3 scripts/run_local_agent.py
     ```
 
--   **Run one task with OpenAI's GPT-4o:**
+-   **Run one task with OpenAI's GPT-5:**
     ```bash
-    python3 scripts/run_local_agent.py --model gpt-4o
+    python3 scripts/run_local_agent.py --model gpt-5
     ```
 
 -   **Run continuously with Groq's high-speed Llama 3:**
