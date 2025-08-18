@@ -48,7 +48,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 11) - Running in isolation/container
    Action: Create a workflow to running the project in a container, i.e. isolated environment.
-   Acceptance: The file `docs/RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the project in a container environment.
+   Acceptance: The file `docs/RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the project in a container environment. It should be as low barrier as possible, ideally involving as few steps as possible, which means that we should give the user all the steps to carry out.
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
 12) - Running on cloud
