@@ -40,7 +40,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/run_local_agent.py`
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
 
-7.6) - Orchestrator can parse and call tools
+7.6) + Orchestrator can parse and call tools
    Action: The script parses the agent's response JSON and in turn executes tools.
    Acceptance: An appropriate JSON response triggers a tool call.
    Output: `scripts/run_local_agent.py`
@@ -78,8 +78,8 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/rename_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.12) - The tool for creating a git PR
-   Action: Create a tool called `write_file` to create Git Pull Requests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
+7.12) + The tool for creating a git PR
+   Action: Create a tool called `submit_for_review` to create Git Pull Requests.
    Acceptance: The tool uses correct naming and creates a pull request. There is also a helper file that manages all git operations.
    Output: `scripts/tools/submit_for_review.py`, `scripts/git_manager.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
