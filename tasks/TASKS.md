@@ -35,13 +35,11 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 8) + Tests specification
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
-   Acceptance: The file `docs/TESTING.md` exists detailing the steps involved in testing the agent's functionality. Any tests should always be part of the tasks and features they are written for. Thus, whatever files are created should live in `tasks\{task_id}` where `{task_id}` is the ID of the task or feature.
-   Create a workflow to add to `docs/PLAN_SPECIFICATION.md` so that tests are always at the end of the process and without them acceptance criteria cannot pass.
-   Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
+   Acceptance: The documentation exists.
 
 9) - Automated tests
    Action: Create tests for every task and feature already existing. 
-   Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps.
+   Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification.
    Notes: These are unit tests that check the agent's ability to perform specific tasks and features. They should cover various scenarios and edge cases to ensure robustness and reliability.
 
 10) - Move tests spec
