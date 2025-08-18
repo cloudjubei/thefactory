@@ -41,17 +41,18 @@ class AgentTools:
         return finish_tool(reason)
 
 class UnifiedEngine:
-    def generate_plan_and_tool_calls(self, model: str, context: dict, task_id: int = None, feature_id: int = None) -> list:
-        messages = self._build_prompt(context, task_id, feature_id)
+    def generate_plan_and_tool_calls(self, model: str, context: dict, task_id: int = None, feature_id: int = None, previous_tool_results: list | None = None) -> list:
+        messages = self._build_prompt(context, task_id, feature_id, previous_tool_results)
         response_text = self._make_api_call(model, messages)
         return self._parse_response(response_text)
 
-    def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None) -> list:
+    def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None, previous_tool_results: list | None = None) -> list:
         context_str = "\n".join(f"--- START of {name} ---\n{content}\n--- END of {name} ---\n" for name, content in context.items())
+        prev_results_str = json.dumps(previous_tool_results or [], ensure_ascii=False, indent=2)
         
         system_prompt = f"""
 You are an autonomous AI agent. Your goal is to advance a software project by completing one task.
-You operate by generating a plan and a sequence of tool calls in a single JSON response.
+You operate by generating a plan and a sequence of tool calls in a single JSON response per turn.
 
 You have access to the following SAFE tools:
 - `write_file(path, content)`
@@ -61,7 +62,7 @@ You have access to the following SAFE tools:
 - `ask_question(question_text)`
 - `finish(reason)`
 
-**YOUR JSON RESPONSE MUST follow this schema precisely:**
+YOUR JSON RESPONSE MUST follow this schema precisely:
 {{
   "plan": "Your high-level plan...",
   "tool_calls": [
@@ -73,20 +74,24 @@ You have access to the following SAFE tools:
 }}
 The key for a tool's parameters MUST be "arguments".
 
-**YOUR WORKFLOW IS MANDATORY:**
-1.  Analyze the context to identify the next eligible pending task.
-2.  Formulate a plan to complete the task.
-3.  Generate `tool_calls` to:
-    a.  `write_file` for all necessary changes.
-    b.  `write_file` to update the task's status in `TASKS.md`.
-    c.  `submit_for_review` with the correct `task_id` and `task_title`.
-    d.  `finish` to end the cycle.
+YOUR WORKFLOW IS MANDATORY:
+1. Analyze the context to identify the next eligible pending task, unless a specific task/feature is provided.
+2. Formulate a plan for this turn.
+3. Return `tool_calls` to:
+   a. Use `retrieve_context_files` if you need to read files before proceeding.
+   b. Use `write_file` for necessary changes.
+   c. Use `write_file` to update the task's status in `TASKS.md` when you complete the task.
+   d. Use `submit_for_review` with the correct `task_id` and `task_title` when the task is complete.
+   e. Use `finish` to end the cycle. If no tasks are eligible, your ONLY tool call is `finish(reason=\"HALT: No eligible tasks found.\")`.
 
-If no tasks are eligible, your ONLY tool call is `finish(reason=\"HALT: No eligible tasks found.\")`.
-Respond with a single, valid JSON object.
+You may take multiple turns. After the tools execute, their results will be provided back to you as PREVIOUS_TOOL_RESULTS. Continue until the task is complete and you call submit_for_review followed by finish.
+Respond with a single, valid JSON object on every turn.
 """
-        user_prompt_parts = ["### PROJECT CONTEXT"]
-        user_prompt_parts.append(context_str)
+        user_prompt_parts = ["### PROJECT CONTEXT", context_str]
+
+        if previous_tool_results:
+            user_prompt_parts.append("### PREVIOUS_TOOL_RESULTS")
+            user_prompt_parts.append(prev_results_str)
 
         if task_id:
             specific_task_instruction = f"You are instructed to work on Task {task_id}."
@@ -152,34 +157,69 @@ class Agent:
             return False
         tools_instance = AgentTools(git_manager.repo_path, git_manager)
         context = self._gather_context(git_manager.repo_path)
-        tool_calls = self.engine.generate_plan_and_tool_calls(self.model, context, self.task_id, self.feature_id)
-        if not tool_calls:
-            print("Agent halted. No tool calls returned.")
-            return False
-        return self._execute_tool_calls(tools_instance, tool_calls)
 
-    def _execute_tool_calls(self, tools_instance: AgentTools, tool_calls: list) -> bool:
+        previous_tool_results = []
+        max_turns = 10
+        for turn in range(1, max_turns + 1):
+            print(f"\n--- LLM Turn {turn} ---")
+            tool_calls = self.engine.generate_plan_and_tool_calls(self.model, context, self.task_id, self.feature_id, previous_tool_results)
+            if not tool_calls:
+                print("Agent halted. No tool calls returned.")
+                return False
+
+            outcome = self._execute_tool_calls(tools_instance, tool_calls)
+            previous_tool_results.extend(outcome["results"])  # provide all results back to the model next turn
+
+            if outcome["asked_question"]:
+                # Stop the cycle and wait for human input.
+                return False
+            if outcome["finished"]:
+                # If HALT, don't continue another cycle in continuous mode.
+                return not outcome["halt_reason"]
+
+        print("Reached maximum number of turns without a finish. Ending cycle.")
+        return False
+
+    def _execute_tool_calls(self, tools_instance: AgentTools, tool_calls: list) -> dict:
         print("\n--- Executing Tool Calls ---")
+        results = []
+        asked_question = False
+        finished = False
+        halt_reason = False
+
         for call in tool_calls:
             tool_name = call.get("tool_name")
-            
-            # Gracefully accept "arguments" (preferred) or "parameters" (fallback).
             arguments = call.get("arguments", call.get("parameters", {}))
-            
             tool_method = getattr(tools_instance, tool_name, None)
             if not tool_method:
-                print(f"Error: Unknown tool implementation '{tool_name}'.")
+                msg = f"Error: Unknown tool implementation '{tool_name}'."
+                print(msg)
+                results.append({"tool_name": tool_name, "arguments": arguments, "ok": False, "result": msg})
                 continue
             print(f"Calling Tool: {tool_name}({arguments})")
             try:
                 result = tool_method(**arguments)
                 print(f"Tool Result: {result}")
-                if tool_name in ['ask_question', 'finish'] and "HALT" in result:
-                    return False
+                # Normalize result for the next turn
+                result_str = result if isinstance(result, str) else json.dumps(result)
+                results.append({"tool_name": tool_name, "arguments": arguments, "ok": True, "result": result_str})
+                if tool_name == 'ask_question':
+                    asked_question = True
+                    # When a question is asked, we stop to wait for a human.
+                if tool_name == 'finish':
+                    finished = True
+                    if isinstance(result, str) and 'HALT' in result:
+                        halt_reason = True
             except Exception as e:
-                print(f"Error executing tool '{tool_name}': {e}")
-                return False
-        return True
+                err = f"Error executing tool '{tool_name}': {e}"
+                print(err)
+                results.append({"tool_name": tool_name, "arguments": arguments, "ok": False, "result": err})
+                # On execution error, stop the cycle.
+                finished = True
+                halt_reason = True
+                break
+
+        return {"results": results, "asked_question": asked_question, "finished": finished, "halt_reason": halt_reason}
     
     def _gather_context(self, repo_path: str):
         files = [
@@ -206,8 +246,10 @@ class Agent:
         context = {}
         for filename in files:
             try:
-                with open(os.path.join(repo_path, filename), "r") as f: context[filename] = f.read()
-            except FileNotFoundError: pass
+                with open(os.path.join(repo_path, filename), "r") as f:
+                    context[filename] = f.read()
+            except FileNotFoundError:
+                pass
         return context
 
     def _get_repo_url(self):
