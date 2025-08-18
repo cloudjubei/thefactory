@@ -99,7 +99,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
 7.15) - The orchestrator can have a multi-way conversation with an LLM, not just one shot.
    Action: Update the orchestrator script to support multiple-shot conversations with an LLM.
    Acceptance: The orchestrator can handle multiple-shot conversations effectively. The tool `retrieve_context_files` can be called by the agent and it can resume its work.
-   Output: `scripts/tools/retrieve_context_files.py`
+   Output: `scripts/run_local_agent.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
    Dependencies: 7.5
 

@@ -127,7 +127,7 @@ Respond with a single, valid JSON object.
             return []
 
 class Agent:
-    def __init__(self, model: str, mode: str, task_id: int = None, feature_id: int = None):
+    def __init__(self, model: str, mode: str, task_id: int, feature_id: int = None):
         self.model = model
         self.mode = mode
         self.task_id = task_id 
@@ -148,7 +148,7 @@ class Agent:
     def _execute_cycle(self) -> bool:
         repo_url = self._get_repo_url()
         git_manager = GitManager(repo_url=repo_url)
-        if not git_manager.setup_repository():
+        if not git_manager.setup_repository(branch_name='features/{self.task_id}'):
             return False
         tools_instance = AgentTools(git_manager.repo_path, git_manager)
         context = self._gather_context(git_manager.repo_path)
@@ -280,9 +280,9 @@ class Agent:
 if __name__ == "__main__":
     load_dotenv()
     parser = argparse.ArgumentParser(description="Autonomous AI Agent for Specification Programming.")
-    parser.add_argument('--model', type=str, default='ollama/llama3', help="The LiteLLM model string.")
-    parser.add_argument('--mode', choices=['single', 'continuous'], default='single', help="Execution mode.")
-    parser.add_argument('--task_id', type=int, help="Specify a task ID to work on.")
+    parser.add_argument('--model', required=True, type=str, default='ollama/llama3', help="The LiteLLM model string.")
+    parser.add_argument('--mode', required=True, choices=['single', 'continuous'], default='single', help="Execution mode.")
+    parser.add_argument('--task_id', required=True, type=int, help="Specify a task ID to work on.")
     parser.add_argument('--feature_id', type=int, help="Specify a feature ID within the task to work on.")
     args = parser.parse_args()
     
