@@ -33,23 +33,26 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
    Acceptance: A script exists that allows interaction with an agent. As the first step the agent must provide information about the task and features it will work on, so the appropriate context (especially `tasks\{task_id}\plan_{task_id}.md`) can be provided to it if it exists.
 
-17) ? Running in isolation/container
+8) - Tests specification
+   Action: Create a test documentation for testing the agent's functionality for any task or feature.
+   Acceptance: The file `docs/TESTING.md` exists detailing the steps involved in testing the agent's functionality.
+   Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
+
+9) - Automated tests
+   Action: Create tests for every task and feature already existing. Create a workflow to add to `docs/PLAN_SPECIFICATION.md` so that tests are always at the end of the process and without them acceptance criteria cannot pass.
+   Acceptance: Automated tests pass for all tasks and features.
+   Notes: These are unit tests that check the agent's ability to perform specific tasks and features. They should cover various scenarios and edge cases to ensure robustness and reliability.
+
+10) - Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.
    Acceptance: The file `docs/RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the agent in a container environment.
-   Context: scripts/run_local_agent.py
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
-18) ? Running on cloud
+11) - Running on cloud
    Action: Create a workflow to running the agent on cloud services such as AWS or Azure.
    Acceptance: The file `docs/RUNNING_ON_CLOUD.md` exists detailing the steps involved in running the agent on cloud services.
-   Context: docs/RUNNING_IN_CONTAINER.md
    Notes: Once containerization is established, it should be possible to also host this project somewhere and have it perpetually run on a cloud service.
 
-19) ? Run tests
-   Action: Create a test framework for testing the agent's functionality.
-   Acceptance: The file `docs/TESTING.md` exists detailing the steps involved in testing the agent's functionality.
-   Context: docs/AGENT_PRINCIPLES.md, docs/TOOL_ARCHITECTURE.md
-   Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
 
 20) ? Local app 
    Action: Create a local app to handle project management, see tasks etc.
