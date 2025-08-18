@@ -47,27 +47,32 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: The test specification task is "task 6" and the other tasks that were after "task 5" are shifted. This means all the plans and dependent files of all tasks involved have moved as well.
 
 11) - Running in isolation/container
-   Action: Create a workflow to running the agent in a container, i.e. isolated environment.
-   Acceptance: The file `docs/RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the agent in a container environment.
+   Action: Create a workflow to running the project in a container, i.e. isolated environment.
+   Acceptance: The file `docs/RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the project in a container environment.
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
 12) - Running on cloud
-   Action: Create a workflow to running the agent on cloud services such as AWS or Azure.
-   Acceptance: The file `docs/RUNNING_ON_CLOUD.md` exists detailing the steps involved in running the agent on cloud services.
-   Notes: Once containerization is established, it should be possible to also host this project somewhere and have it perpetually run on a cloud service.
+   Action: Create a workflow to running the project on cloud services.
+   Acceptance: The file `docs/RUNNING_ON_CLOUD.md` exists detailing the steps involved in running the project on cloud services. The file should contain a discussion as to why certain implementation decisions have been taken. Cost effectiveness should be a major criteria.
 
-
-20) ? Local app 
+13) ? Local app 
    Action: Create a local app to handle project management, see tasks etc.
-   Acceptance: The file `docs/LOCAL_APP.md` exists detailing the steps involved in creating a local app for project management
+   Acceptance: The file `docs/LOCAL_APP.md` exists detailing the steps involved in creating a local app for project management. This will be the first project to stem from this one. It should follow the same exact principles as this project, but it will live in its own separate repository. This project is just meant to kickstart the whole scaffolding and specification. If any extra functionality comes into this project, it should be easy to adapt this Local app project to use the exact same ideas.
    Notes: Currently I'm using VSCode to view the project, run everything, see tasks etc. It would be ideal to have a dedicated app for managing the project, viewing tasks, seeing progress etc. For being able to see how the agents fares etc. Cline the plugin for VSCode does something like this and maybe it makes sense to even built upon a fork on this. One thing to keep in mind is that we want to be really third-party independent. If we can create something ourselves we should. The only question is how it integrates with the project. If maintaining such a service/dependency is too heavy, then using a third party solution makes sense. Each third party solution should be its own tasks, with documented features and explanations as to why it was chosen etc.
 
-21) ? Create a mobile app
-    Action: Develop a mobile application that allows users to interact with the project and thus the agents it runs.
-    Acceptance: The file `docs/MOBILE_APP.md` exists detailing the development process and user interface design for the mobile application.
-    Notes: The purpose of this is to allow users to interact with the agent through a mobile device. It could include voice commands, touch gestures, or other input methods depending on the target audience and platform.
-
-22) ? Create orchestration so that many different agents can be running on different tasks at once.
+14) ? Create orchestration so that many different agents can be running on different tasks at once.
     Action: Implement orchestration logic to manage multiple agents simultaneously.
     Acceptance: The file `docs/ORCHESTration.md` exists detailing the implementation details and strategies for orchestrating multiple agents concurrently.
     Notes: This involves coordinating resources, scheduling tasks, monitoring performance, and ensuring seamless communication between agents. It may require distributed systems concepts and advanced programming techniques.
+    Dependencies: 13
+
+15) ? iOS app
+    Action: Develop an iOS application that allows users to interact with the project and thus the agents it runs. Similarly to the Local app project - this is yet another project.
+    Acceptance: The file `docs/MOBILE_APP.md` exists detailing the development process and user interface design for the mobile application.
+    Notes: The purpose of this is to allow users to interact with the agent through a mobile device. It could include voice commands, touch gestures, or other input methods depending on the target audience and platform.
+
+16) ? Backend
+   Action: Create a way to easily launch a backend that all apps and agents can connect to. The backend must have a way to create a database that it can rely on.
+
+17) ? Create a way to easily launch MCP servers
+   Action: Our agents will need to access functionality that isn't local, it seems MCP servers are the current best way of doing so. Let's have a methodology/workflow to launch these easily.
