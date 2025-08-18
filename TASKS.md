@@ -81,12 +81,10 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored
    Context: SPEC.md, TASKS.md
 
-15) + Fill in missing context information
-   Action: Fill in any missing context information in the existing tasks.
-   Acceptance: All tasks have been reviewed and updated with relevant context information. The `run_local_agent.py` script has been updated to pass in the context files. `run_local_agent.py` has an extra tool `retrieve_context_files` for an agent to get project files to augment its context.
+15) - Running local agent with context
+   Action: Update `run_local_agent.py` so that it always has the base project context, that should be defined in a spec somewhere, as well as all files from a given task's `Context` field.
+   Acceptance: `run_local_agent.py` includes the base project context and all files from a given task's `Context` field whenever running an agent.
    Context: TASKS.md, TASK_FORMAT.md, scripts/run_local_agent.py
-   Dependencies: 13
-   Notes: A new `Context` field has been added to `TASK_FORMAT.md`, none of the current tasks have this - it is required.
 
 16) - File organisation
    Action: Follow the scheme described in `FILE_ORGANISATION.md` to organise all files.
