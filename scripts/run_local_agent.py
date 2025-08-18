@@ -280,10 +280,10 @@ class Agent:
 if __name__ == "__main__":
     load_dotenv()
     parser = argparse.ArgumentParser(description="Autonomous AI Agent for Specification Programming.")
-    parser.add_argument('--model', required=True, type=str, default='ollama/llama3', help="The LiteLLM model string.")
-    parser.add_argument('--mode', required=True, choices=['single', 'continuous'], default='single', help="Execution mode.")
-    parser.add_argument('--task_id', required=True, type=int, help="Specify a task ID to work on.")
-    parser.add_argument('--feature_id', type=int, help="Specify a feature ID within the task to work on.")
+    parser.add_argument('--model', type=str, default='ollama/llama3', help="The LiteLLM model string.")
+    parser.add_argument('--mode', choices=['single', 'continuous'], default='single', help="Execution mode.")
+    parser.add_argument('--task', required=True, type=int, help="Specify a task ID to work on.")
+    parser.add_argument('--feature', type=int, help="Specify a feature ID within the task to work on.")
     args = parser.parse_args()
     
     agent = Agent(model=args.model, mode=args.mode, task_id=args.task_id, feature_id=args.feature_id)
