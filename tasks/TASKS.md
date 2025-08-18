@@ -89,25 +89,25 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Context: scripts/run_local_agent.py
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
-16) ? Running on cloud
+18) ? Running on cloud
    Action: Create a workflow to running the agent on cloud services such as AWS or Azure.
    Acceptance: The file `RUNNING_ON_CLOUD.md` exists detailing the steps involved in running the agent on cloud services.
    Context: docs/RUNNING_IN_CONTAINER.md
    Notes: Once containerization is established, it should be possible to also host this project somewhere and have it perpetually run on a cloud service.
 
-16) ? Run tests
+19) ? Run tests
    Action: Create a test framework for testing the agent's functionality.
    Acceptance: The file `TESTING.md` exists detailing the steps involved in testing the agent's functionality.
    Context: docs/AGENT_PRINCIPLES.md, docs/TOOL_ARCHITECTURE.md
    Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
 
-17) ? Local app 
+20) ? Local app 
    Action: Create a local app to handle project management, see tasks etc.
    Acceptance: The file `LOCAL_APP.md` exists detailing the steps involved in creating a local app for project management
    Context: docs/SPEC.md
    Notes: Currently I'm using VSCode to view the project, run everything, see tasks etc. It would be ideal to have a dedicated app for managing the project, viewing tasks, seeing progress etc. For being able to see how the agents fares etc. Cline the plugin for VSCode does something like this and maybe it makes sense to even built upon a fork on this. One thing to keep in mind is that we want to be really third-party independent. If we can create something ourselves we should. The only question is how it integrates with the project. If maintaining such a service/dependency is too heavy, then using a third party solution makes sense. Each third party solution should be its own tasks, with documented features and explanations as to why it was chosen etc.
 
-18) ? Create a mobile app
+21) ? Create a mobile app
     Action: Develop a mobile application that allows users to interact with the project and thus the agents it runs.
     Acceptance: The file `MOBILE_APP.md` exists detailing the development process and user interface design for the mobile application.
     Context: docs/LOCAL_APP.md
