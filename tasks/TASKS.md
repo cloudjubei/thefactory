@@ -33,7 +33,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
    Acceptance: A script exists that allows interaction with an agent. As the first step the agent must provide information about the task and features it will work on, so the appropriate context (especially `tasks\{task_id}\plan_{task_id}.md`) can be provided to it if it exists.
 
-8) - Tests specification
+8) + Tests specification
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
    Acceptance: The file `docs/TESTING.md` exists detailing the steps involved in testing the agent's functionality.
    Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
