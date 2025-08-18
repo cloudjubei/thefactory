@@ -46,9 +46,9 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: The test spec task should be right after the plan specification "task 5". Move everything around correctly so that they're in order, as that will maintain a cohesive chronological order.
    Acceptance: The test specification task is "task 6" and the other tasks that were after "task 5" are shifted. This means all the plans and dependent files of all tasks involved have moved as well.
 
-11) - Running in isolation/container
-   Action: Create a workflow to running the project in a container, i.e. isolated environment.
-   Acceptance: The file `docs/RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the project in a container environment. It should be as low barrier as possible, ideally involving as few steps as possible, which means that we should give the user all the steps to carry out.
+11) - Running in docker
+   Action: Create a workflow to running the project in docker, i.e. isolated environment.
+   Acceptance: The file `docs/docker/RUNNING_DOCKER_README.md` exists detailing the steps involved in running the project in a container environment. A `docs/docker/Dockerfile` exists that a user can copy and use. Ideally a script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in the API keys in a prepare `.env` file that the script will look into and set everything up.
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
 12) - Running on cloud
