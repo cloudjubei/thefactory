@@ -194,6 +194,7 @@ class Agent:
             "docs/TASK_FORMAT.md",
             "docs/TOOL_ARCHITECTURE.md",
             "scripts/run_local_agent.py",
+            "scripts/git_manager.py",
             "tasks/7/plan_7.md"
         ]
 

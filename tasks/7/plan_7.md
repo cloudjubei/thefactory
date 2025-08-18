@@ -78,10 +78,10 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/rename_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.12) + The tool for creating a git PR
+7.12) - The tool for creating a git PR
    Action: Create a tool called `write_file` to create Git Pull Requests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
-   Acceptance: The tool uses correct naming and creates a pull request.
-   Output: `scripts/tools/submit_for_review.py`
+   Acceptance: The tool uses correct naming and creates a pull request. There is also a helper file that manages all git operations.
+   Output: `scripts/tools/submit_for_review.py`, `scripts/git_manager.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
 7.13) + The tool for asking a question
