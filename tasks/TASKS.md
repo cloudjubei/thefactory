@@ -64,19 +64,29 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored
    Context: docs/SPEC.md, tasks/TASKS.md
 
-13) ? Feature definitions
-   Action: Create a features specifications.
-   Acceptance: The file `FEATURE_DEFINITIONS.md` exists detailing the features of the agent and how they will be implemented.
+13) - Feature specification
+   Action: Create a features specification.
+   Acceptance: The file `FEATURES_SPECIFICATION.md` exists detailing the features of the agent and how they will be implemented. A feature should be defined as closely to a task as possible - i.e. following the same format. `docs/FILE_ORGANISATION.md` is updated to reflect these new files, where they exist and how they are referenced. `docs/TASK_FORMAT.md` is updated to reflect that tasks have features. `tasks/TASKS.md` is updated to now have a set of features for each task.
    Context: tasks/TASKS.md, docs/TASK_FORMAT.md, docs/FILE_ORGANISATION.md
    Notes: The purpose of this is to make task organisations better. Each task can be a set of sub-tasks, i.e. features, that each can have their own plan and can be run independently. A task is only complete once all of its features are complete. Until now it would be possible to achieve a similar effect by having multiple small tasks, but there's a very important thing that is lost here - the context for the whole overarching task. A feature might only need a very small context to be completed or it might need to know about the context of all of the other features to be completed well. A feature can have a nested sub-feature. This way a task will remain a very high level concept - detailing the absolute top level project goals, whereas a feature will focus more on details but still staying away from implementation specifics.
 
-14) ? Running in isolation/container
+14) - Plans update
+   Action: Update plans for all tasks and features.
+   Acceptance: The file `docs/PLAN_SPECIFICATION.md` is updated to reflect what is the the expected behavior for an agent to carry out for each task. The file `docs/SPEC.md` is updated so that the first acton to do is to read the `docs/PLAN_SPECIFICATION.md`. The file `tasks/TASKS.md` is updated to reflect the changes made to the `docs/PLAN_SPECIFICATION.md`, including any updates to the actions and acceptance criteria.
+   Notes: Each agent must always first compose a plan for a task before executing it. This in turn means that the plan must also encompass all features that a task is composed of. This is the only way to ensure that the agent can execute a task correctly.
+   Context: docs/PLAN_SPECIFICATION.md, tasks/TASKS.md, docs/SPEC.md
+
+15) - Cleanup
+   Action: Ensure that everything follows all current specifications. Look at all the files provided in the context, the current tasks, features and plans. Ensure that there are no inconsistencies between the files and that the files are up to date.
+   Context: docs/SPEC.md, docs/TASK_FORMAT.md, docs/FILE_ORGANISATION.md, tasks/TASKS.md, docs/PLAN_SPECIFICATION.md, docs/AGENT_PRINCIPLES.md, plans/, scripts/run_local_agent.py, requirements.txt, .env.example, LOCAL_SETUP.md
+
+16) ? Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.
    Acceptance: The file `RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the agent in a container environment.
    Context: scripts/run_local_agent.py
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
-15) ? Running on cloud
+16) ? Running on cloud
    Action: Create a workflow to running the agent on cloud services such as AWS or Azure.
    Acceptance: The file `RUNNING_ON_CLOUD.md` exists detailing the steps involved in running the agent on cloud services.
    Context: docs/RUNNING_IN_CONTAINER.md
