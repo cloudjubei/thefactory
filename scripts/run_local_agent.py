@@ -286,5 +286,5 @@ if __name__ == "__main__":
     parser.add_argument('--feature', type=int, help="Specify a feature ID within the task to work on.")
     args = parser.parse_args()
     
-    agent = Agent(model=args.model, mode=args.mode, task_id=args.task_id, feature_id=args.feature_id)
+    agent = Agent(model=args.model, mode=args.mode, task_id=args.task, feature_id=args.feature)
     agent.run()
