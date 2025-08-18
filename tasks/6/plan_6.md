@@ -7,12 +7,12 @@ Establish core principles and define the agent's tool-based architecture and ter
 - Specs: `docs/PLAN_SPECIFICATION.md`
 
 ## Features
-6.1) Create the tools guide
+6.1) + Create the tools guide
    Action: Specify the JSON contract, tools, and execution modes.
    Acceptance: `docs/TOOL_ARCHITECTURE.md` exists with all sections and tool definitions.
    Output: `docs/TOOL_ARCHITECTURE.md`
 
-6.2) Create the principles guide
+6.2) + Create the principles guide
    Action: Define Agent vs Orchestrator and core principles.
    Acceptance: `docs/AGENT_PRINCIPLES.md` exists and contains required definitions referencing the tools guide.
    Output: `docs/AGENT_PRINCIPLES.md`

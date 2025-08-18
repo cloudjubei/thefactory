@@ -192,6 +192,7 @@ class Agent:
             "docs/AGENT_PRINCIPLES.md",
             "docs/FEATURE_FORMAT.md",
             "docs/FILE_ORGANISATION.md",
+            "docs/LOCAL_SETUP.md",
             "docs/PLAN_SPECIFICATION.md",
             "docs/SPEC.md",
             "docs/SPECIFICATION_GUIDE.md",

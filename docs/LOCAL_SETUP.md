@@ -83,6 +83,11 @@ The agent is designed to be safe by default and does not have the ability to run
     python3 scripts/run_local_agent.py --model gpt-5
     ```
 
+-   **Run continuously with Google's Gemini:**
+    ```bash
+    python3 scripts/run_local_agent.py --model gemini/gemini-2.5-pro
+    ```
+
 -   **Run continuously with Groq's high-speed Llama 3:**
     ```bash
     python3 scripts/run_local_agent.py --model groq/llama3-70b-8192 --mode continuous

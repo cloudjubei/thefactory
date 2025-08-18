@@ -4,7 +4,7 @@
 Create the foundational specification outlining WHAT, CORE IDEAS, and ACTIONS for the project.
 
 ## Features
-2.1) Create the spec
+2.1) + Create the spec
    Action: Author `docs/SPEC.md` with WHAT, CORE IDEAS, and ACTIONS sections.
    Acceptance: `docs/SPEC.md` exists with the three sections clearly defined.
    Output: `docs/SPEC.md`

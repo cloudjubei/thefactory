@@ -7,12 +7,12 @@ Define how each task should be executed and specify the format for features insi
 - Specs: docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md
 
 ## Features
-5.1) Create the feature format guide
+5.1) + Create the feature format guide
    Action: Define the feature format and fields.
    Acceptance: `docs/FEATURE_FORMAT.md` exists and includes Purpose, Format, Field Definitions, and Examples.
    Output: `docs/FEATURE_FORMAT.md`
 
-5.2) Create the plan spec
+5.2) + Create the plan spec
    Action: Document purpose, principles, structure, template, and example for plans.
    Acceptance: `docs/PLAN_SPECIFICATION.md` exists with all required sections and references `docs/FEATURE_FORMAT.md`.
    Output: `docs/PLAN_SPECIFICATION.md`

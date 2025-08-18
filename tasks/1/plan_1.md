@@ -7,12 +7,12 @@ Provide a formal task format and ensure the canonical task list adheres to it.
 - Source files: `tasks/TASKS.md`
 
 ## Features
-1.1) Create Task Format specification
+1.1) + Create Task Format specification
    Action: Author `docs/TASK_FORMAT.md` defining task fields, statuses, rules, and examples.
    Acceptance: `docs/TASK_FORMAT.md` exists and is unambiguous.
    Output: `docs/TASK_FORMAT.md`
 
-1.2) Apply format to TASKS
+1.2) + Apply format to TASKS
    Action: Update `tasks/TASKS.md` to follow `docs/TASK_FORMAT.md`.
    Acceptance: All tasks follow the required structure and status codes.
    Context: `tasks/TASKS.md`

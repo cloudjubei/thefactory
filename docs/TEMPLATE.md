@@ -1,53 +1,113 @@
-# Specification Template
+# [PROJECT NAME] Specification
 
-Use this template to author new specifications. See docs/SPECIFICATION_GUIDE.md for detailed guidance.
+## Problem Statement
+[Describe the specific problem this project solves. Be clear and concise. Example: "Convert CSV files to JSON format while preserving data types and handling errors gracefully."]
 
-## 1. Problem Statement
-Describe the problem the specification addresses in one or two paragraphs.
-Example:
-Authenticate users to access a protected API using username/password.
+## Inputs
+[Define all inputs with their types, formats, and constraints]
 
-## 2. Inputs and Outputs
-Inputs:
-- input_name: type, constraints
-- ...
+### Input 1: [Name]
+- Type: [string/number/file/etc.]
+- Format: [specific format requirements]
+- Constraints: [size limits, valid ranges, required/optional]
+- Example: `[provide example]`
 
-Outputs:
-- Success: format and fields
-- Failure: error codes and messages
-Example:
-Inputs:
-- username: string, 3-50 chars, alphanumeric + underscore
-- password: string, 8-128 chars
-Outputs:
-- 200: {"token": "string", "expires_at": "ISO8601"}
-- 401: Invalid credentials
+### Input 2: [Name]
+- Type: [type]
+- Format: [format]
+- Constraints: [constraints]
+- Example: `[example]`
 
-## 3. Constraints
-List hard constraints (performance, resources, compatibility).
-Example:
-- 95th percentile response time < 200ms
-- Bcrypt or stronger hashing
+## Outputs
+[Define all outputs with their types and formats]
 
-## 4. Success Criteria
-Measurable, testable conditions for completion.
-Example:
-1) Valid credentials return token within 200ms
-2) Invalid credentials return 401
-3) 6th attempt within 5 minutes returns 429
+### Success Output
+- Type: [type]
+- Format: [exact format specification]
+- Example:
+```
+[example output]
+```
 
-## 5. Edge Cases
-Explicitly list edge cases and expected handling.
-Example:
-- Unicode passwords handled correctly
-- Username case-insensitive
+### Error Outputs
+- Condition: [when this error occurs]
+  - Type: [type]
+  - Format: [format]
+  - Example: `[example]`
 
-## 6. Glossary [Optional]
-Define domain-specific terms if needed.
+- Condition: [another error condition]
+  - Type: [type]
+  - Format: [format]
+  - Example: `[example]`
 
-## 7. Dependencies [Optional]
-List related specs or systems this depends on.
+## Constraints
+[List hard requirements that cannot be violated]
 
-## 8. Revision History [Optional]
-- v1.0: Initial version
-- v1.1: Updated constraints
+- Performance: [e.g., "Process 1MB file in <1 second"]
+- Resource: [e.g., "Memory usage <100MB"]
+- Compatibility: [e.g., "Must work with Node.js 16+"]
+- Security: [e.g., "No execution of user-provided code"]
+
+## Success Criteria
+[Numbered list of testable conditions that verify correct implementation]
+
+1. [First testable criterion. Example: "Given valid input X, produces output Y in format Z"]
+2. [Second criterion. Example: "Rejects invalid input with appropriate error message"]
+3. [Third criterion. Example: "Processes 1000 records in under 10 seconds"]
+4. [Continue numbering all criteria...]
+
+## Edge Cases
+[Explicitly define behavior for boundary conditions]
+
+- Empty input: [what happens]
+- Maximum size input: [what happens]
+- Invalid format: [what happens]
+- Concurrent access: [what happens if applicable]
+- [Other edge cases specific to the problem]
+
+## Examples
+
+### Example 1: [Normal Case]
+**Input:**
+```
+[example input]
+```
+
+**Output:**
+```
+[expected output]
+```
+
+### Example 2: [Edge Case]
+**Input:**
+```
+[edge case input]
+```
+
+**Output:**
+```
+[expected output or error]
+```
+
+### Example 3: [Error Case]
+**Input:**
+```
+[invalid input]
+```
+
+**Output:**
+```
+[expected error response]
+```
+
+## Non-Requirements
+[Optional: Explicitly state what is NOT required to avoid scope creep]
+
+- This specification does NOT require: [example: "GUI interface"]
+- Out of scope: [example: "Authentication or user management"]
+
+## Notes
+[Optional: Additional context or clarifications]
+
+- [Any additional notes that help understand the specification]
+- [References to related specifications or standards]
