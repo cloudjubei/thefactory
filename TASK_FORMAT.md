@@ -4,6 +4,7 @@
 ID) STATUS Title
    Action: What needs to be done and why
    Acceptance: How to verify the task is complete
+   Context: Specification files needed for this task to be completed
    Dependencies: [Optional] Tasks that must be completed first
    Output: [Optional] What artifacts/changes will be produced
    Notes: [Optional] Additional information about the task
@@ -36,11 +37,17 @@ Concrete, testable conditions that define task completion. These should be:
 
 Good acceptance criteria answers: "How do I know this task is finished?"
 
+### Context
+List of files that contain detailed instructions for completing the task. Format, comma and space separate list of filenames: `SPEC_FILE.md`, `IMPLEMENTATION_GUIDE.md`
+
 ### Dependencies
 Lists task IDs that must be completed before this task can begin. Format, comma and space separate list of IDs: `2, 5`
 
 ### Output
 Describes what will be created or changed. Could be files, documentation, code, or process changes.
+
+### Notes
+Any extra notes about the task that explain reasoning or give extra hints about how to accomplish the task. Especially useful for `unknown` tasks that usually require a discussion.
 
 ## Rules
 
