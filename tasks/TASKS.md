@@ -46,7 +46,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: The test spec task should be right after the plan specification "task 5". Move everything around correctly so that they're in order, as that will maintain a cohesive chronological order.
    Acceptance: The test specification task is "task 6" and the other tasks that were after "task 5" are shifted. This means all the plans and dependent files of all tasks involved have moved as well.
 
-11) - Running in isolation/container
+11) + Running in isolation/container
    Action: Create a workflow to running the project in a container, i.e. isolated environment.
    Acceptance: The file `docs/RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the project in a container environment.
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
@@ -63,7 +63,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 14) ? Create orchestration so that many different agents can be running on different tasks at once.
     Action: Implement orchestration logic to manage multiple agents simultaneously.
     Acceptance: The file `docs/ORCHESTration.md` exists detailing the implementation details and strategies for orchestrating multiple agents concurrently.
-    Notes: This involves coordinating resources, scheduling tasks, monitoring performance, and ensuring seamless communication between agents. It may require distributed systems concepts and advanced programming techniques.
+    Notes: This involves coordinating resources, scheduling tasks, monitoring performance, and ensuring seamless communication between agents.
     Dependencies: 13
 
 15) ? iOS app
