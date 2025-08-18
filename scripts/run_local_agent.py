@@ -140,15 +140,15 @@ class Agent:
         while True:
             run_count += 1
             print(f"\n--- Starting Cycle {run_count} ---")
-            should_continue = self._execute_cycle(run_count)
+            should_continue = self._execute_cycle()
             if not should_continue or self.mode == 'single':
                 break
         print("\n--- Agent has finished all work. ---")
 
-    def _execute_cycle(self, run_count: int) -> bool:
+    def _execute_cycle(self) -> bool:
         repo_url = self._get_repo_url()
         git_manager = GitManager(repo_url=repo_url)
-        if not git_manager.setup_repository(branch_name=f"agent/cycle-{run_count}"):
+        if not git_manager.setup_repository():
             return False
         tools_instance = AgentTools(git_manager.repo_path, git_manager)
         context = self._gather_context(git_manager.repo_path)

@@ -46,7 +46,7 @@ class GitManager:
             print(f"Stdout: {e.stdout}", file=sys.stderr)
             return False
 
-    def setup_repository(self, branch_name: str) -> bool:
+    def setup_repository(self, branch_name: str = "main") -> bool:
         """
         Clones the repository, fetches latest changes, and creates a new branch.
 
@@ -66,7 +66,7 @@ class GitManager:
             
         if not self._run_command(["git", "checkout", "main"]): return False
         if not self._run_command(["git", "pull"]): return False
-        if not self._run_command(["git", "checkout", "-b", branch_name]): return False
+        if (branch_name != "main") and (not self._run_command(["git", "checkout", "-b", branch_name])): return False
             
         print(f"Successfully created and checked out branch '{branch_name}' in '{self.repo_path}'")
         return True
