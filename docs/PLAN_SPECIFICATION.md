@@ -60,18 +60,11 @@ Short, high-level description of how this plan will satisfy the task's Acceptanc
    Output: ...
    Notes: ...
 
-{task_id}.2) - Test for Feature {task_id}.1
-   Action: Write a test to verify the acceptance criteria of Feature {task_id}.1.
-   Acceptance: The test script exists at `tasks/{task_id}/tests/test_feature_1.py` and validates the output.
-   Context: docs/TESTING.md
-   Dependencies: {task_id}.1
-   Output: `tasks/{task_id}/tests/test_feature_1.py`
-
 ## Execution Steps
-1) Create/modify files per Features (including tests).
-2) Update tasks/TASKS.md status for the task.
-3) Submit for review.
-4) Finish.
+1) Implement features and corresponding tests
+2) Update `tasks/TASKS.md` with status change
+3) Submit for review
+4) Finish
 ```
 
 ## 5. Example
