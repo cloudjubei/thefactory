@@ -63,7 +63,7 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Acceptance: A folder /plans with a plan file for each task exists.
    Dependencies: 12
 
-14) - File organisation
+14) + File organisation
    Action: Create a scheme for organising files within the repository.
    Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored, and all the files adhere to this file organisation.
    Notes: Perhaps new tools are necessary for this that allow renaming of files etc - this should be. Right now `FILE_ORGANISATION.md` exists, but maybe it should be upgraded. This task should probably exist much earlier in the hierarchy so that from the beginning the file organisation is correct. Remember - assuming that the spec exists and this task says that all files must adhere to it then it should be carried out.
