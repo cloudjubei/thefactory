@@ -74,11 +74,16 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: For each task inside `TASKS.md` there exists a folder `tasks/{task_id}`, which contains a `plan_{task_id}.md`. Inside the plan file there will be a list of features that make up the task and any other relevant contextual information.
    Context: `tasks/TASKS.md`, `docs/TASK_FORMAT.md`, `docs/PLAN_SPECIFICATION.md`, `docs/FEATURE_FORMAT.md`
 
-15) - Cleanup
+15) - Running specific tasks and features
+   Action: `scripts/run_local_agent.py` is run with the optional argument `-t {task_id}` and `-f {feature_id}` (only if task_id is given). This will cause the agent to execute the specified task and the given feature.
+   Acceptance: The agent executes the specified task or a feature in a task and outputs the result. The agent must create a branch for this that follows the convention `features/{task_id}_{feature_id}` or `tasks/{task_id}` if no feature is specified.
+   Context: scripts/run_local_agent.py, tasks/TASKS.md
+
+16) - Cleanup
    Action: Ensure that everything follows all current specifications. Look at all the files provided in the context, the current tasks, features and plans. Ensure that there are no inconsistencies between the files and that the files are up to date.
    Context: docs/SPEC.md, docs/TASK_FORMAT.md, docs/FILE_ORGANISATION.md, tasks/TASKS.md, docs/PLAN_SPECIFICATION.md, docs/AGENT_PRINCIPLES.md, plans/, scripts/run_local_agent.py, requirements.txt, .env.example, LOCAL_SETUP.md
 
-16) ? Running in isolation/container
+17) ? Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.
    Acceptance: The file `RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the agent in a container environment.
    Context: scripts/run_local_agent.py

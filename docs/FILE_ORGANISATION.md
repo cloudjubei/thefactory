@@ -37,7 +37,6 @@ This document outlines the standard file and directory structure for the project
 - **`tasks/`**: Holds the project's task list and per-task plans.
   - `tasks/TASKS.md`: The canonical task list.
   - `tasks/{id}/plan_{id}.md`: The plan for task `{id}`, including its feature list.
-  - `tasks/{id}/features/`: [Optional] Extended feature specifications for task `{id}`.
 - **`tests/`**: Contains all automated tests, including unit tests, integration tests, and end-to-end tests.
 
 ## File Naming Conventions
@@ -50,11 +49,6 @@ This document outlines the standard file and directory structure for the project
   - Example: `run_local_agent.py`.
 - **Configuration Files**: Use standard names where applicable.
   - Example: `requirements.txt`, `.gitignore`.
-
-## Notes on Plans
-
-- Plans are stored alongside their tasks: `tasks/{id}/plan_{id}.md`.
-- The previously used top-level `plans/` directory is deprecated. Future work should follow the Self-Cleaning Principle: when migrating existing plans, remove obsolete references and keep the repository consistent with this file.
 
 ## Future Evolution
 

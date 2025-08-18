@@ -14,16 +14,16 @@ ID) STATUS Title
 ### ID
 Positive integers in incremental order.
 
-### Status
-- `+` Completed - a task that is done
-- `~` In Progress - a task that is being worked on
-- `-` Pending - a task that requires work
-- `?` Unknown - a task that requires to define what options there are and their pros and cons, after choosing an option, the task is rewritten and set to pending
-- `/` Blocked - a task that was started, but cannot proceed due to external factors
-- `=` Perpetual - a task that is always Pending, but low priority
-
 ### Title
 A succinct higher level name for the task
+
+### Status
+- `+` Completed - a task that is done
+- `-` Pending - a task that requires work, i.e. at least one feature is Pending
+- `~` In Progress - a task that is being worked on, supercedes Pending, i.e. at least one feature is In Progress
+- `?` Unknown - a task that has unknowns, supercedes In Progress, i.e. at least one feature is Unknown
+- `/` Blocked - a task that has been blocked, supercedes Unknown, i.e. at least one feature is Blocked
+- `=` Perpetual - a task that has no end date, i.e. at least one feature is Perpetual and all other features are Completed
 
 ### Action
 A clear explanation of what needs to be accomplished. Should be specific enough that someone unfamiliar with the project can understand the task.
@@ -91,19 +91,4 @@ Tasks should reference, not repeat, specification documents.
 1. **One deliverable per task** - If you need multiple outputs, create multiple tasks
 2. **Concrete over abstract** - "Create X file" not "Improve documentation"
 3. **Testable completion** - Anyone should be able to verify if it's done
-4. **Independent when possible** - Minimize dependencies to allow parallel work
 
-## Plans and Features Workflow
-
-- Before implementing any task, the agent MUST create a plan file at `tasks/{task_id}/plan_{task_id}.md`.
-- The plan contains the high-level intent and an enumerated list of features that make up the task.
-- Each feature follows the format defined in `docs/FEATURE_FORMAT.md` and remains specification-driven (WHAT over HOW).
-- `tasks/TASKS.md` remains high-level; all execution details live in per-task plan files.
-
-## Agent Execution Path
-
-1. Read `docs/SPEC.md` to understand core principles and actions.
-2. Read `docs/PLAN_SPECIFICATION.md` to understand how to create a compliant plan.
-3. Select the next eligible task from `tasks/TASKS.md`.
-4. Create `tasks/{task_id}/plan_{task_id}.md` and enumerate features according to `docs/FEATURE_FORMAT.md`.
-5. Execute the plan, update `TASKS.md`, submit for review, and finish.

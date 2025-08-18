@@ -14,7 +14,5 @@
 - This project uses Git for source control.
 
 # ACTIONS:
-- Read **[TASKS.md](../tasks/TASKS.md)** to identify the next eligible task.
 - Read **[PLAN_SPECIFICATION.md](PLAN_SPECIFICATION.md)** to follow the mandatory plan workflow.
-- When taking a task, first create `tasks/{task_id}/plan_{task_id}.md` and enumerate features per **[FEATURE_FORMAT.md](FEATURE_FORMAT.md)**.
-- Execute the plan in one atomic cycle, update the task status in `TASKS.md`, submit for review, and finish.
+- Read **[TASKS.md](../tasks/TASKS.md)**, work on the next possible pending/unknown task.

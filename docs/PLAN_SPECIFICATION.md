@@ -52,6 +52,7 @@ Short, high-level description of how this plan will satisfy the task's Acceptanc
    Context: ...
    Dependencies: ...
    Output: ...
+   Notes: ...
 
 {task_id}.2) Feature title
    ... (repeat as needed)
@@ -82,3 +83,10 @@ A good corresponding plan would be:
    b. `write_file` to update `tasks/TASKS.md`.
    c. `submit_for_review` to finalize the task.
    d. `finish` to end the operation.
+
+
+## Summary of execution workflow:
+
+1. Read the task specification from `tasks/TASKS.md`.
+2. Create `tasks/{task_id}/plan_{task_id}.md` and enumerate features according to `docs/FEATURE_FORMAT.md`.
+3. Execute the plan, update `TASKS.md`, submit for review, and finish.
