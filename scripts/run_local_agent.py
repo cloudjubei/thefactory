@@ -9,8 +9,6 @@ import json
 import litellm
 from dotenv import load_dotenv
 from git_manager import GitManager
-
-# Import the refactored tools
 from scripts.tools.write_file import write_file_tool
 from scripts.tools.retrieve_context_files import retrieve_context_files_tool
 from scripts.tools.rename_files import rename_files as rename_files_tool
