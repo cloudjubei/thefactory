@@ -84,9 +84,15 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
 15) - File organisation
    Action: Follow the scheme described in `FILE_ORGANISATION.md` to organise all files.
    Acceptance: All folders and files follow the conventions described in `FILE_ORGANISATION.md`.
-   Context: FILE_ORGANISATION.md
-   Notes: Perhaps new tools are necessary for this that allow renaming of files etc - this should be. This task and task 14 should probably exist much earlier in the hierarchy so that from the beginning the file organisation is correct. Also think about the organisation of this file (`TASKS.md`) so that it makes logical sense.
-   Dependencies: 14
+   Context: `FILE_ORGANISATION.md`
+   Notes: This task and task 14 should probably exist much earlier in the hierarchy so that from the beginning the file organisation is correct. Also think about the organisation of this file (`TASKS.md`) so that it makes logical sense.
+   Dependencies: 16
+
+16) - File organisation tools
+   Action: Create tools needed for organising files.
+   Acceptance: A `rename_files.py` tool exists for the agent to use inside `run_local_agent.py` and it is described in `TOOL_ARCHITECTURE.md`.
+   Context: `FILE_ORGANISATION.md`, `TOOL_ARCHITECTURE.md`, `run_local_agent.py`
+   Notes: Maybe other tools would be useful to have also for an agent (like making a directory?), update this task and all other relevant files accordingly.
 
 17) ? Feature definitions
    Action: Create a features specifications.
