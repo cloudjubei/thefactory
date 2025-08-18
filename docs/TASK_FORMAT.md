@@ -92,3 +92,18 @@ Tasks should reference, not repeat, specification documents.
 2. **Concrete over abstract** - "Create X file" not "Improve documentation"
 3. **Testable completion** - Anyone should be able to verify if it's done
 4. **Independent when possible** - Minimize dependencies to allow parallel work
+
+## Plans and Features Workflow
+
+- Before implementing any task, the agent MUST create a plan file at `tasks/{task_id}/plan_{task_id}.md`.
+- The plan contains the high-level intent and an enumerated list of features that make up the task.
+- Each feature follows the format defined in `docs/FEATURE_FORMAT.md` and remains specification-driven (WHAT over HOW).
+- `tasks/TASKS.md` remains high-level; all execution details live in per-task plan files.
+
+## Agent Execution Path
+
+1. Read `docs/SPEC.md` to understand core principles and actions.
+2. Read `docs/PLAN_SPECIFICATION.md` to understand how to create a compliant plan.
+3. Select the next eligible task from `tasks/TASKS.md`.
+4. Create `tasks/{task_id}/plan_{task_id}.md` and enumerate features according to `docs/FEATURE_FORMAT.md`.
+5. Execute the plan, update `TASKS.md`, submit for review, and finish.
