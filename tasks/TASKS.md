@@ -35,20 +35,25 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 8) - Tests specification
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
-   Acceptance: The file `docs/TESTING.md` exists detailing the steps involved in testing the agent's functionality.
+   Acceptance: The file `docs/TESTING.md` exists detailing the steps involved in testing the agent's functionality. Any tests should always be part of the tasks and features they are written for. Thus, whatever files are created should live in `tasks\{task_id}` where `{task_id}` is the ID of the task or feature.
+   Create a workflow to add to `docs/PLAN_SPECIFICATION.md` so that tests are always at the end of the process and without them acceptance criteria cannot pass.
    Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
 
 9) - Automated tests
-   Action: Create tests for every task and feature already existing. Create a workflow to add to `docs/PLAN_SPECIFICATION.md` so that tests are always at the end of the process and without them acceptance criteria cannot pass.
-   Acceptance: Automated tests pass for all tasks and features.
+   Action: Create tests for every task and feature already existing. 
+   Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps.
    Notes: These are unit tests that check the agent's ability to perform specific tasks and features. They should cover various scenarios and edge cases to ensure robustness and reliability.
 
-10) - Running in isolation/container
+10) - Move tests spec
+   Action: The test spec task should be right after the plan specification "task 5". Move everything around correctly so that they're in order, as that will maintain a cohesive chronological order.
+   Acceptance: The test specification task is "task 6" and the other tasks that were after "task 5" are shifted.
+
+11) - Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.
    Acceptance: The file `docs/RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the agent in a container environment.
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
-11) - Running on cloud
+12) - Running on cloud
    Action: Create a workflow to running the agent on cloud services such as AWS or Azure.
    Acceptance: The file `docs/RUNNING_ON_CLOUD.md` exists detailing the steps involved in running the agent on cloud services.
    Notes: Once containerization is established, it should be possible to also host this project somewhere and have it perpetually run on a cloud service.
