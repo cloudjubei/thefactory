@@ -87,3 +87,8 @@ The agent is designed to be safe by default and does not have the ability to run
     ```bash
     python3 scripts/run_local_agent.py --model groq/llama3-70b-8192 --mode continuous
     ```
+
+-   **Run one task with Anthropic's Claude 4 Sonnet:**
+    ```bash
+    python3 scripts/run_local_agent.py --model claude-sonnet-4-20250514
+    ```

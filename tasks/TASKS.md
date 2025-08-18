@@ -81,20 +81,12 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored
    Context: docs/SPEC.md, tasks/TASKS.md
 
-15) + File organisation
-   Action: Follow the scheme described in `FILE_ORGANISATION.md` to organise all files.
-   Acceptance: All folders and files follow the conventions described in `FILE_ORGANISATION.md`.
-   Context: docs/FILE_ORGANISATION.md
-   Notes: This task and task 14 should probably exist much earlier in the hierarchy so that from the beginning the file organisation is correct. Also think about the organisation of this file (`TASKS.md`) so that it makes logical sense.
-   Dependencies: 16
+15) - Cleanup
+   Action: Look at the list of tasks and reorganise them into a logical order, so that the specs clearly and linearly drive the work up to a given point.
+   Acceptance: `tasks/TASKS.md` is organised and doesn't contain any irrelevant tasks that are included in other tasks by definition. There should also be no task dependencies on any tasks leading up to this one, as they should've all been resolved through the cleanup.
+   Context: tasks/TASKS.md
 
-16) + File organisation tools
-   Action: Create tools needed for organising files.
-   Acceptance: A `rename_files.py` tool exists for the agent to use inside `run_local_agent.py` and it is described in `TOOL_ARCHITECTURE.md`.
-   Context: docs/FILE_ORGANISATION.md, docs/TOOL_ARCHITECTURE.md, scripts/run_local_agent.py
-   Notes: Maybe other tools would be useful to have also for an agent (like making a directory?), update this task and all other relevant files accordingly.
-
-17) ? Feature definitions
+16) ? Feature definitions
    Action: Create a features specifications.
    Acceptance: The file `FEATURE_DEFINITIONS.md` exists detailing the features of the agent and how they will be implemented.
    Context: tasks/TASKS.md, docs/TASK_FORMAT.md, docs/FILE_ORGANISATION.md
