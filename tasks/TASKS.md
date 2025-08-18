@@ -44,7 +44,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 10) - Move tests spec
    Action: The test spec task should be right after the plan specification "task 5". Move everything around correctly so that they're in order, as that will maintain a cohesive chronological order.
-   Acceptance: The test specification task is "task 6" and the other tasks that were after "task 5" are shifted.
+   Acceptance: The test specification task is "task 6" and the other tasks that were after "task 5" are shifted. This means all the plans and dependent files of all tasks involved have moved as well.
 
 11) - Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.

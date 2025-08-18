@@ -54,8 +54,8 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
    Dependencies: 7.5
 
-7.8) + Orchestrator can run specific task/feature
-   Action: The script has CLI options `--task {task_id}` and `--feature {feature_id}` to run specific tasks/features via prompt construction referencing `tasks/plan_{task_id}.md`.
+7.8) - Orchestrator MUST run specific task and optionally feature
+   Action: The script has the CLI required argument `--task {task_id}` and the optional one `--feature {feature_id}` to run specific tasks/features via prompt construction referencing `tasks/plan_{task_id}.md`. Based on the provided `{task_id}` the corresponding `tasks/{task_id}/plan_{task_id}.md` is passed into the context if it exists.
    Acceptance: Orchestrator accepts `--task` and optional `--feature` and executes accordingly; output confirms execution.
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
    Dependencies: 7.5
