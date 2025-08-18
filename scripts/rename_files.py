@@ -1,156 +1,116 @@
-# scripts/rename_files.py
-
+#!/usr/bin/env python3
 """
-rename_files tool
+Safe rename/move operations within the repository.
+Implements the rename_files tool described in docs/TOOL_ARCHITECTURE.md.
 
-Provides a safe utility to rename/move files or directories within the repository.
-This module is intended to be invoked by the AgentTools.rename_files method in
-scripts/run_local_agent.py so the LLM can perform repository file organization steps.
+Function: rename_files(operations, overwrite=False, dry_run=False) -> str(JSON)
+- operations: list of {"from_path": str, "to_path": str}
+- overwrite: allow replacing existing destination
+- dry_run: validate and report without making changes
 
-All operations are restricted to the provided base_dir to prevent accidental modifications
-outside the repository.
+Returns JSON string with keys:
+- ok (bool)
+- summary: {moved, skipped, errors}
+- results: list of per-operation results: {status: "moved"|"skipped"|"error", message, from_path, to_path}
 
-Usage:
-    from rename_files import rename_files
-    result = rename_files(
-        operations=[{"from_path": "old/name.txt", "to_path": "new/name.txt"}],
-        base_dir="/path/to/repo",
-        overwrite=False,
-        dry_run=False,
-    )
-
-Return value:
-    A dict with keys:
-      - ok (bool): True if all operations succeeded, else False
-      - summary (dict): counts of moved, skipped, errors
-      - results (list): per-operation result entries
-
-Each result entry:
-    {
-      "from_path": str,
-      "to_path": str,
-      "status": "moved" | "skipped" | "error",
-      "message": str
-    }
+The tool validates paths so that no operation can escape the repository root.
 """
-
+from __future__ import annotations
+import json
 import os
 import shutil
 from typing import List, Dict, Any
 
 
-def _is_within_base(path: str, base: str) -> bool:
-    base_real = os.path.realpath(base)
-    path_real = os.path.realpath(path)
-    return os.path.commonpath([path_real, base_real]) == base_real
+def _repo_root() -> str:
+    here = os.path.abspath(os.path.dirname(__file__))
+    return os.path.abspath(os.path.join(here, ".."))
 
 
-def rename_files(operations: List[Dict[str, Any]], base_dir: str, overwrite: bool = False, dry_run: bool = False) -> Dict[str, Any]:
-    if not isinstance(operations, list):
-        raise ValueError("operations must be a list of {from_path, to_path} objects")
+def _safe_path(p: str) -> str:
+    root = _repo_root()
+    abs_path = os.path.abspath(os.path.join(root, p))
+    if not abs_path.startswith(root + os.sep) and abs_path != root:
+        raise ValueError(f"Path escapes repository root: {p}")
+    return abs_path
 
-    summary = {"moved": 0, "skipped": 0, "errors": 0}
-    results = []
+
+def rename_files(operations: List[Dict[str, str]], overwrite: bool = False, dry_run: bool = False) -> str:
+    results: List[Dict[str, Any]] = []
+    moved = skipped = errors = 0
+    root = _repo_root()
 
     for op in operations:
         from_rel = op.get("from_path")
         to_rel = op.get("to_path")
-
-        if not isinstance(from_rel, str) or not isinstance(to_rel, str):
-            results.append({
-                "from_path": from_rel,
-                "to_path": to_rel,
-                "status": "error",
-                "message": "from_path and to_path must be strings"
-            })
-            summary["errors"] += 1
-            continue
-
-        # Normalize paths and join with base_dir
-        from_rel_norm = os.path.normpath(from_rel)
-        to_rel_norm = os.path.normpath(to_rel)
-
-        src = os.path.join(base_dir, from_rel_norm)
-        dst = os.path.join(base_dir, to_rel_norm)
-
-        # Safety: ensure both src and dst are within base_dir
-        if not _is_within_base(src, base_dir) or not _is_within_base(dst, base_dir):
-            results.append({
-                "from_path": from_rel,
-                "to_path": to_rel,
-                "status": "error",
-                "message": "Operation outside repository boundaries is not allowed"
-            })
-            summary["errors"] += 1
-            continue
-
-        if from_rel_norm == to_rel_norm:
-            results.append({
-                "from_path": from_rel,
-                "to_path": to_rel,
-                "status": "skipped",
-                "message": "Source and destination are identical"
-            })
-            summary["skipped"] += 1
-            continue
-
-        if not os.path.exists(src):
-            results.append({
-                "from_path": from_rel,
-                "to_path": to_rel,
-                "status": "error",
-                "message": "Source path does not exist"
-            })
-            summary["errors"] += 1
-            continue
-
-        if os.path.exists(dst) and not overwrite:
-            results.append({
-                "from_path": from_rel,
-                "to_path": to_rel,
-                "status": "error",
-                "message": "Destination already exists (set overwrite=True to replace)"
-            })
-            summary["errors"] += 1
-            continue
-
-        if dry_run:
-            results.append({
-                "from_path": from_rel,
-                "to_path": to_rel,
-                "status": "skipped",
-                "message": "Dry run: no changes made"
-            })
-            summary["skipped"] += 1
-            continue
-
-        # Ensure destination directory exists
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-
+        res: Dict[str, Any] = {
+            "from_path": from_rel,
+            "to_path": to_rel,
+            "status": "",
+            "message": ""
+        }
         try:
-            # shutil.move handles files and directories and cross-filesystem moves
-            if os.path.exists(dst) and overwrite:
-                # Remove destination before moving if overwrite requested
-                if os.path.isdir(dst):
-                    shutil.rmtree(dst)
-                else:
-                    os.remove(dst)
-            shutil.move(src, dst)
-            results.append({
-                "from_path": from_rel,
-                "to_path": to_rel,
-                "status": "moved",
-                "message": "Move completed"
-            })
-            summary["moved"] += 1
-        except Exception as e:
-            results.append({
-                "from_path": from_rel,
-                "to_path": to_rel,
-                "status": "error",
-                "message": f"Failed to move: {e}"
-            })
-            summary["errors"] += 1
+            if not from_rel or not to_rel:
+                raise ValueError("Both 'from_path' and 'to_path' are required")
+            from_abs = _safe_path(from_rel)
+            to_abs = _safe_path(to_rel)
 
-    ok = summary["errors"] == 0
-    return {"ok": ok, "summary": summary, "results": results}
+            if not os.path.exists(from_abs):
+                res["status"] = "error"
+                res["message"] = "Source does not exist"
+                errors += 1
+                results.append(res)
+                continue
+
+            to_dir = os.path.dirname(to_abs)
+            if to_dir and not os.path.exists(to_dir):
+                if not dry_run:
+                    os.makedirs(to_dir, exist_ok=True)
+
+            if os.path.exists(to_abs):
+                if not overwrite:
+                    res["status"] = "skipped"
+                    res["message"] = "Destination exists (overwrite=False)"
+                    skipped += 1
+                    results.append(res)
+                    continue
+                else:
+                    if not dry_run:
+                        # Remove destination (file or directory)
+                        if os.path.isdir(to_abs) and not os.path.islink(to_abs):
+                            shutil.rmtree(to_abs)
+                        else:
+                            os.remove(to_abs)
+
+            if dry_run:
+                res["status"] = "moved"
+                res["message"] = "Dry run: validated"
+                moved += 1
+            else:
+                shutil.move(from_abs, to_abs)
+                res["status"] = "moved"
+                res["message"] = "Moved successfully"
+                moved += 1
+        except Exception as e:
+            res["status"] = "error"
+            res["message"] = str(e)
+            errors += 1
+        results.append(res)
+
+    ok = errors == 0
+    summary = {"moved": moved, "skipped": skipped, "errors": errors}
+    return json.dumps({"ok": ok, "summary": summary, "results": results}, indent=2)
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Safely rename/move files within the repo root.")
+    parser.add_argument("ops", help="Path to a JSON file with operations list: [{from_path, to_path}, ...]")
+    parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args()
+
+    with open(args.ops, "r", encoding="utf-8") as f:
+        operations = json.load(f)
+
+    print(rename_files(operations, overwrite=args.overwrite, dry_run=args.dry_run))

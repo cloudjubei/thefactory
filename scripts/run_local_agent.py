@@ -1,226 +1,384 @@
-# scripts/run_local_agent.py
+#!/usr/bin/env python3
+"""
+Agent Orchestrator (scripts/run_local_agent.py)
 
+A simple, non-intelligent executor that:
+- Provides project context to the LLM Agent
+- Enforces the JSON response contract (docs/TOOL_ARCHITECTURE.md)
+- Exposes tool functions and executes them in order
+- Supports Single and Continuous execution modes
+
+Providers:
+- manual (default): Prints the prompt and asks the user to paste the Agent's JSON plan
+- openai: Uses OpenAI SDK if available (requires OPENAI_API_KEY & OPENAI_MODEL)
+- http: Calls an OpenAI-compatible API via HTTP (requires OPENAI_API_KEY, OPENAI_MODEL, optional OPENAI_BASE_URL)
+
+Environment variables:
+- OPENAI_API_KEY, OPENAI_MODEL, OPENAI_BASE_URL (for http provider)
+- GITHUB_TOKEN (optional, for creating PR via GitHub API if gh CLI not available)
+
+This script follows docs/TOOL_ARCHITECTURE.md and docs/AGENT_PRINCIPLES.md.
+"""
+from __future__ import annotations
+import argparse
+import json
 import os
 import re
-import sys
-import argparse
+import shutil
 import subprocess
-import json
-import litellm
-from dotenv import load_dotenv
-from git_manager import GitManager
+import sys
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-# --- All classes up to UnifiedEngine are unchanged ---
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+# ------------- Utilities -------------
+
+def read_file(rel_path: str) -> str:
+    p = (REPO_ROOT / rel_path).resolve()
+    if not str(p).startswith(str(REPO_ROOT)):
+        raise ValueError(f"Path escapes repo root: {rel_path}")
+    return p.read_text(encoding="utf-8")
+
+
+def ensure_parent_dir(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+
+# ------------- Provider Implementations -------------
+
+class ManualProvider:
+    name = "manual"
+
+    def complete(self, system_prompt: str, user_prompt: str) -> str:
+        print("\n===== SYSTEM PROMPT (read-only) =====\n")
+        print(system_prompt)
+        print("\n===== USER PROMPT (context) =====\n")
+        print(user_prompt)
+        print("\nPaste the Agent's JSON response below (single line or multi-line). Finish with EOF (Ctrl-D on Unix, Ctrl-Z then Enter on Windows).\n")
+        data = sys.stdin.read()
+        return data.strip()
+
+
+class OpenAIProvider:
+    name = "openai"
+
+    def __init__(self):
+        try:
+            import openai  # type: ignore
+        except Exception as e:
+            raise RuntimeError("openai package not available. Install it or choose provider=manual/http.") from e
+        self.openai = openai
+        self.client = openai.OpenAI()
+        self.model = os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
+
+    def complete(self, system_prompt: str, user_prompt: str) -> str:
+        resp = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.2,
+            response_format={"type": "json_object"},
+        )
+        return resp.choices[0].message.content or ""
+
+
+class HTTPProvider:
+    name = "http"
+
+    def __init__(self):
+        import requests  # lazy import may raise if not installed
+        self.requests = requests
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        self.model = os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
+        self.base_url = os.getenv("OPENAI_BASE_URL") or "https://api.openai.com/v1"
+        if not self.api_key:
+            raise RuntimeError("OPENAI_API_KEY must be set for http provider")
+
+    def complete(self, system_prompt: str, user_prompt: str) -> str:
+        url = f"{self.base_url.rstrip('/')}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "temperature": 0.2,
+            "response_format": {"type": "json_object"},
+        }
+        r = self.requests.post(url, headers=headers, data=json.dumps(payload))
+        r.raise_for_status()
+        data = r.json()
+        return data["choices"][0]["message"]["content"]
+
+
+# ------------- Tools -------------
+
 class AgentTools:
-    def __init__(self, repo_path: str, git_manager: GitManager):
-        self.repo_path = repo_path
-        self.git_manager = git_manager
-    def write_file(self, path: str, content: str):
-        full_path = os.path.join(self.repo_path, path)
-        os.makedirs(os.path.dirname(full_path), exist_ok=True)
-        with open(full_path, "w") as f: f.write(content)
-        return f"Successfully wrote {len(content)} bytes to {path}"
-    def retrieve_context_files(self, paths: list):
-        content = {}
-        for path in paths:
-            full_path = os.path.join(self.repo_path, path)
-            try:
-                with open(full_path, "r") as f:
-                    content[path] = f.read()
-            except FileNotFoundError:
-                content[path] = f"Error: File '{path}' not found."
-            except Exception as e:
-                content[path] = f"Error reading file '{path}': {str(e)}"
-        return json.dumps(content)
-    def rename_files(self, operations: list, overwrite: bool = False, dry_run: bool = False):
-        """
-        Rename or move files/directories within the repository safely.
-        - operations: list of {"from_path": str, "to_path": str}
-        - overwrite: bool (default False)
-        - dry_run: bool (default False)
-        Returns a JSON string summarizing results.
-        """
+    def __init__(self, dry_run: bool = False):
+        self.dry_run = dry_run
+
+    def write_file(self, path: str, content: str) -> Dict[str, Any]:
+        abs_path = (REPO_ROOT / path).resolve()
+        if not str(abs_path).startswith(str(REPO_ROOT)):
+            raise ValueError(f"write_file path escapes repo root: {path}")
+        if self.dry_run:
+            return {"ok": True, "message": f"Dry-run: would write {path}", "bytes": len(content)}
+        ensure_parent_dir(abs_path)
+        abs_path.write_text(content, encoding="utf-8")
+        return {"ok": True, "message": f"Wrote {path}", "bytes": len(content)}
+
+    def retrieve_context_files(self, paths: List[str]) -> Dict[str, Any]:
+        files: Dict[str, str] = {}
+        for p in paths:
+            abs_path = (REPO_ROOT / p).resolve()
+            if not str(abs_path).startswith(str(REPO_ROOT)):
+                raise ValueError(f"retrieve_context_files path escapes repo root: {p}")
+            if abs_path.exists():
+                files[p] = abs_path.read_text(encoding="utf-8")
+            else:
+                files[p] = ""
+        return {"ok": True, "files": files}
+
+    def rename_files(self, operations: List[Dict[str, str]], overwrite: bool = False, dry_run: bool = False) -> Dict[str, Any]:
+        # Delegate to scripts/rename_files.py implementation
+        from scripts.rename_files import rename_files as _rename_impl  # type: ignore
+        result_json = _rename_impl(operations, overwrite=overwrite, dry_run=dry_run)
+        return {"ok": True, "result": json.loads(result_json)}
+
+    def submit_for_review(self, task_id: int, task_title: str) -> Dict[str, Any]:
+        # Standardized commit and PR creation
+        ts = time.strftime("%Y%m%d-%H%M%S")
+        slug = re.sub(r"[^a-z0-9-]+", "-", task_title.lower()).strip("-") or f"task-{task_id}"
+        branch = f"task-{task_id}-{slug}-{ts}"
+        commit_msg = f"Task {task_id}: {task_title} (auto-submit)"
+
+        def run(cmd: List[str], check: bool = True) -> subprocess.CompletedProcess:
+            return subprocess.run(cmd, cwd=str(REPO_ROOT), check=check, capture_output=True, text=True)
+
+        if self.dry_run:
+            return {"ok": True, "message": f"Dry-run: would commit and open PR on branch {branch}"}
+
         try:
-            from rename_files import rename_files as _do_renames
+            run(["git", "add", "-A"]) 
+            # Allow empty commits to standardize flow
+            run(["git", "commit", "-m", commit_msg, "--allow-empty"]) 
+            run(["git", "checkout", "-b", branch])
+            run(["git", "push", "-u", "origin", branch])
+        except subprocess.CalledProcessError as e:
+            return {"ok": False, "message": f"Git operation failed: {e.stderr or e.stdout}"}
+
+        # Try GitHub CLI first
+        pr_url = None
+        if shutil.which("gh"):
+            try:
+                cp = run(["gh", "pr", "create", "--fill", "--head", branch])
+                pr_url = cp.stdout.strip() or None
+            except subprocess.CalledProcessError:
+                pr_url = None
+        else:
+            # Fallback: Best-effort GitHub API if GITHUB_TOKEN and origin URL are available
+            token = os.getenv("GITHUB_TOKEN")
+            try:
+                origin = run(["git", "config", "--get", "remote.origin.url"]).stdout.strip()
+            except subprocess.CalledProcessError:
+                origin = ""
+            if token and origin:
+                try:
+                    import requests  # type: ignore
+                    m = re.search(r"[:/]([^/]+)/([^/.]+)(?:\.git)?$", origin)
+                    if m:
+                        owner, repo = m.group(1), m.group(2)
+                        api_url = f"https://api.github.com/repos/{owner}/{repo}/pulls"
+                        base_branch = os.getenv("BASE_BRANCH", "main")
+                        payload = {"title": commit_msg, "head": branch, "base": base_branch, "body": "Automated submission by Orchestrator."}
+                        r = requests.post(api_url, headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}, json=payload)
+                        if r.ok:
+                            pr_url = r.json().get("html_url")
+                except Exception:
+                    pr_url = None
+
+        return {"ok": True, "branch": branch, "pr_url": pr_url}
+
+    def ask_question(self, question_text: str) -> Dict[str, Any]:
+        print("\n=== QUESTION FROM AGENT ===\n" + question_text + "\n")
+        # Halts execution as per spec
+        sys.exit(0)
+
+    def finish(self, reason: Optional[str] = None) -> Dict[str, Any]:
+        if reason:
+            print(f"finish: {reason}")
+        # Signal completion of this cycle
+        sys.exit(0)
+
+
+# ------------- Orchestrator Core -------------
+
+@dataclass
+class Plan:
+    plan: str
+    tool_calls: List[Dict[str, Any]]
+
+
+def validate_plan(obj: Any) -> Plan:
+    if not isinstance(obj, dict):
+        raise ValueError("Agent output must be a JSON object")
+    if "plan" not in obj or "tool_calls" not in obj:
+        raise ValueError("JSON must contain 'plan' and 'tool_calls'")
+    if not isinstance(obj["plan"], str):
+        raise ValueError("'plan' must be a string")
+    if not isinstance(obj["tool_calls"], list):
+        raise ValueError("'tool_calls' must be a list")
+    for i, call in enumerate(obj["tool_calls" ]):
+        if not isinstance(call, dict):
+            raise ValueError(f"tool_calls[{i}] must be an object")
+        if "tool_name" not in call or "arguments" not in call:
+            raise ValueError(f"tool_calls[{i}] must contain 'tool_name' and 'arguments'")
+    return Plan(plan=obj["plan"], tool_calls=obj["tool_calls"])
+
+
+def build_system_prompt() -> str:
+    schema = {
+        "type": "object",
+        "properties": {
+            "plan": {"type": "string"},
+            "tool_calls": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "tool_name": {"type": "string"},
+                        "arguments": {"type": "object"}
+                    },
+                    "required": ["tool_name", "arguments"]
+                }
+            }
+        },
+        "required": ["plan", "tool_calls"]
+    }
+    return (
+        "You are the Agent. You must respond with a SINGLE JSON object that includes 'plan' and 'tool_calls'.\n"
+        "Follow docs/AGENT_PRINCIPLES.md and docs/TOOL_ARCHITECTURE.md.\n"
+        "Only use the available tools. Do not include any other fields.\n"
+        f"JSON Schema (for reference): {json.dumps(schema)}\n"
+    )
+
+
+def build_user_prompt() -> str:
+    # Provide the minimal core context files
+    context_files = [
+        "tasks/TASKS.md",
+        "docs/TOOL_ARCHITECTURE.md",
+        "docs/AGENT_PRINCIPLES.md",
+        "docs/TASK_FORMAT.md",
+        "docs/PLAN_SPECIFICATION.md",
+        "docs/FEATURE_FORMAT.md",
+        "docs/SPEC.md",
+        "docs/SPECIFICATION_GUIDE.md",
+        "docs/FILE_ORGANISATION.md",
+    ]
+    parts = []
+    for f in context_files:
+        p = (REPO_ROOT / f)
+        if p.exists():
+            parts.append(f"--- START {f} ---\n{p.read_text(encoding='utf-8')}\n--- END {f} ---\n")
+    return "\n".join(parts)
+
+
+def get_provider(name: str):
+    name = name.lower()
+    if name == "manual":
+        return ManualProvider()
+    if name == "openai":
+        return OpenAIProvider()
+    if name == "http":
+        return HTTPProvider()
+    raise ValueError(f"Unknown provider: {name}")
+
+
+def execute_plan(plan_obj: Plan, tools: AgentTools) -> None:
+    tool_map = {
+        "write_file": tools.write_file,
+        "retrieve_context_files": tools.retrieve_context_files,
+        "rename_files": tools.rename_files,
+        "submit_for_review": tools.submit_for_review,
+        "ask_question": tools.ask_question,
+        "finish": tools.finish,
+    }
+
+    print("\n=== Agent Plan ===\n" + plan_obj.plan + "\n")
+
+    for i, call in enumerate(plan_obj.tool_calls, start=1):
+        tname = call.get("tool_name")
+        args = call.get("arguments", {})
+        if tname not in tool_map:
+            raise ValueError(f"Unknown tool: {tname}")
+        fn = tool_map[tname]
+        print(f"[Tool {i}] {tname} args={json.dumps(args)[:500]}")
+        result = fn(**args)
+        # Print small result summary to help debugging
+        try:
+            snippet = json.dumps(result)
+        except Exception:
+            snippet = str(result)
+        print(f"[Tool {i}] result={snippet[:800]}")
+
+
+def run_once(provider_name: str, dry_run: bool = False) -> None:
+    provider = get_provider(provider_name)
+    system_prompt = build_system_prompt()
+    user_prompt = build_user_prompt()
+    raw = provider.complete(system_prompt, user_prompt)
+
+    try:
+        obj = json.loads(raw)
+    except Exception as e:
+        raise ValueError(f"Agent response is not valid JSON: {e}\nRaw: {raw[:1000]}")
+
+    plan = validate_plan(obj)
+    tools = AgentTools(dry_run=dry_run)
+    execute_plan(plan, tools)
+
+
+def continuous_loop(provider_name: str, dry_run: bool = False) -> None:
+    while True:
+        try:
+            run_once(provider_name, dry_run=dry_run)
+        except SystemExit:
+            # finish() or ask_question() halts; exit loop
+            break
         except Exception as e:
-            return json.dumps({"ok": False, "error": f"Failed to import rename_files module: {e}"})
-        result = _do_renames(operations=operations, base_dir=self.repo_path, overwrite=overwrite, dry_run=dry_run)
-        return json.dumps(result)
-    def submit_for_review(self, task_id: int, task_title: str):
-        print("Submitting changes for review...")
-        commit_message = f"feat(agent): Complete Task {task_id} - {task_title}"
-        pr_body = f"This PR was automatically generated by the agent to complete Task #{task_id}."
-        if self.git_manager.commit_and_push(commit_message):
-            if self.git_manager.create_pull_request(commit_message, pr_body):
-                return f"Successfully submitted for review. Pull Request for Task {task_id} created."
-        return "Failed to submit for review."
-    def ask_question(self, question_text: str):
-        return f"HALT: Agent has a question: {question_text}"
-    def finish(self, reason: str):
-        return f"Agent finished cycle. Reason: {reason}"
-
-class UnifiedEngine:
-    def generate_plan_and_tool_calls(self, model: str, context: dict) -> list:
-        messages = self._build_prompt(context)
-        response_text = self._make_api_call(model, messages)
-        return self._parse_response(response_text)
-
-    def _build_prompt(self, context: dict) -> list:
-        context_str = "\n".join(f"--- START of {name} ---\n{content}\n--- END of {name} ---\n" for name, content in context.items())
-        
-        system_prompt = f"""
-You are an autonomous AI agent. Your goal is to advance a software project by completing one task.
-You operate by generating a plan and a sequence of tool calls in a single JSON response.
-
-You have access to the following SAFE tools:
-- `write_file(path, content)`
-- `retrieve_context_files(paths: list)`
-- `rename_files(operations: list, overwrite: bool, dry_run: bool)`
-- `submit_for_review(task_id, task_title)`
-- `ask_question(question_text)`
-- `finish(reason)`
-
-**YOUR JSON RESPONSE MUST follow this schema precisely:**
-{{
-  "plan": "Your high-level plan...",
-  "tool_calls": [
-    {{
-      "tool_name": "name_of_tool",
-      "arguments": {{ "arg_name": "value" }}
-    }}
-  ]
-}}
-The key for a tool's parameters MUST be "arguments".
-
-**YOUR WORKFLOW IS MANDATORY:**
-1.  Analyze the context to identify the next eligible pending task.
-2.  Formulate a plan to complete the task.
-3.  Generate `tool_calls` to:
-    a.  `write_file` for all necessary changes.
-    b.  `write_file` to update the task's status in `TASKS.md`.
-    c.  `submit_for_review` with the correct `task_id` and `task_title`.
-    d.  `finish` to end the cycle.
-
-If no tasks are eligible, your ONLY tool call is `finish(reason=\"HALT: No eligible tasks found.\")`.
-Respond with a single, valid JSON object.
-"""
-        user_prompt = f"### PROJECT CONTEXT\n{context_str}\n\nGenerate the JSON response to complete the next task."
-        return [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
-    
-    def _make_api_call(self, model: str, messages: list) -> str:
-        print(f"Sending prompt to model '{model}' via LiteLLM...")
+            print(f"Error during cycle: {e}")
+            break
+        # Pull latest before next iteration (best-effort)
         try:
-            response = litellm.completion(model=model, messages=messages, timeout=300, response_format={"type": "json_object"})
-            if response.choices and response.choices[0].message:
-                return response.choices[0].message.content or ""
-            return ""
-        except Exception as e:
-            print(f"Error: API call via LiteLLM failed: {e}", file=sys.stderr)
-            sys.exit(1)
+            subprocess.run(["git", "fetch", "origin"], cwd=str(REPO_ROOT), check=False)
+            subprocess.run(["git", "pull"], cwd=str(REPO_ROOT), check=False)
+        except Exception:
+            pass
 
-    def _parse_response(self, response: str) -> list:
-        print("\n--- LLM Response Received ---\n")
-        print(response)
-        try:
-            json_str = response.strip()
-            if json_str.startswith("```json"): json_str = json_str[7:-4].strip()
-            data = json.loads(json_str)
-            print("\n--- Agent's Plan ---")
-            print(data.get("plan", "No plan provided."))
-            return data.get("tool_calls", [])
-        except json.JSONDecodeError as e:
-            print(f"Error: Failed to decode LLM response as JSON: {e}", file=sys.stderr)
-            return []
 
-class Agent:
-    def __init__(self, model: str, mode: str):
-        self.model = model
-        self.mode = mode
-        self.engine = UnifiedEngine()
-        print(f"Agent initialized. Mode: {self.mode}, Model: {self.model}. Running in Safe Mode.")
+def main():
+    parser = argparse.ArgumentParser(description="Agent Orchestrator")
+    parser.add_argument("--provider", default=os.getenv("PROVIDER", "manual"), choices=["manual", "openai", "http"], help="LLM provider")
+    parser.add_argument("--mode", default=os.getenv("MODE", "single"), choices=["single", "continuous"], help="Execution mode")
+    parser.add_argument("--dry-run", action="store_true", help="Do not modify files or create PRs")
+    args = parser.parse_args()
 
-    def run(self): # Unchanged
-        run_count = 0
-        while True:
-            run_count += 1
-            print(f"\n--- Starting Cycle {run_count} ---")
-            should_continue = self._execute_cycle(run_count)
-            if not should_continue or self.mode == 'single':
-                break
-        print("\n--- Agent has finished all work. ---")
+    if args.mode == "single":
+        run_once(args.provider, dry_run=args.dry_run)
+    else:
+        continuous_loop(args.provider, dry_run=args.dry_run)
 
-    def _execute_cycle(self, run_count: int) -> bool: # Unchanged
-        repo_url = self._get_repo_url()
-        git_manager = GitManager(repo_url=repo_url)
-        if not git_manager.setup_repository(branch_name=f"agent/cycle-{run_count}"):
-            return False
-        tools_instance = AgentTools(git_manager.repo_path, git_manager)
-        context = self._gather_context(git_manager.repo_path)
-        tool_calls = self.engine.generate_plan_and_tool_calls(self.model, context)
-        if not tool_calls:
-            print("Agent halted. No tool calls returned.")
-            return False
-        return self._execute_tool_calls(tools_instance, tool_calls)
-
-    def _execute_tool_calls(self, tools_instance: AgentTools, tool_calls: list) -> bool:
-        print("\n--- Executing Tool Calls ---")
-        for call in tool_calls:
-            tool_name = call.get("tool_name")
-            
-            # Gracefully accept "arguments" (preferred) or "parameters" (fallback).
-            arguments = call.get("arguments", call.get("parameters", {}))
-            
-            tool_method = getattr(tools_instance, tool_name, None)
-            if not tool_method:
-                print(f"Error: Unknown tool implementation '{tool_name}'.")
-                continue
-            print(f"Calling Tool: {tool_name}({arguments})")
-            try:
-                result = tool_method(**arguments)
-                print(f"Tool Result: {result}")
-                if tool_name in ['ask_question', 'finish'] and "HALT" in result:
-                    return False
-            except Exception as e:
-                print(f"Error executing tool '{tool_name}': {e}")
-                return False
-        return True
-    
-    # ... _gather_context and _get_repo_url are unchanged ...
-    def _gather_context(self, repo_path: str):
-        files = [
-            "tasks/TASKS.md",
-            "docs/AGENT_PRINCIPLES.md",
-            "docs/FEATURE_FORMAT.md",
-            "docs/FILE_ORGANISATION.md",
-            "docs/PLAN_SPECIFICATION.md",
-            "docs/SPEC.md",
-            "docs/SPECIFICATION_GUIDE.md",
-            "docs/TASK_FORMAT.md",
-            "docs/TOOL_ARCHITECTURE.md"
-        ]
-        context = {}
-        for filename in files:
-            try:
-                with open(os.path.join(repo_path, filename), "r") as f: context[filename] = f.read()
-            except FileNotFoundError: pass
-        return context
-
-    def _get_repo_url(self):
-        try:
-            result = subprocess.run(["git", "config", "--get", "remote.origin.url"], check=True, capture_output=True, text=True)
-            url = result.stdout.strip()
-            if url.startswith("git@"): url = url.replace(":", "/").replace("git@", "https://")
-            return url + ".git" if not url.endswith(".git") else url
-        except subprocess.CalledProcessError:
-            print("Error: Could not determine git remote URL.", file=sys.stderr)
-            sys.exit(1)
 
 if __name__ == "__main__":
-    load_dotenv()
-    parser = argparse.ArgumentParser(description="Autonomous AI Agent for Specification Programming.")
-    parser.add_argument('--model', type=str, default='ollama/llama3', help="The LiteLLM model string.")
-    parser.add_argument('--mode', choices=['single', 'continuous'], default='single', help="Execution mode.")
-    args = parser.parse_args()
-    
-    agent = Agent(model=args.model, mode=args.mode)
-    agent.run()
+    main()

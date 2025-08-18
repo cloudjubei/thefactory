@@ -29,8 +29,9 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
    Acceptance: The file `docs/AGENT_PRINCIPLES.md` exists and contains the required definitions. The file `docs/TOOL_ARCHITECTURE.md` exists and defines the JSON contract, the full suite of tools, and the execution modes.
 
-7) - Agent Orchestrator
+7) + Agent Orchestrator
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent. 
+   Acceptance: `scripts/run_local_agent.py` exists and implements the Agent-Orchestrator contract defined in `docs/TOOL_ARCHITECTURE.md`, exposing the tools `write_file`, `retrieve_context_files`, `rename_files`, `submit_for_review`, `ask_question`, and `finish`. The script supports Single and Continuous modes. `scripts/rename_files.py` exists and implements the `rename_files` tool as specified.
    Notes: A script exists that allows interaction with an agent.
 
 8) - Cleanup
