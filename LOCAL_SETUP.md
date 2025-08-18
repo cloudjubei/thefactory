@@ -1,84 +1,79 @@
 # Local Agent Setup and Usage Guide (macOS)
 
-This guide provides step-by-step instructions to set up and run the autonomous AI agent on your local machine.
+This guide provides step-by-step instructions to set up and run the autonomous AI agent. The agent is highly flexible and can use various Large Language Models (LLMs) as its "brain."
 
-## Step 1: Core Tool Setup
-
+## I. Core Setup (Required for All Modes)
 1.  **Install Prerequisites via Homebrew:**
-    Open `Terminal` and run the following. This installs Git, Python, the GitHub CLI, and Ollama.
     ```bash
-    # Install Homebrew if you don't have it
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    
-    # Install tools
     brew install git python gh ollama
     ```
-
 2.  **Authenticate with GitHub:**
-    This allows the agent to create pull requests for you.
     ```bash
-    gh auth login
+    gh auth login # Follow the prompts, selecting HTTPS
     ```
-    Follow the prompts, selecting `HTTPS` as your preferred protocol.
-
-## Step 2: Project and Dependency Setup
-
-1.  **Install Python Libraries:**
-    Navigate to the project's root directory in your terminal and run:
+3.  **Install Python Libraries:**
+    Navigate to the project's root directory and run:
     ```bash
     pip3 install -r requirements.txt
     ```
 
-2.  **Configure API Keys (for Cloud Models):**
-    If you only plan to use local models via Ollama, you can skip this step.
-    ```bash
-    # Copy the example .env file
-    cp .env.example .env
-    ```
-    Now, open the new `.env` file in a text editor. Get your Gemini API key from [aistudio.google.com](https://aistudio.google.com) and paste it into the file.
+## II. Configuring LLM Providers (Choose one or more)
 
-## Step 3: Running the Agent
+### Option A: Local LLM with Ollama (Recommended)
+This method is free, private, and works offline. **Requires a Mac with 16GB+ RAM.**
 
-### For Local Models (Ollama)
-
-1.  **Start the Ollama Service:**
-    Ollama needs to be running in the background. The `brew` command handles this for you.
+1.  **Start the Ollama Service:** This command ensures Ollama is always running in the background.
     ```bash
     brew services start ollama
     ```
-    *(You only need to do this once. It will now start automatically when you log in.)*
-
 2.  **Download a Model:**
-    If you haven't already, pull the Llama 3 model (one-time ~4.7GB download).
     ```bash
-    ollama pull llama3
+    ollama pull llama3 # Downloads the Llama 3 8B model (~4.7GB)
+    ```
+3.  **Model String for Agent:** `ollama/llama3`
+
+### Option B: Cloud LLMs (OpenAI, Groq, Gemini)
+These methods use powerful cloud APIs. They require API keys.
+
+1.  **Create your `.env` file:**
+    In the project root, copy the example file:
+    ```bash
+    cp .env.example .env
+    ```
+2.  **Get API Keys and Edit `.env`:**
+    Open the new `.env` file and add your keys. You only need to add keys for the services you want to use.
+    -   **OpenAI:** Get a key from [platform.openai.com/api-keys](https://platform.openai.com/api-keys).
+        -   **Model String for Agent:** `gpt-4o` or `gpt-3.5-turbo`
+    -   **Groq (for high-speed Llama 3 70B):** Get a key from [console.groq.com/keys](https://console.groq.com/keys).
+        -   **Model String for Agent:** `groq/llama3-70b-8192`
+    -   **Google Gemini:** Get a key from [aistudio.google.com](https://aistudio.google.com).
+        -   **Model String for Agent:** `gemini/gemini-1.5-flash`
+
+## III. Running the Agent
+
+Use the `run_local_agent.py` script from your terminal.
+
+### Key Arguments:
+-   `--model`: Specifies which LLM to use. **Defaults to `ollama/llama3`**.
+-   `--mode`: `single` (runs one task cycle) or `continuous` (runs until all tasks are done). **Defaults to `single`**.
+
+### Examples:
+
+-   **Run one task with the default local model:**
+    ```bash
+    python3 scripts/run_local_agent.py
     ```
 
-3.  **Run the Agent:**
+-   **Run one task with OpenAI's GPT-4o:**
     ```bash
-    # Execute one task with the local Llama 3 model
-    python3 scripts/run_local_agent.py --model ollama/llama3
-    ```    *(Since this is the default, `python3 scripts/run_local_agent.py` also works)*
-
-
-### For Cloud Models (Gemini)
-
-1.  **Ensure your `.env` file is set up** (from Step 2.2).
-
-2.  **Run the Agent:**
-    ```bash
-    # Execute one task with Gemini 1.5 Flash
-    python3 scripts/run_local_agent.py --model gemini/gemini-1.5-flash
+    python3 scripts/run_local_agent.py --model gpt-4o
     ```
 
-### Execution Modes
-
--   **Run in Continuous Mode:** To make the agent complete all available tasks instead of just one, add the `--mode continuous` flag to any of the commands above.
+-   **Run continuously with Groq's high-speed Llama 3:**
     ```bash
-    # Example: Run continuously with the local model
-    python3 scripts/run_local_agent.py --mode continuous
+    python3 scripts/run_local_agent.py --model groq/llama3-70b-8192 --mode continuous
     ``````
 ---
 **EXECUTION COMPLETE.**
 
-All specified tasks are now complete. The project has been significantly refactored based on your feedback. The agent is now more robust, easier to extend, and correctly documented. The stopping point has been reached. You can now follow the new, accurate instructions in `LOCAL_SETUP.md`.
+All tasks are now complete. The agent is significantly more capable. It can run continuously, ask for help when it gets stuck, and can be easily configured to use a variety of powerful LLMs. The documentation is now comprehensive and accurate. The project is ready for you to run.

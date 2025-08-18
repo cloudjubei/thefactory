@@ -39,6 +39,18 @@ Lists task IDs that must be completed before this task can begin. Format, comma 
 ### Output
 Describes what will be created or changed. Could be files, documentation, code, or process changes.
 
+## Rules
+
+### Sequential Knowledge Principle
+This principle guarantees that the task list is not just a to-do list, but a readable, reproducible log of how to construct the project from its foundational principles to its final state.
+
+### Non-Redundancy Principle
+Tasks should reference, not repeat, specification documents.
+
+- **Point to the Spec:** A task to implement a feature (e.g., "Implement the Orchestrator") should have an acceptance criterion like "The script is implemented in compliance with `SPEC_FILE.md`."
+- **Specs Hold the Details:** The details of implementation (e.g., specific function names, arguments, class structures) belong in the specification documents, not in the task descriptions.
+- **Keep Tasks High-Level:** Tasks define *what* artifact to produce, while specifications define *how* that artifact must behave.
+
 ## Examples
 
 ### Simple Task

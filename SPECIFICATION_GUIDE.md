@@ -30,6 +30,13 @@ Good success criteria are:
 - **Complete**: Cover all critical aspects of the problem
 - **Independent**: Each criterion can be tested separately
 
+## The Self-Cleaning Principle
+A specification is a living document. When a new specification is created that introduces a paradigm that makes previous documents conceptually obsolete, the task associated with creating the new specification is also responsible for the removal of those obsolete documents and obsolete tasks.
+
+- **Evolve Files, Replace Paradigms:** A specification's file name (e.g., `TOOL_ARCHITECTURE.md`) should be stable. Tasks should evolve its content over time. This principle applies only when an entire approach is abandoned.
+- **No "Cleanup" Tasks:** The project history should not be littered with tasks like "delete old file." This is a natural part of the evolution of the specification.
+- **Example:** The task that creates the definitive `TOOL_ARCHITECTURE.md` (defining a tool-based agent) is also responsible for removing the obsolete `AGENT_WORKFLOW.md` (which defined a primitive, procedural agent) by removing an older task that instructed to create it. The acceptance criterion would be: "`TOOL_ARCHITECTURE.md` is created".
+
 ## Example: Good vs Bad Specification
 
 ### ❌ Bad Specification: "User Login System"

@@ -1,15 +1,17 @@
 # Autonomous Agent Principles
 
-## 1. Specification-Driven
-The agent's primary directive is to fulfill tasks as defined in `TASKS.md`. It must adhere to all project specifications and guides when producing changes.
+## 1. Terminology
 
-## 2. LLM-Led Intelligence (New Principle)
-**The LLM is the agent.** The local Python script is merely an orchestrator. The orchestrator's sole responsibilities are:
--   To gather the full, unfiltered project context.
--   To present this context to the LLM.
--   To faithfully execute the file changes the LLM provides in its response.
+-   **The Agent:** The Large Language Model (LLM) that provides the intelligence. The Agent analyzes the project context and makes all decisions about what actions to take.
+-   **The Orchestrator:** The local Python script (`run_local_agent.py`) that the user executes. The Orchestrator is a simple, non-intelligent executor. Its only job is to provide context to the Agent and faithfully carry out the commands the Agent issues.
 
-The orchestrator **MUST NOT** contain logic for task selection, dependency checking, or any other "clever" behavior. All reasoning is delegated to the LLM.
+## 2. Core Principles
 
-## 3. Interactive Decision Points
-(This principle remains unchanged)
+### 2.1 Specification-Driven
+The Agent's primary directive is to fulfill tasks as defined in `TASKS.md`. It must adhere to all project specifications and guides when producing changes.
+
+### 2.2 LLM-Led Intelligence
+The Agent is the "brain." The Orchestrator is the "hands." The Orchestrator MUST NOT contain any logic for task selection, dependency checking, or any other decision-making process. All reasoning is delegated to the Agent.
+
+### 2.3 Interactive Decision Points
+When the Agent encounters an ambiguous situation that requires human input, it must use the `ask_question` tool to halt execution and present the user with a clear question. It must not make unsupervised architectural decisions.
