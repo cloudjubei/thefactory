@@ -69,7 +69,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: The agent always when taking on a task creates a `plan_{id}.md` inside `tasks\{id}` folder. The plan holds details about all the features that make up the task. `TASKS.md` stays high level and `TASK_FORMAT.md` is also updated if any changes occur. `FEATURE_FORMAT.md` is updated to include any relevant information. `PLAN_SPECIFICATION.md` is updated to highlight what an agent must do to proceed with any task. An agent's path is the following: read `SPEC.md`, then (because it's an action inside) read `PLAN_SPCIFICATION.md`, and then the next action is to take on a task from `TASKS.md`. The file `FILE_ORGANISATION.md` is updated to hold the information about tasks and plans.
    Context: `tasks/TASKS.md`, `docs/TASK_FORMAT.md`, `docs/PLAN_SPECIFICATION.md`, `docs/FEATURE_FORMAT.md`, `docs/SPEC.md`, `docs/FILE_ORGANISATION.md`
 
-15) - Running specific tasks and features
+15) + Running specific tasks and features
    Action: `scripts/run_local_agent.py` is run with the optional argument `-t {task_id}` and `-f {feature_id}` (only if task_id is given). This will cause the agent to execute the specified task and the given feature.
    Acceptance: The agent executes the specified task or a feature in a task and outputs the result. The agent must create a branch for this that follows the convention `features/{task_id}_{feature_id}` or `tasks/{task_id}` if no feature is specified.
    Context: scripts/run_local_agent.py, tasks/TASKS.md
