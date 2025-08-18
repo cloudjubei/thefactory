@@ -34,7 +34,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: A script exists that allows interaction with an agent.
 
 8) - Cleanup
-   Action: Go over all specification documents and ensure that they adhere to their respective formats. The same goes for tasks and plans.
+   Action: Go over all specification documents and ensure that they adhere to their respective formats. The same goes for tasks and plans. In `FEATURE_FORMAT.md` examples are missing.
 
 17) ? Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.

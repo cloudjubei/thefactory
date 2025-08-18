@@ -54,7 +54,7 @@ Any extra notes about the feature that explain reasoning or give extra hints abo
 
 ### Completed Feature
 ```
-13.1) Create the Feature Format specification
+13.1) + Create the Feature Format specification
    Action: Provide a dedicated specification for describing features so plans can reference and structure them consistently.
    Acceptance:
    - docs/FEATURE_FORMAT.md exists
