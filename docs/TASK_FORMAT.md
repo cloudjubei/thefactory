@@ -14,16 +14,16 @@ ID) STATUS Title
 ### ID
 Positive integers in incremental order.
 
-### Status
-- `+` Completed - a task that is done
-- `~` In Progress - a task that is being worked on
-- `-` Pending - a task that requires work
-- `?` Unknown - a task that requires to define what options there are and their pros and cons, after choosing an option, the task is rewritten and set to pending
-- `/` Blocked - a task that was started, but cannot proceed due to external factors
-- `=` Perpetual - a task that is always Pending, but low priority
-
 ### Title
 A succinct higher level name for the task
+
+### Status
+- `+` Completed - a task that is done
+- `-` Pending - a task that requires work, i.e. at least one feature is Pending
+- `~` In Progress - a task that is being worked on, supercedes Pending, i.e. at least one feature is In Progress
+- `?` Unknown - a task that has unknowns, supercedes In Progress, i.e. at least one feature is Unknown
+- `/` Blocked - a task that has been blocked, supercedes Unknown, i.e. at least one feature is Blocked
+- `=` Perpetual - a task that has no end date, i.e. at least one feature is Perpetual and all other features are Completed
 
 ### Action
 A clear explanation of what needs to be accomplished. Should be specific enough that someone unfamiliar with the project can understand the task.
@@ -91,4 +91,4 @@ Tasks should reference, not repeat, specification documents.
 1. **One deliverable per task** - If you need multiple outputs, create multiple tasks
 2. **Concrete over abstract** - "Create X file" not "Improve documentation"
 3. **Testable completion** - Anyone should be able to verify if it's done
-4. **Independent when possible** - Minimize dependencies to allow parallel work
+

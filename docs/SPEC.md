@@ -14,4 +14,5 @@
 - This project uses Git for source control.
 
 # ACTIONS:
+- Read **[PLAN_SPECIFICATION.md](PLAN_SPECIFICATION.md)** to follow the mandatory plan workflow.
 - Read **[TASKS.md](../tasks/TASKS.md)**, work on the next possible pending/unknown task.
