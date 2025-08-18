@@ -108,6 +108,10 @@ class GitManager:
             print("Error: Failed to create pull request. Ensure 'gh' is installed and authenticated ('gh auth login').", file=sys.stderr)
             return False
         
+        if not self._run_command(["rm", "-rf", self.working_dir], cwd="/"):
+            print("Error: Failed to cleanup tmp repository.", file=sys.stderr)
+            return False
+        
         print(f"Successfully created pull request with title: '{title}'")
         return True
 

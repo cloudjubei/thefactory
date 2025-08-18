@@ -113,6 +113,7 @@ class Agent:
         self.mode = mode
         self.task_id = task_id 
         self.feature_id = feature_id 
+        self.working_dir = f"/tmp/agent_repo_{self.task_id}"
         self.engine = UnifiedEngine()
         print(f"Agent initialized. Mode: {self.mode}, Model: {self.model}. Running in Safe Mode.")
 
@@ -128,7 +129,7 @@ class Agent:
 
     def _execute_cycle(self) -> bool:
         repo_url = self._get_repo_url()
-        git_manager = GitManager(repo_url=repo_url)
+        git_manager = GitManager(repo_url=repo_url, working_dir=self.working_dir)
         if not git_manager.setup_repository(branch_name=f"features/{self.task_id}"):
             return False
         tools_instance = AgentTools(git_manager.repo_path, git_manager)
@@ -257,6 +258,8 @@ class Agent:
         except subprocess.CalledProcessError:
             print("Error: Could not determine git remote URL.", file=sys.stderr)
             sys.exit(1)
+    def _get_working_dir(self):
+        return f"/tmp/agent_repo_{self.task_id}"
 
 if __name__ == "__main__":
     load_dotenv()
