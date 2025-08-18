@@ -54,7 +54,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
    Dependencies: 7.5
 
-7.8) - Orchestrator MUST run specific task and optionally feature
+7.8) + Orchestrator MUST run specific task and optionally feature
    Action: The script has the CLI required argument `--task {task_id}` and the optional one `--feature {feature_id}` to run specific tasks/features via prompt construction referencing `tasks/plan_{task_id}.md`. Based on the provided `{task_id}` the corresponding `tasks/{task_id}/plan_{task_id}.md` is passed into the context if it exists.
    Acceptance: Orchestrator accepts `--task` and optional `--feature` and executes accordingly; output confirms execution.
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
@@ -96,12 +96,13 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/finish.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.15) - The orchestrator can have a multi-way conversation with an LLM, not just one shot.
+7.15) + The orchestrator can have a multi-way conversation with an LLM, not just one shot.
    Action: Update the orchestrator script to support multiple-shot conversations with an LLM.
    Acceptance: The orchestrator can handle multiple-shot conversations effectively. The tool `retrieve_context_files` can be called by the agent and it can resume its work.
-   Output: `scripts/tools/retrieve_context_files.py`
+   Output: `scripts/run_local_agent.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
    Dependencies: 7.5
+   Notes: The primary output is the modification of the orchestrator script to support a conversational loop, not the tool script mentioned in the original feature description.
 
 
 ## Execution Steps
