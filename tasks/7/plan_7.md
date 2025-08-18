@@ -11,7 +11,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Action: Ensure scripts satisfies all requirements.
    Acceptance: Behavior matches `docs/TOOL_ARCHITECTURE.md` and `docs/AGENT_PRINCIPLES.md`.
    Output: `scripts/run_local_agent.py`
-   Dependencies: 7.5, 7.6, 7.7, 7.8
+   Dependencies: 7.5, 7.6, 7.7
 
 7.2) + Dependency specification
    Action: Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`.
@@ -27,70 +27,70 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Context: `scripts/run_local_agent.py`
    Dependencies: 7.1
 
-7.4) ~ Local setup guide
+7.4) + Local setup guide
    Action: Author `docs/LOCAL_SETUP.md` with setup and execution instructions.
    Acceptance: `docs/LOCAL_SETUP.md` exists and is accurate.
    Output: `docs/LOCAL_SETUP.md`
    Context: `scripts/run_local_agent.py`, `requirements.txt`, `.env.example`
    Dependencies: 7.1, 7.2, 7.3
 
-7.4) - Implement orchestrator script
+7.5) + Implement orchestrator script
    Action: Create `scripts/run_local_agent.py` that calls an agent specified by a model `--model {model_id}` with all system context files.
    Acceptance: Behavior matches `docs/TOOL_ARCHITECTURE.md` and `docs/AGENT_PRINCIPLES.md`. The script must accept as many possible models as possible.
    Output: `scripts/run_local_agent.py`
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
 
-7.5) - Orchestrator can call tools
+7.6) + Orchestrator can parse and call tools
    Action: The script parses the agent's response JSON and in turn executes tools.
    Acceptance: An appropriate JSON response triggers a tool call.
    Output: `scripts/run_local_agent.py`
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
-   Dependencies: 7.4, 7.8, 7.9, 7.10, 7.11, 7.12, 7.13
+   Dependencies: 7.5, 7.9, 7.10, 7.11, 7.12, 7.13, 7.14
 
-7.6) - Orchestrator can call tools
-   Action: The script and supports Single/Continuous modes.
+7.7) + Orchestrator supports Single/Continuous modes
+   Action: The script has CLI options `--mode {mode_type}` where `mode_type` is either `single` (running just once) or `continuous` (running until there are no more tasks to work on).
    Acceptance: Behavior matches `docs/TOOL_ARCHITECTURE.md` and `docs/AGENT_PRINCIPLES.md`.
    Output: `scripts/run_local_agent.py`
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
-   Dependencies: 7.4
+   Dependencies: 7.5
 
-7.7) - Orchestrator can run specific task/feature
-   Action: The script has CLI options `-t {task_id}` and `-f {feature_id}` to run specific tasks/features via prompt construction referencing `tasks/plan_{task_id}.md`.
-   Acceptance: Orchestrator accepts `-t` and optional `-f` and executes accordingly; output confirms execution.
+7.8) - Orchestrator can run specific task/feature
+   Action: The script has CLI options `--task {task_id}` and `--feature {feature_id}` to run specific tasks/features via prompt construction referencing `tasks/plan_{task_id}.md`.
+   Acceptance: Orchestrator accepts `--task` and optional `--feature` and executes accordingly; output confirms execution.
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
-   Dependencies: 7.4
+   Dependencies: 7.5
 
-7.8) - The tool for writing a file
+7.9) - The tool for writing a file
    Action: Create a tool called `write_file` to write files.
    Acceptance: The tool uses correct naming and creates a file or rewrites an existing file.
    Output: `scripts/tools/write_file.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.9) - The tool for getting project context file
+7.10) - The tool for getting project context file
    Action: Create a tool called `retrieve_context_files` to return wanted files as text and resume the agent's work.
    Acceptance: The tool uses correct naming and returns all files matching the pattern as text.
    Output: `scripts/tools/retrieve_context_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.10) - The tool for renaming files
+7.11) - The tool for renaming files
    Action: Create a tool called `rename_files` to rename and move files.
-   Acceptance: The tool uses correct naming and is able to rename existing files or move and potentiall rename them.
+   Acceptance: The tool uses correct naming and is able to rename existing files or move and potentially rename them.
    Output: `scripts/tools/rename_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.11) - The tool for creating a git PR
-   Action: Create a tool called `write_file` to create git Pull Ruequests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
+7.12) - The tool for creating a git PR
+   Action: Create a tool called `write_file` to create Git Pull Requests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
    Acceptance: The tool uses correct naming and creates a pull request.
    Output: `scripts/tools/submit_for_review.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.12) - The tool for asking a question
+7.13) - The tool for asking a question
    Action: Create a tool called `ask_question` to indicate an agent wanting to ask a question about a feature being worked on.
    Acceptance: The tool uses correct naming and is able to ask a question.
    Output: `scripts/tools/ask_question.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.13) - The tool for finishing the task
+7.14) - The tool for finishing the task
    Action: Create a tool called `finish` to finish a task.
    Acceptance: The tool uses correct naming and is able to finish a task.
    Output: `scripts/tools/finish.py`
