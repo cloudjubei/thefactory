@@ -81,7 +81,7 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored
    Context: SPEC.md, TASKS.md
 
-15) - Running local agent with context
+15) + Running local agent with context
    Action: Update `run_local_agent.py` so that it always has the base project context, that should be defined in a spec somewhere, as well as all files from a given task's `Context` field.
    Acceptance: `run_local_agent.py` includes the base project context and all files from a given task's `Context` field whenever running an agent.
    Context: TASKS.md, TASK_FORMAT.md, scripts/run_local_agent.py
@@ -131,3 +131,4 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
     Context: LOCAL_APP.md
     Notes: The purpose of this is to allow users to interact with the agent through a mobile device. It could include voice commands, touch gestures, or other input methods depending on the target audience and platform.
     Dependencies: 20
+
