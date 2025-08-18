@@ -60,37 +60,37 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
    Dependencies: 7.5
 
-7.9) - The tool for writing a file
+7.9) + The tool for writing a file
    Action: Create a tool called `write_file` to write files.
    Acceptance: The tool uses correct naming and creates a file or rewrites an existing file.
    Output: `scripts/tools/write_file.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.10) - The tool for getting project context file
+7.10) + The tool for getting project context file
    Action: Create a tool called `retrieve_context_files` to return wanted files as text and resume the agent's work.
    Acceptance: The tool uses correct naming and returns all files matching the pattern as text.
    Output: `scripts/tools/retrieve_context_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.11) - The tool for renaming files
+7.11) + The tool for renaming files
    Action: Create a tool called `rename_files` to rename and move files.
    Acceptance: The tool uses correct naming and is able to rename existing files or move and potentially rename them.
    Output: `scripts/tools/rename_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.12) - The tool for creating a git PR
+7.12) + The tool for creating a git PR
    Action: Create a tool called `write_file` to create Git Pull Requests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
    Acceptance: The tool uses correct naming and creates a pull request.
    Output: `scripts/tools/submit_for_review.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.13) - The tool for asking a question
+7.13) + The tool for asking a question
    Action: Create a tool called `ask_question` to indicate an agent wanting to ask a question about a feature being worked on.
    Acceptance: The tool uses correct naming and is able to ask a question.
    Output: `scripts/tools/ask_question.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.14) - The tool for finishing the task
+7.14) + The tool for finishing the task
    Action: Create a tool called `finish` to finish a task.
    Acceptance: The tool uses correct naming and is able to finish a task.
    Output: `scripts/tools/finish.py`
