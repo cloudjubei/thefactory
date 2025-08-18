@@ -21,6 +21,12 @@ The steps in the plan should follow a clear, logical progression:
 ### 2.4. Clarity and Brevity
 The plan should be easy for a human to understand. It should be concise and focus on the "what" and "why," not the low-level "how." The implementation details are found in the content of the `write_file` tool calls, not in the plan itself.
 
+### 2.5. Test-Driven Acceptance
+A feature is not considered complete until a corresponding test is written and passes. This ensures that all work is verifiable.
+- For every feature that produces a tangible output (like a file or a change in a file), a subsequent feature in the plan MUST be created to write a test for it.
+- The acceptance criteria for the "test-writing" feature is simply that the test script exists and is located correctly according to `docs/TESTING.md`.
+- This principle makes the acceptance criteria of the original feature concrete and machine-verifiable.
+
 ## 3. Location and Structure
 - Each task MUST have a dedicated plan file located at `tasks/{task_id}/plan_{task_id}.md`.
 - The plan enumerates the FEATURES that make up the task. Each feature follows `docs/FEATURE_FORMAT.md`.
@@ -46,7 +52,7 @@ Short, high-level description of how this plan will satisfy the task's Acceptanc
 - Source files: (if any)
 
 ## Features
-{task_id}.1) Feature title
+{task_id}.1) - Feature title
    Action: ...
    Acceptance: ...
    Context: ...
@@ -54,14 +60,18 @@ Short, high-level description of how this plan will satisfy the task's Acceptanc
    Output: ...
    Notes: ...
 
-{task_id}.2) Feature title
-   ... (repeat as needed)
+{task_id}.2) - Test for Feature {task_id}.1
+   Action: Write a test to verify the acceptance criteria of Feature {task_id}.1.
+   Acceptance: The test script exists at `tasks/{task_id}/tests/test_feature_1.py` and validates the output.
+   Context: docs/TESTING.md
+   Dependencies: {task_id}.1
+   Output: `tasks/{task_id}/tests/test_feature_1.py`
 
 ## Execution Steps
-1) Create/modify files per Features
-2) Update tasks/TASKS.md status for the task
-3) Submit for review
-4) Finish
+1) Create/modify files per Features (including tests).
+2) Update tasks/TASKS.md status for the task.
+3) Submit for review.
+4) Finish.
 ```
 
 ## 5. Example
