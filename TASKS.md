@@ -58,7 +58,7 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
     Action: Create a plan specification that describes how each task should be executed.
     Acceptance: The file `PLAN_SPECIFICATION.md` exists and details the steps involved in creating a task plan.
 
-13) - Task plans
+13) + Task plans
    Action: Create a plan for each task.
    Acceptance: A folder /plans with a plan file for each task exists.
    Dependencies: 12
