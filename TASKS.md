@@ -63,7 +63,7 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Acceptance: A folder /plans with a plan file for each task exists.
    Dependencies: 12
 
-14) - File organisation
+14) + File organisation
    Action: Create a scheme for organising files within the repository.
    Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored.
 
