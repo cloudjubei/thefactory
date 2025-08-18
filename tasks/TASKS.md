@@ -33,7 +33,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent. Read `tasks/7/plan_7.md` and check if all the features are implemented and all the action steps carried out. If so, close this task and update this message and status accordingly.
    Acceptance: A script exists that allows interaction with an agent.
 
-8) - Cleanup
+8) + Cleanup
    Action: Go over all specification documents and ensure that they adhere to their respective formats. The same goes for tasks and plans. In `FEATURE_FORMAT.md` examples are missing.
 
 17) ? Running in isolation/container
