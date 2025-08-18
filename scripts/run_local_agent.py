@@ -1,5 +1,3 @@
-# scripts/run_local_agent.py
-
 import os
 import re
 import sys
@@ -16,7 +14,6 @@ from scripts.tools.submit_for_review import submit_for_review_tool
 from scripts.tools.ask_question import ask_question_tool
 from scripts.tools.finish import finish_tool
 
-# --- All classes up to UnifiedEngine are unchanged ---
 class AgentTools:
     def __init__(self, repo_path: str, git_manager: GitManager):
         self.repo_path = repo_path
@@ -44,12 +41,12 @@ class AgentTools:
         return finish_tool(reason)
 
 class UnifiedEngine:
-    def generate_plan_and_tool_calls(self, model: str, context: dict) -> list:
-        messages = self._build_prompt(context)
+    def generate_plan_and_tool_calls(self, model: str, context: dict, task_id: int = None, feature_id: int = None) -> list:
+        messages = self._build_prompt(context, task_id, feature_id)
         response_text = self._make_api_call(model, messages)
         return self._parse_response(response_text)
 
-    def _build_prompt(self, context: dict) -> list:
+    def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None) -> list:
         context_str = "\n".join(f"--- START of {name} ---\n{content}\n--- END of {name} ---\n" for name, content in context.items())
         
         system_prompt = f"""
@@ -88,9 +85,22 @@ The key for a tool's parameters MUST be "arguments".
 If no tasks are eligible, your ONLY tool call is `finish(reason=\"HALT: No eligible tasks found.\")`.
 Respond with a single, valid JSON object.
 """
-        user_prompt = f"### PROJECT CONTEXT\n{context_str}\n\nGenerate the JSON response to complete the next task."
+        user_prompt_parts = ["### PROJECT CONTEXT"]
+        user_prompt_parts.append(context_str)
+
+        if task_id:
+            specific_task_instruction = f"You are instructed to work on Task {task_id}."
+            if feature_id:
+                specific_task_instruction += f" Specifically, focus on Feature {task_id}.{feature_id} within this task."
+            specific_task_instruction += " Ignore the '1. Analyze the context to identify the next eligible pending task.' step and directly formulate a plan and tool calls for this specific task/feature."
+            user_prompt_parts.append(specific_task_instruction)
+            user_prompt_parts.append("\nGenerate the JSON response to complete the specified task/feature.")
+        else:
+            user_prompt_parts.append("\nGenerate the JSON response to complete the next task.")
+        
+        user_prompt = "\n".join(user_prompt_parts)
         return [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
-    
+        
     def _make_api_call(self, model: str, messages: list) -> str:
         print(f"Sending prompt to model '{model}' via LiteLLM...")
         try:
@@ -117,9 +127,11 @@ Respond with a single, valid JSON object.
             return []
 
 class Agent:
-    def __init__(self, model: str, mode: str):
+    def __init__(self, model: str, mode: str, task_id: int = None, feature_id: int = None):
         self.model = model
         self.mode = mode
+        self.task_id = task_id 
+        self.feature_id = feature_id 
         self.engine = UnifiedEngine()
         print(f"Agent initialized. Mode: {self.mode}, Model: {self.model}. Running in Safe Mode.")
 
@@ -140,7 +152,7 @@ class Agent:
             return False
         tools_instance = AgentTools(git_manager.repo_path, git_manager)
         context = self._gather_context(git_manager.repo_path)
-        tool_calls = self.engine.generate_plan_and_tool_calls(self.model, context)
+        tool_calls = self.engine.generate_plan_and_tool_calls(self.model, context, self.task_id, self.feature_id)
         if not tool_calls:
             print("Agent halted. No tool calls returned.")
             return False
@@ -169,7 +181,6 @@ class Agent:
                 return False
         return True
     
-    # ... _gather_context and _get_repo_url are unchanged ...
     def _gather_context(self, repo_path: str):
         files = [
             "tasks/TASKS.md",
@@ -183,9 +194,14 @@ class Agent:
             "docs/TASK_FORMAT.md",
             "docs/TOOL_ARCHITECTURE.md",
             "scripts/run_local_agent.py",
-            "scripts/tools/rename_files.py", # Updated path
             "tasks/7/plan_7.md"
         ]
+
+        if self.task_id:
+            task_plan_path = f"tasks/{self.task_id}/plan_{self.task_id}.md"
+            if task_plan_path not in files:
+                files.append(task_plan_path)
+
         context = {}
         for filename in files:
             try:
@@ -208,7 +224,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Autonomous AI Agent for Specification Programming.")
     parser.add_argument('--model', type=str, default='ollama/llama3', help="The LiteLLM model string.")
     parser.add_argument('--mode', choices=['single', 'continuous'], default='single', help="Execution mode.")
+    parser.add_argument('--task_id', type=int, help="Specify a task ID to work on.")
+    parser.add_argument('--feature_id', type=int, help="Specify a feature ID within the task to work on.")
     args = parser.parse_args()
     
-    agent = Agent(model=args.model, mode=args.mode)
+    agent = Agent(model=args.model, mode=args.mode, task_id=args.task_id, feature_id=args.feature_id)
     agent.run()
