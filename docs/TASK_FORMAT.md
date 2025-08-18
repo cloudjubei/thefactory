@@ -19,7 +19,7 @@ Positive integers in incremental order.
 - `+` Completed - a task that is done
 - `~` In Progress - a task that is being worked on
 - `-` Pending - a task that requires work
-- `?` Unknown - a task that is requires discussion between agent and human before proceeding, usually to determine to best course of action
+- `?` Unknown - a task that requires to define what options there are and their pros and cons, after choosing an option, the task is rewritten and set to pending
 - `/` Blocked - a task that was started, but cannot proceed due to external factors
 - `=` Perpetual - a task that is always Pending, but low priority
 
