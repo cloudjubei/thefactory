@@ -54,7 +54,7 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
     Acceptance: The file `LOCAL_SETUP.md` exists and provides clear, accurate instructions for the entire setup and execution process.
     Dependencies: 8, 9, 10
 
-12) - Plan specification
+12) + Plan specification
     Action: Create a plan specification that describes how each task should be executed.
     Acceptance: The file `PLAN_SPECIFICATION.md` exists and details the steps involved in creating a task plan.
 
