@@ -152,34 +152,93 @@ class Agent:
             return False
         tools_instance = AgentTools(git_manager.repo_path, git_manager)
         context = self._gather_context(git_manager.repo_path)
-        tool_calls = self.engine.generate_plan_and_tool_calls(self.model, context, self.task_id, self.feature_id)
-        if not tool_calls:
-            print("Agent halted. No tool calls returned.")
-            return False
-        return self._execute_tool_calls(tools_instance, tool_calls)
 
-    def _execute_tool_calls(self, tools_instance: AgentTools, tool_calls: list) -> bool:
+        # Build initial conversation messages
+        messages = self.engine._build_prompt(context, self.task_id, self.feature_id)
+
+        # Conversational loop to support multi-turn tool usage (Feature 7.15)
+        max_turns = 8
+        turn = 0
+        while True:
+            turn += 1
+            response_text = self.engine._make_api_call(self.model, messages)
+            print("\n--- LLM Response Received ---\n")
+            print(response_text)
+
+            # Append assistant's JSON response to the conversation history
+            messages.append({"role": "assistant", "content": response_text})
+
+            # Parse the JSON
+            try:
+                json_str = response_text.strip()
+                if json_str.startswith("```json"): json_str = json_str[7:-4].strip()
+                data = json.loads(json_str)
+            except json.JSONDecodeError as e:
+                print(f"Error: Failed to decode LLM response as JSON: {e}", file=sys.stderr)
+                return False
+
+            print("\n--- Agent's Plan ---")
+            print(data.get("plan", "No plan provided."))
+
+            tool_calls = data.get("tool_calls", [])
+            if not tool_calls:
+                print("No tool calls returned by the agent. Halting.")
+                return False
+
+            results, halt = self._execute_and_collect_tool_calls(tools_instance, tool_calls)
+
+            if halt:
+                # ask_question or finish signaled a halt condition
+                return False
+
+            # If the agent invoked finish (even without a HALT string), end this cycle
+            if any(call.get("tool_name") == "finish" for call in tool_calls):
+                return False
+
+            # Provide tool execution results back to the agent for the next turn
+            feedback = {
+                "type": "tool_results",
+                "results": results
+            }
+            messages.append({
+                "role": "user",
+                "content": (
+                    "Tool execution results:\n" + json.dumps(feedback, indent=2) +
+                    "\nContinue by returning your next JSON response following the required schema."
+                )
+            })
+
+            if turn >= max_turns:
+                print("Max conversation turns reached; ending cycle.")
+                return True
+
+    def _execute_and_collect_tool_calls(self, tools_instance: AgentTools, tool_calls: list) -> tuple[list, bool]:
         print("\n--- Executing Tool Calls ---")
+        results = []
         for call in tool_calls:
             tool_name = call.get("tool_name")
-            
             # Gracefully accept "arguments" (preferred) or "parameters" (fallback).
             arguments = call.get("arguments", call.get("parameters", {}))
-            
             tool_method = getattr(tools_instance, tool_name, None)
             if not tool_method:
-                print(f"Error: Unknown tool implementation '{tool_name}'.")
+                msg = f"Error: Unknown tool implementation '{tool_name}'."
+                print(msg)
+                results.append({"tool_name": tool_name, "arguments": arguments, "error": msg})
                 continue
             print(f"Calling Tool: {tool_name}({arguments})")
             try:
                 result = tool_method(**arguments)
                 print(f"Tool Result: {result}")
-                if tool_name in ['ask_question', 'finish'] and "HALT" in result:
-                    return False
+                results.append({"tool_name": tool_name, "arguments": arguments, "result": result})
+                # If ask_question or finish indicates HALT, stop the cycle
+                if tool_name in ['ask_question', 'finish'] and isinstance(result, str) and "HALT" in result:
+                    return results, True
             except Exception as e:
-                print(f"Error executing tool '{tool_name}': {e}")
-                return False
-        return True
+                err = f"Error executing tool '{tool_name}': {e}"
+                print(err)
+                results.append({"tool_name": tool_name, "arguments": arguments, "error": err})
+                return results, True
+        return results, False
     
     def _gather_context(self, repo_path: str):
         files = [
