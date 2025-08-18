@@ -1,0 +1,3 @@
+# Python dependencies for the Autonomous Agent
+litellm
+python-dotenv
