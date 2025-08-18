@@ -29,11 +29,11 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
    Acceptance: The documentation exists.
 
-7) + Agent Orchestrator
+7) - Agent Orchestrator
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
-   Acceptance: A script exists that allows interaction with an agent. As the first step the agent must provide information about the task and features it will work on, so the appropriate context (especially `tasks\{task_id}\plan_{task_id}.md`) can be provided to it if it exists.
+   Acceptance: A script exists that allows interaction with an agent. Step 1, the agent determines the task to work in response it is told whether a plan for that task exists and is given it if it does. Step 2, the agent determines the minimal context it requires to work on the task it chose in response it receives the context files. Step 3 - the agent works on the task until completion.
 
-8) - Tests specification
+8) + Tests specification
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
    Acceptance: The documentation exists.
 

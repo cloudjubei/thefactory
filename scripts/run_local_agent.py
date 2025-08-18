@@ -251,10 +251,8 @@ class Agent:
             "docs/SPEC.md",
             "docs/SPECIFICATION_GUIDE.md",
             "docs/TASK_FORMAT.md",
-            "docs/TOOL_ARCHITECTURE.md",
-            "scripts/run_local_agent.py",
-            "scripts/git_manager.py",
-            "tasks/7/plan_7.md"
+            "docs/TESTING.md",
+            "docs/TOOL_ARCHITECTURE.md"
         ]
 
         if self.task_id:
