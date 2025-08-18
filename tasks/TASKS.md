@@ -64,42 +64,37 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored
    Context: docs/SPEC.md, tasks/TASKS.md
 
-13) + Cleanup
-   Action: Look at the list of tasks and reorganise them into a logical order, so that the specs clearly and linearly drive the work up to a given point.
-   Acceptance: `tasks/TASKS.md` is organised and doesn't contain any irrelevant tasks that are included in other tasks by definition. There should also be no task dependencies on any tasks leading up to this one, as they should've all been resolved through the cleanup.
-   Context: tasks/TASKS.md
-
-14) ? Feature definitions
+13) ? Feature definitions
    Action: Create a features specifications.
    Acceptance: The file `FEATURE_DEFINITIONS.md` exists detailing the features of the agent and how they will be implemented.
    Context: tasks/TASKS.md, docs/TASK_FORMAT.md, docs/FILE_ORGANISATION.md
    Notes: The purpose of this is to make task organisations better. Each task can be a set of sub-tasks, i.e. features, that each can have their own plan and can be run independently. A task is only complete once all of its features are complete. Until now it would be possible to achieve a similar effect by having multiple small tasks, but there's a very important thing that is lost here - the context for the whole overarching task. A feature might only need a very small context to be completed or it might need to know about the context of all of the other features to be completed well. A feature can have a nested sub-feature. This way a task will remain a very high level concept - detailing the absolute top level project goals, whereas a feature will focus more on details but still staying away from implementation specifics.
 
-15) ? Running in isolation/container
+14) ? Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.
    Acceptance: The file `RUNNING_IN_CONTAINER.md` exists detailing the steps involved in running the agent in a container environment.
    Context: scripts/run_local_agent.py
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
-16) ? Running on cloud
+15) ? Running on cloud
    Action: Create a workflow to running the agent on cloud services such as AWS or Azure.
    Acceptance: The file `RUNNING_ON_CLOUD.md` exists detailing the steps involved in running the agent on cloud services.
    Context: docs/RUNNING_IN_CONTAINER.md
    Notes: Once containerization is established, it should be possible to also host this project somewhere and have it perpetually run on a cloud service.
 
-17) ? Run tests
+16) ? Run tests
    Action: Create a test framework for testing the agent's functionality.
    Acceptance: The file `TESTING.md` exists detailing the steps involved in testing the agent's functionality.
    Context: docs/AGENT_PRINCIPLES.md, docs/TOOL_ARCHITECTURE.md
    Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
 
-18) ? Local app 
+17) ? Local app 
    Action: Create a local app to handle project management, see tasks etc.
    Acceptance: The file `LOCAL_APP.md` exists detailing the steps involved in creating a local app for project management
    Context: docs/SPEC.md
    Notes: Currently I'm using VSCode to view the project, run everything, see tasks etc. It would be ideal to have a dedicated app for managing the project, viewing tasks, seeing progress etc. For being able to see how the agents fares etc. Cline the plugin for VSCode does something like this and maybe it makes sense to even built upon a fork on this. One thing to keep in mind is that we want to be really third-party independent. If we can create something ourselves we should. The only question is how it integrates with the project. If maintaining such a service/dependency is too heavy, then using a third party solution makes sense. Each third party solution should be its own tasks, with documented features and explanations as to why it was chosen etc.
 
-19) ? Create a mobile app
+18) ? Create a mobile app
     Action: Develop a mobile application that allows users to interact with the project and thus the agents it runs.
     Acceptance: The file `MOBILE_APP.md` exists detailing the development process and user interface design for the mobile application.
     Context: docs/LOCAL_APP.md
