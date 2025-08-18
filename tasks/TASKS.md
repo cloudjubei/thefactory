@@ -37,7 +37,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
    Acceptance: The documentation exists.
 
-9) - Automated tests
+9) ~ Automated tests
    Action: Create tests for every task and feature already existing. 
    Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification.
    Notes: These are unit tests that check the agent's ability to perform specific tasks and features. They should cover various scenarios and edge cases to ensure robustness and reliability.
