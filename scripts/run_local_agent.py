@@ -41,11 +41,6 @@ class AgentTools:
         return finish_tool(reason)
 
 class UnifiedEngine:
-    def generate_plan_and_tool_calls(self, model: str, context: dict, task_id: int = None, feature_id: int = None) -> list:
-        messages = self._build_prompt(context, task_id, feature_id)
-        response_text = self._make_api_call(model, messages)
-        return self._parse_response(response_text)
-
     def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None) -> list:
         context_str = "\n".join(f"--- START of {name} ---\n{content}\n--- END of {name} ---\n" for name, content in context.items())
         
@@ -112,20 +107,6 @@ Respond with a single, valid JSON object.
             print(f"Error: API call via LiteLLM failed: {e}", file=sys.stderr)
             sys.exit(1)
 
-    def _parse_response(self, response: str) -> list:
-        print("\n--- LLM Response Received ---\n")
-        print(response)
-        try:
-            json_str = response.strip()
-            if json_str.startswith("```json"): json_str = json_str[7:-4].strip()
-            data = json.loads(json_str)
-            print("\n--- Agent's Plan ---")
-            print(data.get("plan", "No plan provided."))
-            return data.get("tool_calls", [])
-        except json.JSONDecodeError as e:
-            print(f"Error: Failed to decode LLM response as JSON: {e}", file=sys.stderr)
-            return []
-
 class Agent:
     def __init__(self, model: str, mode: str, task_id: int, feature_id: int = None):
         self.model = model
@@ -156,13 +137,12 @@ class Agent:
         # Build initial conversation messages
         messages = self.engine._build_prompt(context, self.task_id, self.feature_id)
 
-        # Conversational loop to support multi-turn tool usage (Feature 7.15)
+        # Conversational loop to support multi-turn tool usage
         max_turns = 8
-        turn = 0
-        while True:
-            turn += 1
+        for turn in range(max_turns):
+            print(f"\n--- Conversation Turn {turn + 1}/{max_turns} ---")
             response_text = self.engine._make_api_call(self.model, messages)
-            print("\n--- LLM Response Received ---\n")
+            print("\n--- LLM Response Received ---")
             print(response_text)
 
             # Append assistant's JSON response to the conversation history
@@ -188,18 +168,14 @@ class Agent:
             results, halt = self._execute_and_collect_tool_calls(tools_instance, tool_calls)
 
             if halt:
-                # ask_question or finish signaled a halt condition
-                return False
+                return False # ask_question or finish signaled a halt
 
-            # If the agent invoked finish (even without a HALT string), end this cycle
+            # If the agent invoked finish (even without HALT), end this cycle
             if any(call.get("tool_name") == "finish" for call in tool_calls):
-                return False
+                return True # Cycle complete, might start another in continuous mode
 
             # Provide tool execution results back to the agent for the next turn
-            feedback = {
-                "type": "tool_results",
-                "results": results
-            }
+            feedback = {"type": "tool_results", "results": results}
             messages.append({
                 "role": "user",
                 "content": (
@@ -207,17 +183,15 @@ class Agent:
                     "\nContinue by returning your next JSON response following the required schema."
                 )
             })
-
-            if turn >= max_turns:
-                print("Max conversation turns reached; ending cycle.")
-                return True
+        
+        print("Max conversation turns reached; ending cycle.")
+        return True
 
     def _execute_and_collect_tool_calls(self, tools_instance: AgentTools, tool_calls: list) -> tuple[list, bool]:
         print("\n--- Executing Tool Calls ---")
         results = []
         for call in tool_calls:
             tool_name = call.get("tool_name")
-            # Gracefully accept "arguments" (preferred) or "parameters" (fallback).
             arguments = call.get("arguments", call.get("parameters", {}))
             tool_method = getattr(tools_instance, tool_name, None)
             if not tool_method:
@@ -230,7 +204,6 @@ class Agent:
                 result = tool_method(**arguments)
                 print(f"Tool Result: {result}")
                 results.append({"tool_name": tool_name, "arguments": arguments, "result": result})
-                # If ask_question or finish indicates HALT, stop the cycle
                 if tool_name in ['ask_question', 'finish'] and isinstance(result, str) and "HALT" in result:
                     return results, True
             except Exception as e:
@@ -253,7 +226,6 @@ class Agent:
             "docs/TASK_FORMAT.md",
             "docs/TESTING.md",
             "docs/TOOL_ARCHITECTURE.md",
-
             "scripts/run_local_agent.py",
             "scripts/git_manager.py",
             "scripts/tools/ask_question.py",
@@ -262,7 +234,6 @@ class Agent:
             "scripts/tools/retrieve_context_files.py",
             "scripts/tools/submit_for_review.py",
             "scripts/tools/write_file.py",
-            "tasks/7/plan_7.md"
         ]
 
         if self.task_id:

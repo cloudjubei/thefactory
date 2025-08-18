@@ -29,7 +29,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
    Acceptance: The documentation exists.
 
-7) - Agent Orchestrator
+7) + Agent Orchestrator
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
    Acceptance: A script exists that allows interaction with an agent. Step 1, the agent determines the task to work in response it is told whether a plan for that task exists and is given it if it does. Before the response, the agent is switched to the correct feature branch for that task. Step 2, the agent determines the minimal context it requires to work on the task it chose in response it receives the context files. Step 3 - the agent works on the task until completion.
 
@@ -69,5 +69,5 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 22) ? Create orchestration so that many different agents can be running on different tasks at once.
     Action: Implement orchestration logic to manage multiple agents simultaneously.
-    Acceptance: The file `docs/ORCHESTRATION.md` exists detailing the implementation details and strategies for orchestrating multiple agents concurrently.
+    Acceptance: The file `docs/ORCHESTration.md` exists detailing the implementation details and strategies for orchestrating multiple agents concurrently.
     Notes: This involves coordinating resources, scheduling tasks, monitoring performance, and ensuring seamless communication between agents. It may require distributed systems concepts and advanced programming techniques.
