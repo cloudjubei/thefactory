@@ -64,7 +64,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored
    Context: docs/SPEC.md, tasks/TASKS.md
 
-13) ? Feature definitions
+13) + Feature definitions
    Action: Create a features specifications.
    Acceptance: The file `FEATURE_DEFINITIONS.md` exists detailing the features of the agent and how they will be implemented.
    Context: tasks/TASKS.md, docs/TASK_FORMAT.md, docs/FILE_ORGANISATION.md
