@@ -4,22 +4,23 @@
 Establish core principles and define the agent's tool-based architecture and terminology.
 
 ## Context
-- Specs: docs/AGENT_PRINCIPLES.md, docs/TOOL_ARCHITECTURE.md, docs/PLAN_SPECIFICATION.md
+- Specs: `docs/PLAN_SPECIFICATION.md`
 
 ## Features
-6.1) Create AGENT_PRINCIPLES.md
-   Action: Define Agent vs Orchestrator and core principles.
-   Acceptance: docs/AGENT_PRINCIPLES.md exists and contains required definitions.
-   Output: docs/AGENT_PRINCIPLES.md
-
-6.2) Create TOOL_ARCHITECTURE.md
+6.1) Create the tools guide
    Action: Specify the JSON contract, tools, and execution modes.
-   Acceptance: docs/TOOL_ARCHITECTURE.md exists with all sections and tool definitions.
-   Output: docs/TOOL_ARCHITECTURE.md
+   Acceptance: `docs/TOOL_ARCHITECTURE.md` exists with all sections and tool definitions.
+   Output: `docs/TOOL_ARCHITECTURE.md`
+
+6.2) Create the principles guide
+   Action: Define Agent vs Orchestrator and core principles.
+   Acceptance: `docs/AGENT_PRINCIPLES.md` exists and contains required definitions referencing the tools guide.
+   Output: `docs/AGENT_PRINCIPLES.md`
+   Context: `docs/PLAN_SPECIFICATION.md`, `docs/TOOL_ARCHITECTURE.md`
+   Dependencies: 6.1
 
 ## Execution Steps
-1) Create docs/AGENT_PRINCIPLES.md
-2) Create docs/TOOL_ARCHITECTURE.md
-3) Update tasks/TASKS.md if status changes
-4) Submit for review
-5) Finish
+1) Implement features
+2) Update `tasks/TASKS.md` with status change
+3) Submit for review
+4) Finish

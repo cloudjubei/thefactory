@@ -30,17 +30,11 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: The file `docs/AGENT_PRINCIPLES.md` exists and contains the required definitions. The file `docs/TOOL_ARCHITECTURE.md` exists and defines the JSON contract, the full suite of tools, and the execution modes.
 
 7) - Agent Orchestrator
-   Action: Create a script that functions as the Agent's Orchestrator. A corresponding guide is also written for this.
-   Acceptance: The `scripts/run_local_agent.py` script is implemented and its functionality is fully compliant with the contracts and principles defined in `docs/AGENT_PRINCIPLES.md` and `docs/TOOL_ARCHITECTURE.md`.
-   Notes: A feature in this task should be to create a file `requirements.txt` that contains all external libraries required to run `scripts/run_local_agent.py`. Another feature would be to have the file `.env.example` that contains all placeholders for required API keys. And finally, the last feature would be to create the file `docs/LOCAL_SETUP.md` that provides clear, accurate instructions for the entire setup and execution process.
+   Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent. 
+   Notes: A script exists that allows interaction with an agent.
 
-8) + Cleanup
-   Action: Ensure that everything follows all current specifications. Look at all the files provided in the context, the current tasks, features and plans. Ensure that there are no inconsistencies between the files and that the files are up to date. An agent must know that at any point during task & feature work, they are able to update/rewrite the spec docs in case there is a change that requires such an update. This is especially relevant if during work on a feature, the plan should change and perhaps new features should be added to the task.
-   Context: docs/SPEC.md, docs/TASK_FORMAT.md, docs/FILE_ORGANISATION.md, docs/FEATURE_FORMAT.md, tasks/TASKS.md, docs/PLAN_SPECIFICATION.md, docs/AGENT_PRINCIPLES.md, plans/, scripts/run_local_agent.py, requirements.txt, .env.example, LOCAL_SETUP.md
-
-9) - Running specific tasks and features
-   Action: `scripts/run_local_agent.py` is run with the optional argument `-t {task_id}` and `-f {feature_id}` (only if task_id is given). This will cause the agent to execute the specified task and the given feature.
-   Acceptance: The agent executes the specified task or a feature in a task and outputs the result. The agent must create a branch for this that follows the convention `features/{task_id}_{feature_id}` or `tasks/{task_id}` if no feature is specified. This should be achieved by simply giving an appropriate prompt (referencing the corresponding `tasks/plan_{task_id}.md`) to the agent instead of telling it to read `SPEC.md`. The information in this task should be included as a feature in task 7. After completion, this whole task should be removed.
+8) - Cleanup
+   Action: Go over all specification documents and ensure that they adhere to their respective formats. The same goes for tasks and plans.
 
 17) ? Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.

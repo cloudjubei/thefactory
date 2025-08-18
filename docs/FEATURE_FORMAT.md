@@ -42,7 +42,7 @@ Good acceptance criteria answers: "What must be achieved for this feature to be 
 List of files that contain any relevant information needed for completing the feature. Format, comma and space separate list of filenames: `SPEC_FILE.md`, `IMPLEMENTATION_GUIDE.md`
 
 ### Dependencies
-Lists feature IDs that must be completed before this feature can begin. Format, comma and space separate list of IDs: `2, 5`
+Lists feature IDs that must be completed before this feature can begin. Format, comma and space separate list of IDs: `1.2, 1.5`
 
 ### Output
 Describes what will be created or changed. Could be files, documentation, code, or process changes.
