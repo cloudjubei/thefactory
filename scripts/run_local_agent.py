@@ -50,10 +50,10 @@ class UnifiedEngine:
         context_str = "\n".join(f"--- START of {name} ---\n{content}\n--- END of {name} ---\n" for name, content in context.items())
         
         system_prompt = f"""
-YouAre an autonomous AI agent. Your goal is to advance a software project by completing one task.
+You are an autonomous AI agent. Your goal is to advance a software project by completing one task.
 You operate by generating a plan and a sequence of tool calls in a single JSON response.
 
-Youhave access to the following SAFE tools:
+You have access to the following SAFE tools:
 - `write_file(path, content)`
 - `retrieve_context_files(paths: list)`
 - `rename_files(operations: list, overwrite: bool, dry_run: bool)`
@@ -85,46 +85,46 @@ The key for a tool's parameters MUST be "arguments".
 If no tasks are eligible, your ONLY tool call is `finish(reason=\"HALT: No eligible tasks found.\")`.
 Respond with a single, valid JSON object.
 """
-            user_prompt_parts = ["### PROJECT CONTEXT"]
-            user_prompt_parts.append(context_str)
+        user_prompt_parts = ["### PROJECT CONTEXT"]
+        user_prompt_parts.append(context_str)
 
-            if task_id:
-                specific_task_instruction = f"You are instructed to work on Task {task_id}."
-                if feature_id:
-                    specific_task_instruction += f" Specifically, focus on Feature {task_id}.{feature_id} within this task."
-                specific_task_instruction += " Ignore the '1. Analyze the context to identify the next eligible pending task.' step and directly formulate a plan and tool calls for this specific task/feature."
-                user_prompt_parts.append(specific_task_instruction)
-                user_prompt_parts.append("\nGenerate the JSON response to complete the specified task/feature.")
-            else:
-                user_prompt_parts.append("\nGenerate the JSON response to complete the next task.")
-            
-            user_prompt = "\n".join(user_prompt_parts)
-            return [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
+        if task_id:
+            specific_task_instruction = f"You are instructed to work on Task {task_id}."
+            if feature_id:
+                specific_task_instruction += f" Specifically, focus on Feature {task_id}.{feature_id} within this task."
+            specific_task_instruction += " Ignore the '1. Analyze the context to identify the next eligible pending task.' step and directly formulate a plan and tool calls for this specific task/feature."
+            user_prompt_parts.append(specific_task_instruction)
+            user_prompt_parts.append("\nGenerate the JSON response to complete the specified task/feature.")
+        else:
+            user_prompt_parts.append("\nGenerate the JSON response to complete the next task.")
         
-        def _make_api_call(self, model: str, messages: list) -> str:
-            print(f"Sending prompt to model '{model}' via LiteLLM...")
-            try:
-                response = litellm.completion(model=model, messages=messages, timeout=300, response_format={"type": "json_object"})
-                if response.choices and response.choices[0].message:
-                    return response.choices[0].message.content or ""
-                return ""
-            except Exception as e:
-                print(f"Error: API call via LiteLLM failed: {e}", file=sys.stderr)
-                sys.exit(1)
+        user_prompt = "\n".join(user_prompt_parts)
+        return [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
+        
+    def _make_api_call(self, model: str, messages: list) -> str:
+        print(f"Sending prompt to model '{model}' via LiteLLM...")
+        try:
+            response = litellm.completion(model=model, messages=messages, timeout=300, response_format={"type": "json_object"})
+            if response.choices and response.choices[0].message:
+                return response.choices[0].message.content or ""
+            return ""
+        except Exception as e:
+            print(f"Error: API call via LiteLLM failed: {e}", file=sys.stderr)
+            sys.exit(1)
 
-        def _parse_response(self, response: str) -> list:
-            print("\n--- LLM Response Received ---\n")
-            print(response)
-            try:
-                json_str = response.strip()
-                if json_str.startswith("```json"): json_str = json_str[7:-4].strip()
-                data = json.loads(json_str)
-                print("\n--- Agent's Plan ---")
-                print(data.get("plan", "No plan provided."))
-                return data.get("tool_calls", [])
-            except json.JSONDecodeError as e:
-                print(f"Error: Failed to decode LLM response as JSON: {e}", file=sys.stderr)
-                return []
+    def _parse_response(self, response: str) -> list:
+        print("\n--- LLM Response Received ---\n")
+        print(response)
+        try:
+            json_str = response.strip()
+            if json_str.startswith("```json"): json_str = json_str[7:-4].strip()
+            data = json.loads(json_str)
+            print("\n--- Agent's Plan ---")
+            print(data.get("plan", "No plan provided."))
+            return data.get("tool_calls", [])
+        except json.JSONDecodeError as e:
+            print(f"Error: Failed to decode LLM response as JSON: {e}", file=sys.stderr)
+            return []
 
 class Agent:
     def __init__(self, model: str, mode: str, task_id: int = None, feature_id: int = None):
@@ -194,7 +194,6 @@ class Agent:
             "docs/TASK_FORMAT.md",
             "docs/TOOL_ARCHITECTURE.md",
             "scripts/run_local_agent.py",
-            "scripts/tools/rename_files.py",
             "tasks/7/plan_7.md"
         ]
 
