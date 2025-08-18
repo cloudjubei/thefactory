@@ -1,4 +1,3 @@
-
 # WHAT:
 - Each project, this one included, can be split into two parts -> the specification and the implementation.
 - The specification defines what the project does, so that anyone - be it an AI agent or a human can read it and implement the details.
@@ -15,7 +14,4 @@
 - This project uses Git for source control.
 
 # ACTIONS:
-- Read **[TASKS.md](TASKS.md)**, work on the next possible pending/unknown task.
-
-
-
+- Read **[TASKS.md](../tasks/TASKS.md)**, work on the next possible pending/unknown task.
