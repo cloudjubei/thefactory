@@ -32,6 +32,9 @@ def submit_for_review_tool(git_manager, task_id: int, task_title: str) -> str:
     # Ensure we are on a dedicated feature branch
     if not git_manager._run_command(["git", "checkout", "-B", branch_name]):
         return f"Error: Failed to switch to branch {branch_name}."
+    
+    if not git_manager._run_command(["git", "pull"]):
+        return f"Error: Failed to pull branch {branch_name}."
 
     # Commit and push changes
     if not git_manager.commit_and_push(commit_message=commit_message):
