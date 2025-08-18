@@ -63,15 +63,16 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Acceptance: A folder /plans with a plan file for each task exists.
    Dependencies: 12
 
-14) + File organisation
+14) - File organisation
    Action: Create a scheme for organising files within the repository.
-   Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored.
+   Acceptance: The file `FILE_ORGANISATION.md` exists detailing the structure and naming conventions for different types of files and where they are stored, and all the files adhere to this file organisation.
+   Notes: Perhaps new tools are necessary for this that allow renaming of files etc - this should be. Right now `FILE_ORGANISATION.md` exists, but maybe it should be upgraded.
 
-15) ? Tackle growth
-   Action: Create a system for representing tasks and their plans.
-   Acceptance: A folder /tasks with a task file for each task exists.
-   Dependencies: 13
-   Notes: The project is growing and there's a definite need to organise things better than just having everything in one place. Maybe a special DSL is required, or a different scheme to more succinctly describe thing. This file is great for now, but once there are 1000s of tasks, we'll need something else - we need to prepare for that.
+15) ? Feature definitions
+   Action: Create a features specifications.
+   Acceptance: The file `FEATURE_DEFINITIONS.md` exists detailing the features of the agent and how they will be implemented.
+   Notes: The purpose of this is to make task organisations better. Each task can be a set of sub-tasks, i.e. features, that each can have their own plan and can be run independently. A task is only complete once all of its features are complete. Until now it would be possible to achieve a similar effect by having multiple small tasks, but there's a very important thing that is lost here - the context for the whole overarching task. A feature might only need a very small context to be completed or it might need to know about the context of all of the other features to be completed well. A feature can have a nested sub-feature. This way a task will remain a very high level concept - detailing the absolute top level project goals, whereas a feature will focus more on details but still staying away from implementation specifics.
+   Dependencies: 14
 
 16) ? Running in isolation/container
    Action: Create a workflow to running the agent in a container, i.e. isolated environment.
@@ -89,7 +90,13 @@ See **[TASK_FORMAT.md](TASK_FORMAT.md)** for format reference and how to write a
    Acceptance: The file `TESTING.md` exists detailing the steps involved in testing the agent's functionality.
    Notes: The test framework is implemented and can run tests on the agent - knowing the agent's output and the tools it can access, it needs to be able to determine if the agent has completed a task successfully or not.
 
-19) ? Feature definitions
-   Action: Create a features specifications.
-   Acceptance: The file `FEATURE_DEFINITIONS.md` exists detailing the features of the agent and how they will be implemented.
-   Notes: The purpose of this is to make task organisations better. Each task can be a set of sub-tasks, i.e. features, that each can have their own plan and can be run independently. A task is only complete once all of its features are complete. Until now it would be possible to achieve a similar effect by having multiple small tasks, but there's a very important thing that is lost here - the context for the whole overarching task. A feature might only need a very small context to be completed or it might need to know about the context of all of the other features to be completed well. A feature can have a nested sub-feature. This way a task will remain a very high level concept - detailing the absolute top level project goals, whereas a feature will focus more on details but still staying away from implementation specifics.
+19) ? Local app 
+   Action: Create a local app to handle project management, see tasks etc.
+   Acceptance: The file `LOCAL_APP.md` exists detailing the steps involved in creating a local
+   Notes: Currently I'm using VSCode to view the project, run everything, see tasks etc. It would be ideal to have a dedicated app for managing the project, viewing tasks, seeing progress etc. For being able to see how the agents fares etc. Cline the plugin for VSCode does something like this and maybe it makes sense to even built upon a fork on this. One thing to keep in mind is that we want to be really third-party independent. If we can create something ourselves we should. The only question is how it integrates with the project. If maintaining such a service/dependency is too heavy, then using a third party solution makes sense. Each third party solution should be its own tasks, with documented features and explanations as to why it was chosen etc.
+
+20) ? Create a mobile app
+    Action: Develop a mobile application that allows users to interact with the project and thus the agents it runs.
+    Acceptance: The file `MOBILE_APP.md` exists detailing the development process and user interface design for the mobile application.
+    Notes: The purpose of this is to allow users to interact with the agent through a mobile device. It could include voice commands, touch gestures, or other input methods depending on the target audience and platform.
+    Dependencies: 20

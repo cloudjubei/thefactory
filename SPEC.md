@@ -15,7 +15,7 @@
 - This project uses Git for source control.
 
 # ACTIONS:
-- Read **[TASKS.md](TASKS.md)**, work on the next possible pending task.
+- Read **[TASKS.md](TASKS.md)**, work on the next possible pending/unknown task.
 
 
 
