@@ -1,31 +1,56 @@
 import os
 import json
+from typing import List, Dict
 
-def retrieve_context_files_tool(repo_path: str, paths: list) -> str:
+
+def retrieve_context_files_tool(repo_path: str, paths: List[str]) -> str:
     """
-    Reads and returns the content of the files at the given paths.
-    The result is a JSON string mapping file paths to their content.
+    Retrieve and return the content of the files at the given relative paths.
+
+    Args:
+        repo_path: Absolute path to the cloned repository root.
+        paths: List of relative file paths to read.
+
+    Returns:
+        JSON string with structure:
+        {
+          "ok": bool,
+          "files": { "path": "content", ... },
+          "missing": ["path", ...],
+          "errors": ["message", ...]
+        }
     """
-    retrieved_content = {}
-    for path in paths:
-        full_path = os.path.join(repo_path, path)
-        if not _is_within_base(full_path, repo_path):
-            retrieved_content[path] = f"Error: Path outside repository boundaries is not allowed: {path}"
-            continue
-        if not os.path.exists(full_path):
-            retrieved_content[path] = f"Error: File not found at {path}"
-            continue
-        if not os.path.isfile(full_path):
-            retrieved_content[path] = f"Error: Path is not a file: {path}"
-            continue
+    result: Dict[str, object] = {"ok": True, "files": {}, "missing": [], "errors": []}
+
+    if not isinstance(paths, list):
+        result["ok"] = False
+        result["errors"].append("Invalid argument: 'paths' must be a list of strings.")
+        return json.dumps(result)
+
+    base_abs = os.path.abspath(repo_path)
+
+    for rel in paths:
         try:
-            with open(full_path, "r", encoding="utf-8") as f:
-                retrieved_content[path] = f.read()
+            if not isinstance(rel, str) or rel.strip() == "":
+                result["errors"].append("Encountered an empty or non-string path.")
+                result["ok"] = False
+                continue
+            abs_path = os.path.abspath(os.path.join(base_abs, rel))
+            if not abs_path.startswith(base_abs + os.sep):
+                result["errors"].append(f"Path escapes repository root: {rel}")
+                result["ok"] = False
+                continue
+            if not os.path.exists(abs_path):
+                result["missing"].append(rel)
+                continue
+            if os.path.isdir(abs_path):
+                result["errors"].append(f"Path is a directory, not a file: {rel}")
+                result["ok"] = False
+                continue
+            with open(abs_path, "r", encoding="utf-8") as f:
+                result["files"][rel] = f.read()
         except Exception as e:
-            retrieved_content[path] = f"Error reading file {path}: {e}"
-    return json.dumps(retrieved_content, indent=2)
+            result["errors"].append(f"Failed to read {rel}: {e}")
+            result["ok"] = False
 
-def _is_within_base(path: str, base: str) -> bool:
-    base_real = os.path.realpath(base)
-    path_real = os.path.realpath(path)
-    return os.path.commonpath([path_real, base_real]) == base_real
+    return json.dumps(result)

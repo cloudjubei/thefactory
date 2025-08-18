@@ -40,7 +40,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/run_local_agent.py`
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
 
-7.6) - Orchestrator can parse and call tools
+7.6) + Orchestrator can parse and call tools
    Action: The script parses the agent's response JSON and in turn executes tools.
    Acceptance: An appropriate JSON response triggers a tool call.
    Output: `scripts/run_local_agent.py`
@@ -66,12 +66,12 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/write_file.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.10) - The tool for getting project context file
+7.10) + The tool for getting project context file
    Action: Create a tool called `retrieve_context_files` to return wanted files as text and resume the agent's work.
-   Acceptance: The tool uses correct naming and returns all files matching the pattern as text.
+   Acceptance: The tool uses correct naming and returns requested files as text.
    Output: `scripts/tools/retrieve_context_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
-   Depdendencies: 7.15
+   Dependencies: 7.15
 
 7.11) + The tool for renaming files
    Action: Create a tool called `rename_files` to rename and move files.
@@ -79,9 +79,9 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/tools/rename_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
-7.12) - The tool for creating a git PR
+7.12) + The tool for creating a git PR
    Action: Create a tool called `submit_for_review` to create Git Pull Requests, where the branch naming follows `features/{task_id}` or `features/{task_id}_{feature_id}` if `feature_id` is provided.
-   Acceptance: The tool uses correct naming and creates a pull request. There is also a helper file that manages all git operations. When the agent gets the repository at the beginning - they should be on the `main` branch, but when the agent calls this tool - it should switch to the new branch created by this tool - so all code committed by agents should always be tied to the tasks and features they worked on. This means that the agent should respond in their JSON response with the task and features they are working on. If they are working on a single feature then the branch should be `features/{task_id}_{feature_id}`, otherwise it should be `features/{task_id}`. To achieve this in a cleaner way a JSON respons format should be specified somewhere.
+   Acceptance: The tool uses correct naming and creates a pull request. There is also a helper file that manages all git operations. When the agent calls this tool it switches to the new branch created by this tool so all code committed by agents is tied to the tasks/features worked on.
    Output: `scripts/tools/submit_for_review.py`, `scripts/git_manager.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
 
