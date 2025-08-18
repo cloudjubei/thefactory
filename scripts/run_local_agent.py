@@ -196,7 +196,10 @@ class Agent:
             "docs/SPEC.md",
             "docs/SPECIFICATION_GUIDE.md",
             "docs/TASK_FORMAT.md",
-            "docs/TOOL_ARCHITECTURE.md"
+            "docs/TOOL_ARCHITECTURE.md",
+            "scripts/run_local_agent.py",
+            "scripts/rename_files.py",
+            "tasks/7/plan_7.md"
         ]
         context = {}
         for filename in files:

@@ -35,8 +35,8 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Dependencies: 7.1, 7.2, 7.3
 
 7.4) Implement orchestrator script
-   Action: Create `scripts/run_local_agent.py` that calls an agent with all system context files.
-   Acceptance: Behavior matches `docs/TOOL_ARCHITECTURE.md` and `docs/AGENT_PRINCIPLES.md`.
+   Action: Create `scripts/run_local_agent.py` that calls an agent specified by a model `--model {model_id}` with all system context files.
+   Acceptance: Behavior matches `docs/TOOL_ARCHITECTURE.md` and `docs/AGENT_PRINCIPLES.md`. The script must accept as many possible models as possible.
    Output: `scripts/run_local_agent.py`
    Context: `docs/AGENT_PRINCIPLES.md`, `docs/TOOL_ARCHITECTURE.md`
 
@@ -67,7 +67,7 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Context: `docs/TOOL_ARCHITECTURE.md`
 
 7.9) The tool for getting project context file
-   Action: Create a tool called `retrieve_context_files` to return wanted files as text.
+   Action: Create a tool called `retrieve_context_files` to return wanted files as text and resume the agent's work.
    Acceptance: The tool uses correct naming and returns all files matching the pattern as text.
    Output: `scripts/tools/retrieve_context_files.py`
    Context: `docs/TOOL_ARCHITECTURE.md`
