@@ -62,11 +62,14 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 20) ? Local app 
    Action: Create a local app to handle project management, see tasks etc.
    Acceptance: The file `docs/LOCAL_APP.md` exists detailing the steps involved in creating a local app for project management
-   Context: docs/SPEC.md
    Notes: Currently I'm using VSCode to view the project, run everything, see tasks etc. It would be ideal to have a dedicated app for managing the project, viewing tasks, seeing progress etc. For being able to see how the agents fares etc. Cline the plugin for VSCode does something like this and maybe it makes sense to even built upon a fork on this. One thing to keep in mind is that we want to be really third-party independent. If we can create something ourselves we should. The only question is how it integrates with the project. If maintaining such a service/dependency is too heavy, then using a third party solution makes sense. Each third party solution should be its own tasks, with documented features and explanations as to why it was chosen etc.
 
 21) ? Create a mobile app
     Action: Develop a mobile application that allows users to interact with the project and thus the agents it runs.
     Acceptance: The file `docs/MOBILE_APP.md` exists detailing the development process and user interface design for the mobile application.
-    Context: docs/LOCAL_APP.md
     Notes: The purpose of this is to allow users to interact with the agent through a mobile device. It could include voice commands, touch gestures, or other input methods depending on the target audience and platform.
+
+22) ? Create orchestration so that many different agents can be running on different tasks at once.
+    Action: Implement orchestration logic to manage multiple agents simultaneously.
+    Acceptance: The file `docs/ORCHESTRATION.md` exists detailing the implementation details and strategies for orchestrating multiple agents concurrently.
+    Notes: This involves coordinating resources, scheduling tasks, monitoring performance, and ensuring seamless communication between agents. It may require distributed systems concepts and advanced programming techniques.
