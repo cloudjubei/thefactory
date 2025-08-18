@@ -13,21 +13,21 @@ Implement the local orchestrator script and setup, fully compliant with AGENT_PR
    Output: `scripts/run_local_agent.py`
    Dependencies: 7.5, 7.6, 7.7, 7.8
 
-7.2) Dependency specification
+7.2) + Dependency specification
    Action: Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`.
    Acceptance: `requirements.txt` exists and installs cleanly.
    Output: `requirements.txt`
    Context: `scripts/run_local_agent.py`
    Dependencies: 7.1
 
-7.3) Environment variables template
+7.3) + Environment variables template
    Action: Provide `.env.example` containing placeholders for required API keys and settings.
    Acceptance: `.env.example` exists and documents each variable.
    Output: `.env.example`
    Context: `scripts/run_local_agent.py`
    Dependencies: 7.1
 
-7.4) Local setup guide
+7.4) + Local setup guide
    Action: Author `docs/LOCAL_SETUP.md` with setup and execution instructions.
    Acceptance: `docs/LOCAL_SETUP.md` exists and is accurate.
    Output: `docs/LOCAL_SETUP.md`
