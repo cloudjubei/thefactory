@@ -9,7 +9,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
 
 ## Features
 
-9.1) + Update spec
+9.1) - Update spec
    Action: Update the `docs/PLAN_SPECIFICATION.md` file to include a section describing how testing works in this project. Include an example of what a test looks like, and explain how it verifies acceptance criteria.
    Acceptance:
    - The doc includes a section titled "Testing" which describes the process of writing tests for each task.
