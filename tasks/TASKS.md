@@ -12,9 +12,10 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create the spec that is the entry point for anyone to begin work on the project.
    Acceptance: docs/SPEC.md exists as the entry-point document, includes WHAT, CORE IDEAS, and ACTIONS sections, and references SPECIFICATION_GUIDE.md.
 
-3) + File organisation specification
+3) - File organisation specification
    Action: Create a scheme for organising files within the repository.
-   Acceptance: The documentation exists.
+   Acceptance: docs/FILE_ORGANISATION.md exists and documents the top-level directory layout, file naming conventions, and evolution guidance.
+   Notes: Test file created for Feature 3.1 verification at tasks/3/tests/test_3_2.py (checks required section headings).
 
 4) + Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
