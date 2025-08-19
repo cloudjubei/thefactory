@@ -18,7 +18,7 @@ This plan outlines the features required to transition from the current Markdown
      - The types cover all fields currently used in `TASKS.md` and `plan.md` files.
    Output: `docs/tasks/task_format.py`
 
-13.2) - Create Example JSON Task File
+13.2) + Create Example JSON Task File
    Action: Create `docs/tasks/task_example.json` that demonstrates a complete task in the new format, adhering to the schema defined in `task_format.py`.
    Acceptance:
      - `docs/tasks/task_example.json` exists.
