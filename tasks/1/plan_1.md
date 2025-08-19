@@ -8,7 +8,7 @@ Provide a formal, specification-driven task format and ensure the canonical task
 - Source files: tasks/TASKS.md
 
 ## Features
-1.1) - Create Task Format specification
+1.1) + Create Task Format specification
    Action: Author docs/TASK_FORMAT.md defining task fields, statuses, rules (Sequential Knowledge, Non-Redundancy), examples, and tips.
    Acceptance:
    - docs/TASK_FORMAT.md exists
