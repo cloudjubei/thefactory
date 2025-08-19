@@ -20,13 +20,22 @@ A short, descriptive title for the task (e.g., "Implement User Authentication").
 The current state of the task. While the schema allows for flexibility, common statuses include `-` (Pending), `~` (In Progress), and `+` (Completed).
 
 ### `action` (string)
-A detailed description of the work to be done. It should explain the 'what' and 'why' of the task.
+A  high level description of the work to be done. It should explain the 'what' and 'why' of the task.
+
+### `plan` (string)
+A step-by-step high level plan. This can help guide the development process but does not need to be exhaustive or detailed like the action field.
 
 ### `acceptance` (array)
 A list of criteria that must be met for the task to be considered complete. These should be written as clear, declarative statements.
 
 ### `features` (array)
-For complex tasks, the work should be broken down into a list of smaller, implementable features. Each feature object within this array should follow the same principles of clarity and verifiability.
+For all tasks, the work should be broken down into a list of smaller, implementable features. Each feature object within this array should follow the same principles of clarity and verifiability.
+
+### `rejection` (string)
+A user specified rejection reason. These are optional and only used if there is a specific reason why a task cannot be completed.
+
+### `agent_question` (string)
+A space for the agent to provide back a question to the user when not sure how to proceed or something else has gone wrong. This is also an optional field.
 
 ## 3. Example
 

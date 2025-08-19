@@ -17,30 +17,29 @@ Status = Literal["+", "~", "-", "?", "/", "="]
 class Feature(TypedDict):
     """
     Represents a single, actionable feature within a task.
-    This structure is derived from docs/FEATURE_FORMAT.md.
     """
-    feature_id: int
+    id: int
     status: Status
     title: str
     action: str
+    plan: str # Precise step-by-step plan for this feature. In Markdown format.
     acceptance: str
-    # Optional fields below
     context: Optional[List[str]]
     dependencies: Optional[List[str]]
     output: Optional[List[str]]
     notes: Optional[str]
+    rejection: Optional[str]
+    agent_question: Optional[str] #if the agent asks a question about this feature, it should be stored here.
 
 class Task(TypedDict):
     """
     Represents a single task, containing one or more features.
     This structure is the core of the JSON-based task definition.
     """
-    task_id: int
+    id: int
     status: Status
     title: str
     action: str
-    acceptance: str
-    # Optional fields below
-    dependencies: Optional[List[int]]
-    plan_intent: str # High-level intent/plan for the task as a whole.
+    plan: str # High-level intent/plan for the task as a whole. In Markdown format.
     features: List[Feature]
+    agent_question: Optional[str] #if the agent asks a question about this task, it should be stored here.
