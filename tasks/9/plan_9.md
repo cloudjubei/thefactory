@@ -10,7 +10,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
 ## Features
 
 9.1) - Update spec
-   Action: Update the `docs/PLAN_SPECIFICATION.md file to include a section describing how testing works in this project. Include an example of what a test looks like, and explain how it verifies acceptance criteria.
+   Action: Update the `docs/PLAN_SPECIFICATION.md` file to include a section describing how testing works in this project. Include an example of what a test looks like, and explain how it verifies acceptance criteria.
    Acceptance:
    - The doc includes a section titled "Testing" which describes the process of writing tests for each task.
    - The section requires each task to have a folder named `tests`.
@@ -25,6 +25,8 @@ Create automated tests for all currently existing tasks to verify their acceptan
    Acceptance:
    - For each of Tasks 1,2,3,4,5,6,7,8 there exists a test script at tasks/{id}/tests/ for each of the features that passes.
    - Tests check for expected files and key phrases tied to acceptance.
+   - This task requires to gather context from whichever task is being looked at - if the `docs/PLAN_SPECIFICATION.md` is missing steps relating to this, it should be updated.
+   - As a further improvement to the above, the plan should specify that the agent tries to complete a feature as a single step, gathers all the context required, and finishes by writing the tests for that feature. This way there's going to be a commit per feature so it should be easy to see the steps taken.
    Context: docs/TESTING.md, tasks/TASKS.md
    Output: `tasks/{task_id}/tests/test_{task_id}_{feature_id}.py` for all tasks up to this one and all their features
 
