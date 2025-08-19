@@ -19,9 +19,15 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a scheme for organising files within the repository.
    Acceptance: The documentation exists.
 
-4) + Specification documentation
+4) ~ Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
-   Acceptance: `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist; `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
+   Acceptance:
+     - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
+     - `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
+     - Tests exist under `tasks/4/tests/` (test_4_4.py and test_4_5.py) that verify the guide, template, and SPEC.md adherence, and they pass via run_tests.
+   Rejection: 
+     - SPECIFICATION_GUIDE.md missing '# Specification Guide' heading.
+     - docs/SPEC.md is missing headings: # Problem Statement, # Inputs and Outputs, # Constraints, # Success Criteria, # Edge Cases, # Examples
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
@@ -48,7 +54,6 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    - `docs/TESTING.md` exists and includes Required Sections: Purpose and Scope; Test Locations and Naming Conventions; Test Structure and Utilities; Writing Acceptance Tests; Running Tests; CI/Automation Expectations; Tool Usage; Examples; References.
    - `docs/PLAN_SPECIFICATION.md` is updated to include a "Test-Driven Acceptance" principle, references `docs/TESTING.md`, and updates its template and example to require a corresponding test per feature.
    - No feature should be simply a test run.
-
 
 10) + Agent personas
    Action: Create 4 personas that will serve different purposes:

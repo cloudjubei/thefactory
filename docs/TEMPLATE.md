@@ -1,113 +1,43 @@
-# [PROJECT NAME] Specification
+# Problem Statement
+<Describe the core problem and motivation in 2-5 sentences.>
 
-## Problem Statement
-[Describe the specific problem this project solves. Be clear and concise. Example: "Convert CSV files to JSON format while preserving data types and handling errors gracefully."]
+Example:
+- We need a single entry-point specification file that guides contributors and tools.
 
-## Inputs
-[Define all inputs with their types, formats, and constraints]
+# Inputs and Outputs
+<Enumerate all inputs and outputs with types and examples.>
 
-### Input 1: [Name]
-- Type: [string/number/file/etc.]
-- Format: [specific format requirements]
-- Constraints: [size limits, valid ranges, required/optional]
-- Example: `[provide example]`
+Inputs:
+- Task description (markdown)
+- Repo context files (paths)
 
-### Input 2: [Name]
-- Type: [type]
-- Format: [format]
-- Constraints: [constraints]
-- Example: `[example]`
+Outputs:
+- Created/updated documentation files
+- Passing tests under tasks/{task_id}/tests/
 
-## Outputs
-[Define all outputs with their types and formats]
+# Constraints
+<List technical, operational, and organizational constraints.>
 
-### Success Output
-- Type: [type]
-- Format: [exact format specification]
-- Example:
-```
-[example output]
-```
+- Use only standard library for tests
+- Files must be UTF-8 encoded
+- Deterministic test outcomes (no network calls)
 
-### Error Outputs
-- Condition: [when this error occurs]
-  - Type: [type]
-  - Format: [format]
-  - Example: `[example]`
+# Success Criteria
+<Define objective, verifiable success conditions.>
 
-- Condition: [another error condition]
-  - Type: [type]
-  - Format: [format]
-  - Example: `[example]`
+- Required files exist at exact paths
+- Files contain required headings/phrases
+- run_tests exits with code 0
 
-## Constraints
-[List hard requirements that cannot be violated]
+# Edge Cases
+<List edge cases and expected handling.>
 
-- Performance: [e.g., "Process 1MB file in <1 second"]
-- Resource: [e.g., "Memory usage <100MB"]
-- Compatibility: [e.g., "Must work with Node.js 16+"]
-- Security: [e.g., "No execution of user-provided code"]
+- Missing directories: create them as needed
+- Pre-existing files: update content idempotently
+- Extra sections: allowed if core headings remain intact
 
-## Success Criteria
-[Numbered list of testable conditions that verify correct implementation]
+# Examples
+<Provide concrete examples of correct outputs.>
 
-1. [First testable criterion. Example: "Given valid input X, produces output Y in format Z"]
-2. [Second criterion. Example: "Rejects invalid input with appropriate error message"]
-3. [Third criterion. Example: "Processes 1000 records in under 10 seconds"]
-4. [Continue numbering all criteria...]
-
-## Edge Cases
-[Explicitly define behavior for boundary conditions]
-
-- Empty input: [what happens]
-- Maximum size input: [what happens]
-- Invalid format: [what happens]
-- Concurrent access: [what happens if applicable]
-- [Other edge cases specific to the problem]
-
-## Examples
-
-### Example 1: [Normal Case]
-**Input:**
-```
-[example input]
-```
-
-**Output:**
-```
-[expected output]
-```
-
-### Example 2: [Edge Case]
-**Input:**
-```
-[edge case input]
-```
-
-**Output:**
-```
-[expected output or error]
-```
-
-### Example 3: [Error Case]
-**Input:**
-```
-[invalid input]
-```
-
-**Output:**
-```
-[expected error response]
-```
-
-## Non-Requirements
-[Optional: Explicitly state what is NOT required to avoid scope creep]
-
-- This specification does NOT require: [example: "GUI interface"]
-- Out of scope: [example: "Authentication or user management"]
-
-## Notes
-[Optional: Additional context or clarifications]
-
-- [Any additional notes that help understand the specification]
-- [References to related specifications or standards]
+- Example: SPECIFICATION_GUIDE.md includes headings: Problem Statement, Inputs and Outputs, Constraints, Success Criteria, Edge Cases, Examples.
+- Example: TEMPLATE.md includes the same headings with placeholders and example snippets.
