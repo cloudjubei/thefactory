@@ -237,7 +237,8 @@ class Agent:
             "docs/SPECIFICATION_GUIDE.md",
             "docs/TASK_FORMAT.md",
             "docs/TESTING.md",
-            "docs/TOOL_ARCHITECTURE.md"
+            "docs/TOOL_ARCHITECTURE.md",
+            "scripts/run_local_agent.py"
         ]
 
         if self.task_id:
