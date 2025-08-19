@@ -1,5 +1,7 @@
 # File Organisation
 
+Authoritative reference: This document defines the repository file organization and is referenced by Task 3 in tasks/TASKS.md per the Non-Redundancy Principle. Tasks should reference this file rather than duplicating its details.
+
 This document outlines the standard file and directory structure for the project. A consistent structure is essential for maintaining clarity, scalability, and ease of navigation as the project grows.
 
 ## Guiding Principles
