@@ -27,6 +27,14 @@ A feature is not considered complete until a corresponding test is written and p
 - The acceptance criteria for the "test-writing" feature is that the test script exists under `tasks/{task_id}/tests/` and verifies the acceptance criteria of the previous feature.
 - Use `scripts/run_tests.py` to execute all tests and ensure they pass before submitting the work.
 
+### 2.6. Per-Feature Single-Step Delivery and Commit (Required)
+To enforce more thorough planning and reliable delivery:
+- The agent should complete each feature as a single cohesive step: gather all necessary context, implement the change, and finish by writing the tests for that feature.
+- When a feature is complete and its tests pass, the agent MUST send a `finish_feature` signal. This triggers the orchestrator to commit the current work for that feature (creating one commit per feature) and push the branch.
+- After all features in the task are completed and all tests pass, the agent submits the task via a pull request.
+
+Note: The `finish_feature` signal is a dedicated completion signal for a feature. It is separate from the final `submit_for_review` and `finish` calls that complete the task.
+
 ## 3. Location and Structure
 - Each task MUST have a dedicated plan file located at `tasks/{task_id}/plan_{task_id}.md`.
 - The plan enumerates the FEATURES that make up the task. Each feature follows `docs/FEATURE_FORMAT.md`.
@@ -48,7 +56,7 @@ A plan should include the following sections:
 Short, high-level description of how this plan will satisfy the task's Acceptance criteria.
 
 ## Context
-- Specs: docs/SPEC.md, docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, ...
+- Specs: docs/SPEC.md, docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TESTING.md
 - Source files: (if any)
 
 ## Features
@@ -61,11 +69,17 @@ Short, high-level description of how this plan will satisfy the task's Acceptanc
    Notes: ...
 
 ## Execution Steps
-1) Implement features and their corresponding tests (see Testing rules below)
-2) Run `python scripts/run_tests.py` and ensure all tests pass
-3) Update `tasks/TASKS.md` with status change
-4) Submit for review
-5) Finish
+For each feature in order:
+1) Gather context and implement the feature changes
+2) Create the test(s) that verify the feature's acceptance criteria under `tasks/{task_id}/tests/`
+3) Run `python scripts/run_tests.py` and ensure tests pass locally
+4) Send `finish_feature` with a descriptive message (e.g., "Feature {task_id}.{n} complete: {Title}") to create a commit for this feature
+
+After all features are completed:
+5) Run `python scripts/run_tests.py` again and ensure the full suite passes
+6) Update `tasks/TASKS.md` with status change for this task
+7) Submit for review (open PR)
+8) Finish
 ```
 
 ## 5. Example
@@ -79,10 +93,11 @@ For a task like:
 
 A good corresponding plan would be:
 
-1. Analyze Task: Review Task 12 to confirm the goal is to create `docs/PLAN_SPECIFICATION.md` with purpose, principles, structure, and example.
+1. Analyze Task: Review Task 12 to confirm the goal is to create `docs/PLAN_SPECIFICATION.md` with purpose, principles, structure, template, and example.
 2. Draft Specification: Author the content for `docs/PLAN_SPECIFICATION.md` covering purpose, principles, structure, template, and example.
-3. Update Task List: Modify `tasks/TASKS.md` to change the status of Task 12 from `-` (Pending) to `+` (Completed).
-4. Execute Changes: Generate the necessary tool calls:
+3. Implement Per-Feature Flow: For each feature, write its tests, run the test suite, and then call `finish_feature` to create a per-feature commit.
+4. Update Task List: Modify `tasks/TASKS.md` to change the status of Task 12 from `-` (Pending) to `+` (Completed).
+5. Execute Changes: Generate the necessary tool calls:
    a. `write_file` to create `docs/PLAN_SPECIFICATION.md` with the drafted content.
    b. `write_file` to update `tasks/TASKS.md`.
    c. `submit_for_review` to finalize the task.
@@ -130,11 +145,30 @@ if __name__ == "__main__":
 
 ### 6.5 Running Tests
 - Use `python scripts/run_tests.py` to discover and run all tests under `tasks/*/tests/*.py`.
+- A feature can only be marked complete when its test(s) pass and `finish_feature` has been sent to create a per-feature commit.
 - A plan is only complete when all related tests pass locally before submission.
+
+## 7. Feature Completion Protocol (finish_feature)
+
+### 7.1 Intent
+Ensure every feature completion results in an isolated, reviewable commit and that the feature's tests pass before the work is committed.
+
+### 7.2 Behavior
+- The agent sends `finish_feature` after implementing a feature and creating passing tests.
+- The orchestrator commits all current changes and pushes the branch. One commit per feature is required.
+- Suggested commit message format: `Feature {task_id}.{n}: {Title}`. Include a short description if helpful.
+
+### 7.3 Finalization of the Task
+- After all features send `finish_feature` and all tests pass, the agent:
+  1) Updates `tasks/TASKS.md` marking the task as completed
+  2) Calls `submit_for_review` to open a pull request
+  3) Calls `finish` to end the cycle
 
 ## Summary of execution workflow:
 
 1. Read the task specification from `tasks/TASKS.md`.
 2. Create `tasks/{task_id}/plan_{task_id}.md` and enumerate features according to `docs/FEATURE_FORMAT.md`.
-3. Implement features and their tests, then run `python scripts/run_tests.py`.
-4. Update `TASKS.md`, submit for review, and finish.
+3. For each feature: implement, write tests, run `python scripts/run_tests.py`, then call `finish_feature` to commit the feature.
+4. After all features pass tests: update `TASKS.md`, submit for review, and finish.
+
+Context for implementation references: `scripts/run_tests.py`, `scripts/git_manager.py`, `scripts/run_local_agent.py`.
