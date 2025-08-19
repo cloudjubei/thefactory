@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys
 
 def run():
     path = "docs/PLAN_SPECIFICATION.md"
@@ -8,17 +7,17 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    required = [
-        "Test-Driven Acceptance",
-        "tasks/{task_id}/tests/",
-        "scripts/run_tests.py",
-        "A feature is not considered complete until a corresponding test is written and passes."
+    checks = [
+        ("Testing section header", "## 6. Testing" in content or "\n# Testing" in content or "\n## Testing" in content),
+        ("Test file naming guidance", "test_{task_id}_{feature_id}.py" in content),
+        ("Tasks tests folder path mention", "tasks/{task_id}/tests/" in content),
+        ("finish_feature mention", "finish_feature" in content),
     ]
-    missing = [r for r in required if r not in content]
+    missing = [name for name, ok in checks if not ok]
     if missing:
         print("FAIL: PLAN_SPECIFICATION.md missing: " + ", ".join(missing))
         sys.exit(1)
-    print("PASS: Task 9.1 - PLAN_SPECIFICATION.md encodes test-driven policy and references test runner/location.")
+    print("PASS: PLAN_SPECIFICATION.md encodes testing policy and structure.")
     sys.exit(0)
 
 if __name__ == "__main__":
