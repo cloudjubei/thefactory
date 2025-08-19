@@ -25,8 +25,9 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
      - `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
      - Tests exist under `tasks/4/tests/` (test_4_4.py and test_4_5.py) that verify the guide, template, and SPEC.md adherence, and they pass via run_tests.
-   Notes: 
-     - Per `docs/PLAN_SPECIFICATION.md` and `docs/TESTING.md`, features that create tests are valid deliverables; do not reject work on that basis.
+   Rejection: 
+     - SPECIFICATION_GUIDE.md missing '# Specification Guide' heading.
+     - docs/SPEC.md is missing headings: # Problem Statement, # Inputs and Outputs, # Constraints, # Success Criteria, # Edge Cases, # Examples
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
