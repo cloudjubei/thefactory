@@ -14,9 +14,9 @@ The plan represents a single, atomic set of actions that will be executed. The a
 
 ### 2.3. Logical Sequence
 The steps in the plan should follow a clear, logical progression:
-1. **Analysis:** Start by interpreting the task's requirements.
-2. **Creation/Modification:** Detail the primary changes to be made (e.g., creating new files, modifying existing ones).
-3. **Administration:** Include the final administrative steps, such as updating `TASKS.md` and submitting the work for review.
+1. Analysis: Start by interpreting the task's requirements.
+2. Creation/Modification: Detail the primary changes to be made (e.g., creating new files, modifying existing ones).
+3. Administration: Include the final administrative steps, such as updating `TASKS.md` and submitting the work for review.
 
 ### 2.4. Clarity and Brevity
 The plan should be easy for a human to understand. It should be concise and focus on the "what" and "why," not the low-level "how." The implementation details are found in the content of the `write_file` tool calls, not in the plan itself.
@@ -24,8 +24,8 @@ The plan should be easy for a human to understand. It should be concise and focu
 ### 2.5. Test-Driven Acceptance
 A feature is not considered complete until a corresponding test is written and passes. This ensures that all work is verifiable.
 - For every feature that produces a tangible output (like a file or a change in a file), a subsequent feature in the plan MUST be created to write a test for it.
-- The acceptance criteria for the "test-writing" feature is simply that the test script exists and is located correctly according to `docs/TESTING.md`.
-- This principle makes the acceptance criteria of the original feature concrete and machine-verifiable.
+- The acceptance criteria for the "test-writing" feature is that the test script exists under `tasks/{task_id}/tests/` and verifies the acceptance criteria of the previous feature.
+- Use `scripts/run_tests.py` to execute all tests and ensure they pass before submitting the work.
 
 ## 3. Location and Structure
 - Each task MUST have a dedicated plan file located at `tasks/{task_id}/plan_{task_id}.md`.
@@ -61,10 +61,11 @@ Short, high-level description of how this plan will satisfy the task's Acceptanc
    Notes: ...
 
 ## Execution Steps
-1) Implement features and corresponding tests
-2) Update `tasks/TASKS.md` with status change
-3) Submit for review
-4) Finish
+1) Implement features and their corresponding tests (see Testing rules below)
+2) Run `python scripts/run_tests.py` and ensure all tests pass
+3) Update `tasks/TASKS.md` with status change
+4) Submit for review
+5) Finish
 ```
 
 ## 5. Example
@@ -78,18 +79,62 @@ For a task like:
 
 A good corresponding plan would be:
 
-1. **Analyze Task:** Review Task 12 to confirm the goal is to create `docs/PLAN_SPECIFICATION.md` with purpose, principles, structure, and example.
-2. **Draft Specification:** Author the content for `docs/PLAN_SPECIFICATION.md` covering purpose, principles, structure, template, and example.
-3. **Update Task List:** Modify `tasks/TASKS.md` to change the status of Task 12 from `-` (Pending) to `+` (Completed).
-4. **Execute Changes:** Generate the necessary tool calls:
+1. Analyze Task: Review Task 12 to confirm the goal is to create `docs/PLAN_SPECIFICATION.md` with purpose, principles, structure, and example.
+2. Draft Specification: Author the content for `docs/PLAN_SPECIFICATION.md` covering purpose, principles, structure, template, and example.
+3. Update Task List: Modify `tasks/TASKS.md` to change the status of Task 12 from `-` (Pending) to `+` (Completed).
+4. Execute Changes: Generate the necessary tool calls:
    a. `write_file` to create `docs/PLAN_SPECIFICATION.md` with the drafted content.
    b. `write_file` to update `tasks/TASKS.md`.
    c. `submit_for_review` to finalize the task.
    d. `finish` to end the operation.
 
+## 6. Testing
+
+### 6.1 Purpose
+Testing encodes the acceptance criteria into executable checks, making feature completion objective and reproducible.
+
+### 6.2 Location
+- All tests for a specific task reside within that task's folder under `tasks/{task_id}/tests/`.
+
+### 6.3 Naming
+- Each test file validating a specific feature should follow: `test_{task_id}_{feature_id}.py`.
+  - Example: The test for Task 9, Feature 1 is `tasks/9/tests/test_9_1.py`.
+
+### 6.4 Structure and Content
+- Tests should be simple Python scripts that:
+  - Verify file existence, expected structure, or key phrases defined by acceptance criteria.
+  - Print PASS/FAIL messages and exit with 0 on success, 1 on failure.
+
+Example:
+```
+import os, sys
+
+def run():
+    path = "docs/TEMPLATE.md"
+    if not os.path.exists(path):
+        print(f"FAIL: {path} does not exist.")
+        sys.exit(1)
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+    required = ["# Problem Statement", "# Inputs and Outputs"]
+    missing = [s for s in required if s not in content]
+    if missing:
+        print("FAIL: Missing sections: " + ", ".join(missing))
+        sys.exit(1)
+    print("PASS: TEMPLATE.md has required sections.")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    run()
+```
+
+### 6.5 Running Tests
+- Use `python scripts/run_tests.py` to discover and run all tests under `tasks/*/tests/*.py`.
+- A plan is only complete when all related tests pass locally before submission.
 
 ## Summary of execution workflow:
 
 1. Read the task specification from `tasks/TASKS.md`.
 2. Create `tasks/{task_id}/plan_{task_id}.md` and enumerate features according to `docs/FEATURE_FORMAT.md`.
-3. Execute the plan, update `TASKS.md`, submit for review, and finish.
+3. Implement features and their tests, then run `python scripts/run_tests.py`.
+4. Update `TASKS.md`, submit for review, and finish.
