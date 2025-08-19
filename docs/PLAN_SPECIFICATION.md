@@ -186,4 +186,12 @@ Ensure every feature completion results in an isolated, reviewable commit and th
 3. For each feature: gather MCC via `retrieve_context_files`, implement, write tests, run `run_tests`, then call `finish_feature` to commit the feature.
 4. After all features pass tests: update `TASKS.md`, submit for review, and finish.
 
-Context for implementation references: `scripts/run_tests.py`, `scripts/git_manager.py`, `scripts/run_local_agent.py`.
+## 8. Legacy Tasks and Backfilled Plans
+
+When introducing plans or tests for tasks that were completed before this specification ("legacy tasks"), apply the following rules:
+
+- Do not retroactively change a task's status in `tasks/TASKS.md` from Completed unless you determine its original Acceptance criteria were not actually met.
+- It is acceptable to add a dedicated test-writing feature per legacy task and mark it as Blocked (`/`) with a dependency on Task 9 (Automated tests). This documents the intent to add tests without implying current work is pending for that legacy task.
+- If the task has follow-on enhancements (e.g., optional artifacts noted in the task's Notes), you may add a Pending (`-`) feature to capture that enhancement. This does not negate the original completion status as long as it was not part of the original Acceptance.
+- Always include MCC gathering when backfilling plans, and reference the relevant specs in the plan's Context section.
+- New work must follow the standard flow (per-feature tests and `finish_feature`) going forward.
