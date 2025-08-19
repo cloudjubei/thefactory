@@ -9,7 +9,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
 
 ## Features
 
-9.1) - Update spec
+9.1) + Update spec
    Action: Update the `docs/PLAN_SPECIFICATION.md` file to include a section describing how testing works in this project. Include an example of what a test looks like, and explain how it verifies acceptance criteria.
    Acceptance:
    - The doc includes a section titled "Testing" which describes the process of writing tests for each task.
@@ -30,8 +30,9 @@ Create automated tests for all currently existing tasks to verify their acceptan
    - This task requires to gather context from whichever task is being looked at - if the `docs/PLAN_SPECIFICATION.md` is missing steps relating to this, it should be updated.
    Context: docs/TESTING.md, tasks/TASKS.md
    Output: `tasks/{task_id}/tests/test_{task_id}_{feature_id}.py` for all tasks up to this one and all their features
+   Rejection: Not all features in a task have tests implemented. The test for this task doesn't check for the correct files or phrases.
 
-9.3) - Create a test runner script
+9.3) + Create a test runner script
    Action: Create a new script `scripts/run_tests.py`. It should run all tests found under `tasks/*/tests/*.py`.
    Acceptance:
    - Script runs successfully on local machine.
@@ -45,6 +46,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
    - All of the features here are tested by running `python scripts/run_tests.py`
    Context: docs/PLAN_SPECIFICATION.md, docs/TESTING.md
    Output: `tasks/{task_id}/tests/test_{task_id}_{feature_id}.py` for this task and all of its features
+   Rejection: The test for this task doesn't check for the correct files or phrases - i.e. doesn't check that tests for features are done.
 
 ## Execution Steps
 1) Implement features

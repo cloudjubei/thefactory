@@ -16,6 +16,7 @@ ID) STATUS Title
    Dependencies: [Optional] Other features (e.g., 13.1) or tasks (by ID) that must be done first
    Output: [Optional] Artifacts this feature produces or changes
    Notes: [Optional] Additional clarifications
+   Rejection: [Optional] Information about why this feature is currently being rejected
 ```
 
 ## Field Definitions
@@ -57,6 +58,10 @@ Describes what will be created or changed. Could be files, documentation, code, 
 
 ### Notes
 Any extra notes about the feature that explain reasoning or give extra hints about how to accomplish the feature. Especially useful for `Unknown` features that usually require a discussion.
+
+### Rejection
+Concrete reason that defines why the feature is not accepted.
+If the reason introduces new spec that isn't already covered elsewhere, add it to the spec.
 
 ## Examples
 
