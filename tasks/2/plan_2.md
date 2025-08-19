@@ -30,7 +30,7 @@ Ensure Task 2 satisfies its Acceptance by providing a concise, specification-dri
    Context: docs/SPECIFICATION_GUIDE.md, docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md
    Output: docs/SPEC.md
 
-2.4) - Tests: SPECIFICATION_GUIDE.md required sections
+2.4) + Tests: SPECIFICATION_GUIDE.md required sections
    Action: Add a deterministic test verifying that docs/SPECIFICATION_GUIDE.md exists and includes all required section headings.
    Acceptance:
    - tasks/2/tests/test_2_4.py exists
@@ -40,7 +40,7 @@ Ensure Task 2 satisfies its Acceptance by providing a concise, specification-dri
    Dependencies: 2.1
    Output: tasks/2/tests/test_2_4.py
 
-2.5) - Tests: TEMPLATE.md coverage
+2.5) + Tests: TEMPLATE.md coverage
    Action: Add a deterministic test verifying docs/TEMPLATE.md exists and includes placeholders/headers for all sections defined by the guide.
    Acceptance:
    - tasks/2/tests/test_2_5.py exists
@@ -50,7 +50,7 @@ Ensure Task 2 satisfies its Acceptance by providing a concise, specification-dri
    Dependencies: 2.2
    Output: tasks/2/tests/test_2_5.py
 
-2.6) - Tests: SPEC.md structure and reference
+2.6) + Tests: SPEC.md structure and reference
    Action: Add a deterministic test verifying docs/SPEC.md exists and matches required structure and references the guide.
    Acceptance:
    - tasks/2/tests/test_2_6.py exists
