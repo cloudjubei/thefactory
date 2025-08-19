@@ -87,7 +87,7 @@ This plan outlines the features required to transition from the current Markdown
    Dependencies: 13.8
    Output: Modified `scripts/run_local_agent.py`
 
-13.10) - Remove TASKS.md
+13.10) + Remove TASKS.md
    Action: Delete the old `tasks/TASKS.md` file from the repository to complete the migration.
    Acceptance:
      - `tasks/TASKS.md` is deleted.
