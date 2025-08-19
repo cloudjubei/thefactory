@@ -14,9 +14,12 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
      - `docs/SPEC.md` exists and adheres to `docs/SPECIFICATION_GUIDE.md`.
 
-3) + File organisation specification
+3) - File organisation specification
    Action: Create a scheme for organising files within the repository.
-   Acceptance: The documentation exists.
+   Acceptance: 
+   - `docs/FILE_ORGANISATION.md` exists.
+   - The specification contains examples of how files should be organised.
+   - All files are organised according to the specification.
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
