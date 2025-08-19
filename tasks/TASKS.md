@@ -37,19 +37,28 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
    Acceptance: The documentation exists.
 
-9) - Automated tests
+9) + Automated tests
    Action: Create tests for every task and feature already existing. 
    Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification. The tests for this task must all pass.
 
-10) - Tasks 6 & 7 should be joined into one
+10) - Agent personas
+   Action: Create 4 personas that will serve different purposes:
+   - Manager: An agent that looks at the task description and identifies any missing specification or context. They must identify all necessary information to be in place for the other agents to proceed with their work. They are responsible for seeing if the work has been done, or whether it couldn't due to bad/missing spec. This agent is the one that can edit the task description.
+   - Planner: An agent that looks at the task description and creates a plan for completing a task following the given specifications. This agent is the one that can edit the plan description.
+   - Tester: An agent that looks at the task description, and then for each feature creates the most appropriate acceptance criteria. Based on that criteria the agent creates a test case for each feature. This agent is the one that can edit the tests.
+   - Developer: An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria.
+   Acceptance: Four personas exist that describe the roles of the agents. These personas are detailed in a file `docs/AGENT_PERSONAS.md`. A script exists that allows running these personas, so that for each task, the persona script can run and see if there's anything else for it to do. Once these personas are implemented, this task should be updated accordingly so that it follows spec.
+   VERY IMPORTANT: The personans must work with minimal context needed for them to succeed. We must have all the tools in place for them to succeed at this.
+
+11) - Tasks 6 & 7 should be joined into one
    Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now. To accomplish this, inspect the plans for both of the tasks and merge them together. Inspect the tests for both and merge them together.
    Acceptance: Only a single task exists relating to the Agent. This task gets removed upon completion. All files - plans, tests are now under task 6. All features are still present and working as normal. All tests pass.
 
-11) - The plans for all tasks must be updated
+12) - The plans for all tasks must be updated
    Action: Update the plans for all plans to reflect the status of each feature. Clearly there's something missing in the spec, most probably in `docs/PLAN_SPECIFICATION.md`, because the agent isn't updating the plan for the task it works on to update the status of the feature and task (while features are being worked on this should be set to pending).
    Acceptance: All tasks until this one have all plans updated with correct status, acceptance criteria and any other spec.
 
-12) - New child projects structure
+13) - New child projects structure
    Action: Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. This project will only oversee their specification correctness.
    Acceptance: The file `docs/CHILD_PROJECTS_SPECIFICATION.md` exists detailing the structure of child projects stemming from this project. There is a folder called `projects` where all the child projects are stored. Each child project has its own repository and is linked to this one via git submodules. This project's `.gitignore` needs to be updated so it ignores the `projects` folder and all the files inside it.
 

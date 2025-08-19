@@ -227,6 +227,7 @@ class Agent:
     def _gather_context(self, repo_path: str):
         files = [
             "tasks/TASKS.md",
+            "docs/AGENT_EXECUTION_CHECKLIST.md",
             "docs/AGENT_PRINCIPLES.md",
             "docs/FEATURE_FORMAT.md",
             "docs/FILE_ORGANISATION.md",

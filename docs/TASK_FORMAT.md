@@ -5,6 +5,7 @@ ID) STATUS Title
    Action: High level description of what needs to be done
    Acceptance: High level description of how to verify the task is complete
    Notes: [Optional] Additional information about the task
+   Rejection: [Optional] Information about why this task is currently being rejected
 ```
 
 ## Field Definitions
@@ -36,6 +37,10 @@ Good acceptance criteria answers: "What must be achieved for this task to be fin
 
 ### Notes
 Any extra notes about the task that explain reasoning or give extra hints about how to accomplish the task. Especially useful for `unknown` tasks that usually require a discussion.
+
+### Rejection
+Concrete reason that defines why the task is not accepted.
+If the reason introduces new spec that isn't already covered elsewhere, add it to the spec.
 
 ## Rules
 
