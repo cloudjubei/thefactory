@@ -30,6 +30,7 @@ Deliver a concise, specification-driven plan that ensures the specification guid
    - docs/SPEC.md exists and includes sections: Problem Statement, Inputs and Outputs, Constraints, Success Criteria, Edge Cases, Examples
    - Section order and intent match docs/SPECIFICATION_GUIDE.md
    - No extraneous sections superseding these core sections remain
+   - The document references docs/SPECIFICATION_GUIDE.md at the top
    Context: docs/SPEC.md, docs/SPECIFICATION_GUIDE.md
    Dependencies: 4.1, 4.2
    Output: Updated docs/SPEC.md
