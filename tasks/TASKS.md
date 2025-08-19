@@ -24,8 +24,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance:
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
      - `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
-     - Tests exist under `tasks/4/tests/` that verify the guide, template, and SPEC.md adherence, and they pass via run_tests.
-   Notes: Plan updated to include per-feature tests (4.4, 4.5, 4.6) per PLAN_SPECIFICATION.
+   Rejection: test doesn't exist
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.

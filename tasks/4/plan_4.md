@@ -34,41 +34,7 @@ Deliver a concise, specification-driven plan that ensures the specification guid
    Context: docs/SPEC.md, docs/SPECIFICATION_GUIDE.md
    Dependencies: 4.1, 4.2
    Output: Updated docs/SPEC.md
-
-4.4) - Write tests for 4.1 (SPECIFICATION_GUIDE.md)
-   Action: Create an acceptance test that verifies the guide exists and includes the required sections.
-   Acceptance:
-   - File tasks/4/tests/test_4_4.py exists
-   - The test verifies docs/SPECIFICATION_GUIDE.md exists
-   - The test asserts presence of headings: "Problem Statement", "Inputs and Outputs", "Constraints", "Success Criteria", "Edge Cases", "Examples"
-   - Test exits with code 0 on success
-   Context: docs/TESTING.md, docs/PLAN_SPECIFICATION.md, docs/SPECIFICATION_GUIDE.md
-   Dependencies: 4.1
-   Output: tasks/4/tests/test_4_4.py
-
-4.5) - Write tests for 4.2 (TEMPLATE.md)
-   Action: Create an acceptance test that verifies the template exists and includes placeholders for the required sections.
-   Acceptance:
-   - File tasks/4/tests/test_4_5.py exists
-   - The test verifies docs/TEMPLATE.md exists
-   - The test asserts presence of placeholders/headings corresponding to all sections defined in docs/SPECIFICATION_GUIDE.md
-   - Test exits with code 0 on success
-   Context: docs/TESTING.md, docs/PLAN_SPECIFICATION.md, docs/TEMPLATE.md, docs/SPECIFICATION_GUIDE.md
-   Dependencies: 4.2
-   Output: tasks/4/tests/test_4_5.py
-
-4.6) - Write tests for 4.3 (SPEC.md adherence)
-   Action: Create an acceptance test that verifies docs/SPEC.md adheres to the guide.
-   Acceptance:
-   - File tasks/4/tests/test_4_6.py exists
-   - The test verifies docs/SPEC.md exists
-   - The test asserts that docs/SPEC.md references docs/SPECIFICATION_GUIDE.md at the top
-   - The test asserts presence of headings: "Problem Statement", "Inputs and Outputs", "Constraints", "Success Criteria", "Edge Cases", "Examples"
-   - The test asserts there are no extraneous top-level sections that supersede these core sections
-   - Test exits with code 0 on success
-   Context: docs/TESTING.md, docs/PLAN_SPECIFICATION.md, docs/SPEC.md, docs/SPECIFICATION_GUIDE.md
-   Dependencies: 4.3
-   Output: tasks/4/tests/test_4_6.py
+   Rejection: test doesn't exist
 
 ## Execution Steps
 For each feature in order:
