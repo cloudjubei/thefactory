@@ -7,8 +7,11 @@ Establish the canonical, project-wide testing specification and integrate testin
 - Specs: docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TOOL_ARCHITECTURE.md
 - Source files: tasks/TASKS.md
 
+## Notes
+- Task 9 is deprecated; removal and renumbering will be handled under Task 15. This task focuses solely on defining the testing specification and integrating it into the planning specification.
+
 ## Features
-8.1) + Author the canonical testing specification
+8.1) - Author the canonical testing specification
    Action: Create docs/TESTING.md describing the philosophy, scope, structure, location, naming conventions, tooling, and workflow for tests in this project.
    Acceptance:
    - docs/TESTING.md exists and includes the following sections:
@@ -23,7 +26,7 @@ Establish the canonical, project-wide testing specification and integrate testin
      9) References (PLAN_SPECIFICATION.md, TASK_FORMAT.md, TOOL_ARCHITECTURE.md)
    Context: docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TOOL_ARCHITECTURE.md
    Output: docs/TESTING.md
-   Notes: This feature defines the specification only. Task 9 remains responsible for implementing tests.
+   Notes: This feature defines the specification only. Repository-wide test implementation is out of scope here and is addressed by future consolidation (see Task 15).
 
 8.2) - Integrate testing into the planning specification
    Action: Update docs/PLAN_SPECIFICATION.md so testing is a mandatory part of the feature workflow and clearly referenced in the plan template.

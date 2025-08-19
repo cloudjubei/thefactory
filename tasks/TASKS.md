@@ -43,13 +43,15 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    - `docs/TESTING.md` exists and includes Required Sections: Purpose and Scope; Test Locations and Naming Conventions; Test Structure and Utilities; Writing Acceptance Tests; Running Tests; CI/Automation Expectations; Tool Usage; Examples; References.
    - `docs/PLAN_SPECIFICATION.md` is updated to include a "Test-Driven Acceptance" principle, references `docs/TESTING.md`, and updates its template and example to require a corresponding test per feature.
    - New or updated task/feature plans created after this change reference `docs/TESTING.md` where applicable.
-   - Task 9 is superfluous. All information that isn't included in Task 8, but is in Task 9 should be merged into Task 8.
-   - Task 9 doesn't exist, it's removed from this document and so are all files related to it.
    - No feature should be simply a test run.
+   Notes: Consolidation and reordering of testing-related tasks (including deprecating Task 9) will be handled in Task 15 to avoid midstream renumbering.
+   Dependencies: 5
 
-9) + Automated tests
-   Action: Create tests for every task and feature already existing. 
-   Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification. The tests for this task must all pass.
+9) = Automated tests
+   Action: Deprecated. This effort is consolidated under Task 8 (testing specification) and Task 15 (task consolidation and reordering).
+   Acceptance: Do not implement this task directly. It will be removed as part of Task 15 after Task 8 is complete.
+   Notes: All testing requirements live in `docs/TESTING.md` and `docs/PLAN_SPECIFICATION.md` per Task 8.
+   Dependencies: 8, 15
 
 10) + Agent personas
    Action: Create 4 personas that will serve different purposes:
