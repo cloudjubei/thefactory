@@ -19,7 +19,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a scheme for organising files within the repository.
    Acceptance: The documentation exists.
 
-4) ~ Specification documentation
+4) + Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
    Acceptance:
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
@@ -27,7 +27,6 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
      - Tests exist under `tasks/4/tests/` (test_4_4.py and test_4_5.py) that verify the guide, template, and SPEC.md adherence, and they pass via run_tests.
    Notes: 
      - Per `docs/PLAN_SPECIFICATION.md` and `docs/TESTING.md`, features that create tests are valid deliverables; do not reject work on that basis.
-     - Current status: test_4_4 is failing due to missing required headings in one or both documents (`docs/SPECIFICATION_GUIDE.md`, `docs/TEMPLATE.md`); test_4_5 is pending. Update the docs and/or tests accordingly.
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
