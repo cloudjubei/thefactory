@@ -53,3 +53,41 @@ Create automated tests for all currently existing tasks to verify their acceptan
 2) Update `tasks/TASKS.md` with status change
 3) Submit for review
 4) Finish
+
+---
+
+## Manager Review — Clarifications and Constraints (Non-implementing)
+
+The following refinements remove ambiguity and ensure testers and developers can proceed deterministically without additional guidance. No code is implemented by this change; it only clarifies the plan.
+
+1) Scope and Sources for 9.2 (Tests for Tasks 1–8)
+- Test Generation Basis: For each task in 1–8, enumerate its features exclusively from its plan file at `tasks/{id}/plan_{id}.md`.
+- Per-Feature Tests: Create exactly one test file per feature, named `tasks/{id}/tests/test_{id}_{feature_number}.py`.
+- Assertions: Each test must check the acceptance criteria of its corresponding feature. When acceptance depends on file existence or key phrases, assert those concrete conditions. When acceptance references a spec document, assert the presence of the referenced section/phrase in that document.
+- Missing Plans/Specs: If a task lacks a plan file or acceptance criteria are undefined, mark the corresponding test effort as Unknown (`?`) in the plan (via feature status update) and use `ask_question` to request clarification. Do not fabricate acceptance criteria.
+
+2) Test Discovery and Runner Conventions (Aligns with 9.3)
+- Runner Entrypoint: `scripts/run_tests.py` is the single entry to run the entire suite.
+- Discovery Pattern: The runner must discover tests under `tasks/*/tests/*.py`.
+- Determinism: Tests must not depend on external network, API keys, or environment-specific state. Tests should operate solely on repository files.
+
+3) Explicit Requirements for 9.4 (Meta-tests for this Task)
+- Section Name: docs/PLAN_SPECIFICATION.md must include a section titled exactly "Test-Driven Acceptance".
+- Mandatory Phrase: That section must contain the exact sentence: "A feature is not complete until a corresponding test is written and passes."
+- Verification: The tests for 9.4 must assert both the presence of the section title and the exact sentence above.
+- Execution: Verifying 9.4 is done by running `python scripts/run_tests.py` and seeing these tests pass.
+
+4) Workflow and Status Tracking (Per docs/TOOL_ARCHITECTURE.md)
+- Single Feature Focus: Implement and validate exactly one feature per agent cycle.
+- Feature Completion Boundary: After implementing and validating a feature, call `finish_feature(task_id, feature_id, ...)` to create an isolated commit.
+- Plan Status Updates: Update `tasks/{task_id}/plan_{task_id}.md` feature statuses as they progress (`-` Pending -> `~` In Progress -> `+` Completed). If ambiguity blocks progress, set `?` Unknown and use `ask_question`.
+- Task Status in TASKS.md: When any feature of Task 9 is being actively worked on, set Task 9 status to `~` In Progress.
+
+5) Non-Redundancy and References
+- Do not restate implementation details in tests; reference docs/TESTING.md and docs/PLAN_SPECIFICATION.md for methodology and structure. Acceptance remains the authoritative source for "what"; specs define "how".
+
+6) Current Status Summary for Task 9 (for visibility only)
+- 9.1 Completed (+)
+- 9.2 Pending (-)
+- 9.3 Completed (+)
+- 9.4 Pending (-)
