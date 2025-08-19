@@ -29,7 +29,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
       - `docs/FEATURE_FORMAT.md` exists and includes Purpose, Format, Field Definitions, and Examples.
       - `docs/PLAN_SPECIFICATION.md` exists and includes purpose, principles, structure, template, and example, and references `docs/FEATURE_FORMAT.md`.
 
-6) ~ Define Core Agent Terminology, Orchestrator, and Personas
+6) + Define Core Agent Terminology, Orchestrator, and Personas
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". Consolidate the Orchestrator and Personas into a single cohesive agent architecture under this task.
    Acceptance: 
      - The documentation exists and is cohesive:
@@ -49,23 +49,12 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    - `docs/PLAN_SPECIFICATION.md` is updated to include a "Test-Driven Acceptance" principle, references `docs/TESTING.md`, and updates its template and example to require a corresponding test per feature.
    - No feature should be simply a test run.
 
-<<<<<<< HEAD
 9) - Move tasks around
    Action: Perform the following:
    - Create a tool for moving a task to a different position in the list of tasks.
    - The testing task - task 8, should be the moved to spot 6.
    - All other tasks need to be shifted accordingly.
 
-10) + Agent personas
-   Action: Create 4 personas that will serve different purposes:
-   - Manager: An agent that looks at the task description and identifies any missing specification or context. They must identify all necessary information to be in place for the other agents to proceed with their work. They are responsible for seeing if the work has been done, or whether it couldn't due to bad/missing spec. This agent is the one that can edit the task description.
-   - Planner: An agent that looks at the task description and creates a plan for completing a task following the given specifications. This agent is the one that can edit the plan description.
-   - Tester: An agent that looks at the task description, and then for each feature creates the most appropriate acceptance criteria. Based on that criteria the agent creates a test case for each feature. This agent is the one that can edit the tests.
-   - Developer: An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria.
-   Acceptance: Four personas exist that describe the roles of the agents. These personas are detailed in a file `docs/AGENT_PERSONAS.md`. A script exists that allows running these personas, so that for each task, the persona script can run and see if there's anything else for it to do. Once these personas are implemented, this task should be updated accordingly so that it follows spec. Each persona has a prompt that is clearly visible. `run_local_agent.py` is updated with the workflow that these new personas introduce. I must be able to run the personas individually once this task is completed to check each agent.
-
-=======
->>>>>>> f7afc0647da36584b2d1e5451ba0f89697287328
 11) ? Should the tasks and plan format change?
    Action: Now that the personas exist, it's clear that to be able to provide them with the smallest context possible, we need to change the spec and thus the format of tasks and features. Instead of keeping a task in this markdown file, each task should be in a separate JSON file in its folder - `task.json`. The task should contain all the information that is currently here and all the feature specifics. This way it's easy to extract specific task or feature information and provide it as context to a given agent. The plan in each folder should remain as markdown, as it should be the best way for an LLM to consume information. Appropriate tools need to be in place, so that each persona will only get the relevant context.
 
