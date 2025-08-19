@@ -10,35 +10,31 @@ REQUIRED_HEADINGS = [
     "# Examples",
 ]
 
-TARGET_FILES = [
-    ("docs/SPECIFICATION_GUIDE.md", "SPECIFICATION_GUIDE.md"),
-    ("docs/TEMPLATE.md", "TEMPLATE.md"),
+FILES = [
+    ("docs/SPECIFICATION_GUIDE.md", "Specification Guide"),
+    ("docs/TEMPLATE.md", "Specification Template"),
 ]
 
-def check_file(path: str, label: str) -> list:
+def check_file(path, label):
     if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
-        return [f"{label} missing file"]
+        print(f"FAIL: {label} missing: {path} does not exist.")
+        return False
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
     missing = [h for h in REQUIRED_HEADINGS if h not in content]
     if missing:
-        print(f"FAIL: {label} is missing headings: {', '.join(missing)}")
-    return missing
+        print(f"FAIL: {label} ({path}) is missing headings: {', '.join(missing)}")
+        return False
+    print(f"PASS: {label} ({path}) contains all required headings.")
+    return True
 
 def run():
-    all_missing = []
-    for path, label in TARGET_FILES:
-        missing = check_file(path, label)
-        if missing:
-            all_missing.append((label, missing))
-    if all_missing:
-        # Provide a concise rejection summary similar to the plan's expectations
-        spec_missing = next((m for lbl, m in all_missing if lbl == "SPECIFICATION_GUIDE.md"), [])
-        tmpl_missing = next((m for lbl, m in all_missing if lbl == "TEMPLATE.md"), [])
-        # Exit with failure
+    ok = True
+    for path, label in FILES:
+        ok = check_file(path, label) and ok
+    if not ok:
         sys.exit(1)
-    print("PASS: SPECIFICATION_GUIDE.md and TEMPLATE.md exist and contain all required headings.")
+    print("PASS: test_4_4 - Guide and Template verified.")
     sys.exit(0)
 
 if __name__ == "__main__":
