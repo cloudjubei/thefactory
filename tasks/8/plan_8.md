@@ -8,7 +8,7 @@ Establish the canonical, project-wide testing specification and integrate testin
 - Source files: tasks/TASKS.md
 
 ## Features
-8.1) - Author the canonical testing specification
+8.1) + Author the canonical testing specification
    Action: Create docs/TESTING.md describing the philosophy, scope, structure, location, naming conventions, tooling, and workflow for tests in this project.
    Acceptance:
    - docs/TESTING.md exists and includes the following sections:
