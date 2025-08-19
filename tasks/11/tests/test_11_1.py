@@ -1,45 +1,30 @@
-import os, sys, re
-
-
-def fail(msg: str):
-    print(f"FAIL: {msg}")
-    sys.exit(1)
-
+import os, sys
 
 def run():
     path = "docs/TASKS_JSON_FORMAT.md"
     if not os.path.exists(path):
-        fail(f"{path} does not exist.")
+        print(f"FAIL: {path} does not exist.")
+        sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Folder structure elements
-    for needle in ["tasks/{id}/", "task.json", "plan_{id}.md", "tests/"]:
-        if needle not in content:
-            fail(f"Missing folder structure element: '{needle}'")
-    if "artifacts" not in content:
-        fail("Missing mention of optional 'artifacts' folder")
-
-    # Core fields
-    fields = [
-        "id", "status", "title", "action", "acceptance", "notes", "dependencies",
-        "features", "metadata", "created", "updated", "version"
+    required_strings = [
+        "tasks/{id}/", "task.json", "plan_{id}.md", "tests/", "artifacts",
+        "id (int)", "status (one of + ~ - ? / =)", "title (string)", "action (string)",
+        "acceptance (array[string] or structured list)", "notes (string, optional)",
+        "dependencies (array[int], optional)", "features (array[Feature])",
+        "metadata (object: created, updated, version)",
+        "number", "context", "output", "notes",
+        "docs/TASK_FORMAT.md", "Example: task.json"
     ]
-    missing = [f for f in fields if re.search(rf"\\b{re.escape(f)}\\b", content) is None]
+
+    missing = [s for s in required_strings if s not in content]
     if missing:
-        fail("Missing schema field mentions: " + ", ".join(missing))
+        print("FAIL: Missing required phrases: " + ", ".join(missing))
+        sys.exit(1)
 
-    # Reference to status definitions
-    if "docs/TASK_FORMAT.md" not in content:
-        fail("Must reference docs/TASK_FORMAT.md for status codes")
-
-    # Example presence
-    if not re.search(r"example", content, re.IGNORECASE):
-        fail("No example section found (expected an end-to-end example)")
-
-    print("PASS: TASKS_JSON_FORMAT.md meets required structure and references.")
+    print("PASS: TASKS_JSON_FORMAT.md defines required structure, fields, references, and examples.")
     sys.exit(0)
-
 
 if __name__ == "__main__":
     run()

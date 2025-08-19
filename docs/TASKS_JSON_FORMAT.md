@@ -1,110 +1,125 @@
-# JSON-Based Tasks Format
+# JSON-based Tasks Format (Canonical)
 
-## Purpose
-Define the canonical, per-task JSON representation and repository layout for tasks. This format becomes the single source of truth for task data across all personas and tooling.
+## 1. Purpose
+This document defines the canonical, JSON-based format for tasks, using a per-task folder at tasks/{id}/. It standardizes the fields stored in task.json, the structure of nested features, and required metadata. This format becomes the single source of truth for tasks post-migration (see docs/TASKS_MIGRATION_GUIDE.md).
 
-- Canonical Source: tasks/{id}/task.json
-- Compatibility: During migration, tasks/TASKS.md is maintained as an index. See docs/TASKS_MIGRATION_GUIDE.md.
-- Status Codes: Reuse definitions from docs/TASK_FORMAT.md.
+## 2. Folder Structure
+Each task lives in its own folder:
 
-## Repository Layout
-Each task resides in its own folder:
+```
+tasks/{id}/
+  task.json              # canonical machine-readable task file
+  plan_{id}.md           # human-readable plan with features and statuses
+  tests/                 # acceptance tests per feature
+  artifacts/             # optional: outputs, generated files, attachments
+```
 
-- tasks/{id}/
-  - task.json (canonical task data)
-  - plan_{id}.md (human-readable plan following docs/PLAN_SPECIFICATION.md and docs/FEATURE_FORMAT.md)
-  - tests/ (acceptance tests for this task’s features)
-  - artifacts/ (optional, generated or supporting files)
+Key requirements:
+- Folder structure: tasks/{id}/ containing task.json, plan_{id}.md, tests/, optional artifacts/.
+- plan_{id}.md remains the human-readable plan and is kept in sync with task.json during migration.
 
-## task.json Schema (conceptual)
-The schema describes fields and types to be validated by JSON Schema in a follow-up task (see Task 25).
+## 3. task.json Schema
+The task.json file captures the complete state of a task and its features.
 
-Top-level fields:
-- id: integer. The task ID.
-- status: string. One of "+", "~", "-", "?", "/", "=" (see docs/TASK_FORMAT.md for definitions).
-- title: string. Short title of the task.
-- action: string. Imperative description of the work.
-- acceptance: array. Either array of strings or a structured list capturing acceptance criteria.
-- notes: string (optional).
-- dependencies: array of integers (optional). Task IDs.
-- features: array of objects (see Feature Object below).
-- metadata: object with fields:
-  - created: string (ISO 8601 timestamp)
-  - updated: string (ISO 8601 timestamp)
-  - version: string (schema version for task.json)
+### 3.1 Fields (Task-level)
+- id (int): Unique task identifier (matches folder name).
+- status (one of + ~ - ? / =): Overall task status. Status code semantics are defined in docs/TASK_FORMAT.md and must be reused here.
+- title (string): Short, human-readable task title.
+- action (string): The primary action the task aims to achieve.
+- acceptance (array[string] or structured list): Acceptance criteria. May be a list of strings or a structured object.
+- notes (string, optional): Additional freeform notes.
+- dependencies (array[int], optional): IDs of tasks this task depends on.
+- features (array[Feature]): A list of feature objects (see 3.2).
+- metadata (object: created, updated, version): Timestamps and schema version info.
 
-Feature object fields:
-- number: string. Feature ID in the form "{task_id}.{n}" (e.g., "11.1"). String is used to preserve the dot notation.
-- status: string. One of "+", "~", "-", "?", "/", "=".
-- title: string. Short feature title.
-- action: string. What the feature implements and why.
-- acceptance: array. Either array of strings or a structured list.
-- context: array of strings (optional). Relevant spec/files.
-- dependencies: array of strings (optional). Feature IDs like "11.2" or task IDs.
-- output: array of strings (optional). Paths of created/modified artifacts.
-- notes: string (optional).
+### 3.2 Feature object (Feature-level)
+Each feature describes a discrete unit of work.
+- number (int): Feature number within the task (e.g., for 11.3, number = 3).
+- status (one of + ~ - ? / =): Feature status; same codes as docs/TASK_FORMAT.md.
+- title (string): Short, human-readable feature title.
+- action (string): Concrete action to perform for this feature.
+- acceptance (array[string] or structured list): Criteria to verify this feature.
+- context (array[string] or string): File paths or notes describing required context.
+- dependencies (array[int], optional): Other feature numbers in this task that this one depends on.
+- output (string, optional): Expected outputs (files/paths) produced by this feature.
+- notes (string, optional): Additional freeform information.
 
-Notes:
-- Status codes MUST reference docs/TASK_FORMAT.md and not be redefined here.
-- plan_{id}.md remains the human-readable planning document. task.json is the canonical data source.
+### 3.3 Metadata
+- created (string, ISO 8601): Creation timestamp for the task record.
+- updated (string, ISO 8601): Last modification timestamp.
+- version (string): Schema version for task.json.
 
-## End-to-End Examples
+## 4. Status Codes
+Status codes reference and reuse the definitions from docs/TASK_FORMAT.md. Do not redefine semantics here; instead, ensure values for status and features[*].status are validated against that specification.
 
-### Example: Minimal task.json with one feature
+## 5. End-to-End Examples
+
+### Example: task.json
 ```json
 {
-  "id": 42,
+  "id": 11,
   "status": "-",
-  "title": "Example Task",
-  "action": "Demonstrate the JSON format by providing a minimal example.",
+  "title": "JSON-based tasks format migration specification",
+  "action": "Define and approve a new JSON-based per-task format and repository layout, plus a migration plan from tasks/TASKS.md to tasks/{id}/task.json, while preserving per-task plans in Markdown.",
   "acceptance": [
-    "A minimal task.json exists with required fields.",
-    "Status codes reference docs/TASK_FORMAT.md."
+    "docs/TASKS_JSON_FORMAT.md exists and defines folder structure and schema.",
+    "docs/TASKS_MIGRATION_GUIDE.md exists with migration plan and CI guidance.",
+    "docs/TASK_FORMAT.md references the JSON format as canonical."
   ],
+  "notes": "Documentation-only; implementation tasks follow.",
   "dependencies": [4, 8, 10],
   "features": [
     {
-      "number": "42.1",
+      "number": 1,
       "status": "-",
-      "title": "Create example feature",
-      "action": "Add an example feature object to the task.json file.",
+      "title": "Author the JSON-based tasks format specification (TASKS_JSON_FORMAT.md)",
+      "action": "Create the canonical spec for task folders and task.json schema.",
       "acceptance": [
-        "Feature object contains the required fields."
+        "docs/TASKS_JSON_FORMAT.md exists.",
+        "Defines folder structure and schema fields.",
+        "References docs/TASK_FORMAT.md for status codes.",
+        "Includes examples."
       ],
-      "context": [
-        "docs/FEATURE_FORMAT.md",
-        "docs/TASK_FORMAT.md"
-      ],
-      "output": [
-        "tasks/42/task.json"
-      ]
+      "context": ["docs/TASK_FORMAT.md", "docs/FEATURE_FORMAT.md"],
+      "dependencies": [],
+      "output": "docs/TASKS_JSON_FORMAT.md",
+      "notes": "Canonical source of truth for tasks after migration."
     }
   ],
   "metadata": {
-    "created": "2025-08-19T00:00:00Z",
-    "updated": "2025-08-19T00:00:00Z",
-    "version": "1.0"
+    "created": "2025-01-01T00:00:00Z",
+    "updated": "2025-01-01T00:00:00Z",
+    "version": "1.0.0"
   }
 }
 ```
 
-### Example: Structured acceptance entries
+### Example: feature entry (standalone)
 ```json
 {
+  "number": 3,
+  "status": "~",
+  "title": "Add schema validation to CI",
+  "action": "Introduce JSON Schema files and a validation script; integrate into CI.",
   "acceptance": [
-    { "criterion": "docs/TASKS_JSON_FORMAT.md exists", "rationale": "Single entry-point specification." },
-    { "criterion": "task.json validated against schema", "rationale": "Ensures conformance." }
-  ]
+    "docs/schemas/task.schema.json and docs/schemas/feature.schema.json exist.",
+    "scripts/validate_tasks_json.py validates all tasks/{id}/task.json files.",
+    "CI runs validation on every PR."
+  ],
+  "context": ["docs/TESTING.md", "docs/TASKS_JSON_FORMAT.md"],
+  "dependencies": [1],
+  "output": "Validation script and passing CI run",
+  "notes": "See docs/TASKS_MIGRATION_GUIDE.md for details."
 }
 ```
 
-## Authoring Guidance
-- Use ISO 8601 timestamps for metadata.created and metadata.updated.
-- Keep acceptance criteria testable; reference docs/TESTING.md for guidance.
-- Prefer strings for feature.number to preserve the dotted notation.
+## 6. Validation Guidance
+- Enforce types for id, metadata timestamps, and status enumerations (+ ~ - ? / =) per docs/TASK_FORMAT.md.
+- Validate features[*].number matches the position or declared number within the plan.
+- Ensure acceptance is either array[string] or a structured object documented by your team.
 
-## References
-- docs/TASK_FORMAT.md (status codes, authoring rules)
-- docs/FEATURE_FORMAT.md (feature structure and meaning)
-- docs/PLAN_SPECIFICATION.md (planning requirements)
-- docs/TASKS_MIGRATION_GUIDE.md (migration strategy and compatibility)
+## 7. References
+- docs/TASK_FORMAT.md
+- docs/PLAN_SPECIFICATION.md
+- docs/TESTING.md
+- docs/TASKS_MIGRATION_GUIDE.md
