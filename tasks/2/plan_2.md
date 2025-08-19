@@ -17,6 +17,7 @@ Satisfy Task 2 acceptance by ensuring a clear entry-point specification exists. 
    Context: docs/SPECIFICATION_GUIDE.md, docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md
    Output: docs/SPEC.md
    Notes: This task predated the mandatory per-feature test protocol; automated tests for legacy tasks are addressed under Task 9.
+   Rejection: Missing required section headers: WHAT, CORE IDEAS, ACTIONS
 
 ## Execution Steps
 For each feature in order:
