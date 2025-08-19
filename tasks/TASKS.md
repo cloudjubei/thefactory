@@ -37,10 +37,10 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
        - `docs/TOOL_ARCHITECTURE.md` defines the JSON contract, tools, and execution modes.
        - `docs/AGENT_PERSONAS.md` exists with four personas (Manager, Planner, Tester, Developer), each with responsibilities and clear prompts.
      - The Orchestrator lives at `scripts/run_local_agent.py` and supports persona mode with minimal-context prompts and the SAFE tools.
-     - Plans/features from former tasks 7 and 10 are merged into `tasks/6/plan_6.md`; redundant files (if any) under `tasks/7` and `tasks/10` are removed.
+     - Plans/features from former task 7 are merged into `tasks/6/plan_6.md`; redundant files (if any) under `tasks/7`  are removed.
      - Tasks 7 and 10 are removed from `tasks/TASKS.md`.
      - Task 12 is marked `=` Deprecated as it is superseded by this merge.
-   Notes: This task replaces the separate Orchestrator and Personas tasks. Plan updated to conform to docs/PLAN_SPECIFICATION.md and docs/FEATURE_FORMAT.md.
+   Rejection: all the features defining the code logic in task 7 are not present in task 6; `run_local_agent.py`, `run_persona.py`, `git_manager.py` and the whole `scripts` and especially `scripts\tools` folder is never mentioned ; folders for task 7 exist; The acceptance criteria for features is wrong;
 
 8) + Tests specification
    Action: Create and maintain the canonical testing specification for the project and integrate testing requirements into the planning specification.
@@ -58,10 +58,6 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 11) ? Should the tasks and plan format change?
    Action: Now that the personas exist, it's clear that to be able to provide them with the smallest context possible, we need to change the spec and thus the format of tasks and features. Instead of keeping a task in this markdown file, each task should be in a separate JSON file in its folder - `task.json`. The task should contain all the information that is currently here and all the feature specifics. This way it's easy to extract specific task or feature information and provide it as context to a given agent. The plan in each folder should remain as markdown, as it should be the best way for an LLM to consume information. Appropriate tools need to be in place, so that each persona will only get the relevant context.
 
-12) = Tasks 6 & 7 should be joined into one
-   Action: Deprecated. Superseded by Task 6.
-   Acceptance: None.
-   Notes: Kept for historical traceability only.
 
 13) - The plans for all tasks must be updated
    Action: Update the plans for all plans to reflect the status of each feature. Clearly there's something missing in the spec, most probably in `docs/PLAN_SPECIFICATION.md`, because the agent isn't updating the plan for the task it works on to update the status of the feature and task (while features are being worked on this should be set to pending).
