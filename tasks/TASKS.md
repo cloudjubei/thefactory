@@ -27,6 +27,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 6) + Define Core Agent Terminology and Principles
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
    Acceptance: The documentation exists. This task is merged with task 7 and task 10 for a single cohesive task about agents. Tasks 7 and 10 should not exist separately.
+   Notes: Plan updated to conform with docs/PLAN_SPECIFICATION.md. Added test-writing features (6.5–6.8) in tasks/6/plan_6.md to validate the produced documentation and deprecations.
 
 7) = Agent Orchestrator
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
