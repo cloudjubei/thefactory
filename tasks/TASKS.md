@@ -25,6 +25,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
      - `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
    Rejection: test doesn't exist
+   Note: Test for Feature 4.3 added at tasks/4/tests/test_4_3.py
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
