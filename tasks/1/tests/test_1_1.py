@@ -1,23 +1,26 @@
-import os, sys
+import os
+import sys
 
 def run():
-    ok = True
-    # Check Task format doc exists
-    path = "docs/TASK_FORMAT.md"
-    if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
+    task_format = "docs/TASK_FORMAT.md"
+    tasks_md = "tasks/TASKS.md"
+
+    if not os.path.exists(task_format):
+        print(f"FAIL: {task_format} does not exist.")
         sys.exit(1)
-    # Check TASKS.md references TASK_FORMAT at the top
-    tasks_path = "tasks/TASKS.md"
-    if not os.path.exists(tasks_path):
-        print(f"FAIL: {tasks_path} does not exist.")
+
+    if not os.path.exists(tasks_md):
+        print(f"FAIL: {tasks_md} does not exist.")
         sys.exit(1)
-    with open(tasks_path, "r", encoding="utf-8") as f:
-        content = f.read()
-    if "TASK_FORMAT.md" not in content:
-        print("FAIL: tasks/TASKS.md does not reference TASK_FORMAT.md.")
+
+    with open(tasks_md, "r", encoding="utf-8") as f:
+        lines = f.read().splitlines()
+    top = "\n".join(lines[:10])
+    if "TASK_FORMAT.md" not in top:
+        print("FAIL: TASKS.md does not reference TASK_FORMAT.md near the top.")
         sys.exit(1)
-    print("PASS: Task 1 acceptance verified.")
+
+    print("PASS: Task 1 - TASK_FORMAT.md exists and TASKS.md references it at the top.")
     sys.exit(0)
 
 if __name__ == "__main__":

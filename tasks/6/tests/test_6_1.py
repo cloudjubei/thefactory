@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 
 def run():
     path = "docs/AGENT_PRINCIPLES.md"
@@ -7,10 +8,12 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    if "The Agent" not in content or "The Orchestrator" not in content:
-        print("FAIL: AGENT_PRINCIPLES.md missing required terminology.")
+    required_phrases = ["The Agent:", "The Orchestrator:"]
+    missing = [p for p in required_phrases if p not in content]
+    if missing:
+        print("FAIL: AGENT_PRINCIPLES.md missing: " + ", ".join(missing))
         sys.exit(1)
-    print("PASS: Task 6 acceptance verified.")
+    print("PASS: Task 6 - AGENT_PRINCIPLES.md defines Agent and Orchestrator.")
     sys.exit(0)
 
 if __name__ == "__main__":

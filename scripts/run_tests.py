@@ -1,44 +1,43 @@
-#!/usr/bin/env python3
-import os
 import sys
+import os
 import glob
 import subprocess
 
+
+def find_tests():
+    return sorted(glob.glob(os.path.join("tasks", "*", "tests", "*.py")))
+
+
+def run_test(path: str):
+    proc = subprocess.run([sys.executable, path], capture_output=True, text=True)
+    return proc.returncode, proc.stdout, proc.stderr
+
+
 def main():
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    pattern = os.path.join(repo_root, "tasks", "*", "tests", "*.py")
-    test_files = sorted(glob.glob(pattern))
-
-    if not test_files:
-        print("No tests found.")
-        sys.exit(0)
-
-    total = len(test_files)
-    failures = 0
-    print(f"Discovered {total} test(s). Running...\n")
-
-    for idx, test in enumerate(test_files, 1):
-        rel = os.path.relpath(test, repo_root)
-        print(f"[{idx}/{total}] Running {rel} ...")
-        result = subprocess.run([sys.executable, rel], cwd=repo_root, capture_output=True, text=True)
-        # Forward test output
-        if result.stdout:
-            print(result.stdout, end="")
-        if result.returncode != 0:
-            if result.stderr:
-                print(result.stderr, end="")
-            print(f"FAIL: {rel} exited with code {result.returncode}")
-            failures += 1
-        else:
-            print(f"PASS: {rel}")
-        print("-" * 60)
-
-    if failures:
-        print(f"Test run completed: {total - failures}/{total} passed, {failures} failed.")
+    tests = find_tests()
+    if not tests:
+        print("No tests found under tasks/*/tests/*.py")
         sys.exit(1)
 
-    print(f"All {total} tests passed.")
-    sys.exit(0)
+    total = len(tests)
+    failed = 0
+
+    for t in tests:
+        print(f"Running {t} ...")
+        code, out, err = run_test(t)
+        if out:
+            print(out.strip())
+        if err:
+            print(err.strip())
+        if code != 0:
+            print(f"FAIL: {t} exited with code {code}")
+            failed += 1
+        else:
+            print(f"PASS: {t}")
+
+    print(f"\nSummary: {total - failed}/{total} tests passed.")
+    sys.exit(0 if failed == 0 else 1)
+
 
 if __name__ == "__main__":
     main()

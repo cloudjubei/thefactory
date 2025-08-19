@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 
 def run():
     path = "scripts/run_tests.py"
@@ -7,12 +8,10 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    required = ["if __name__ == \"__main__\":", "glob.glob", "subprocess.run"]
-    missing = [s for s in required if s not in content]
-    if missing:
-        print("FAIL: run_tests.py missing: " + ", ".join(missing))
+    if "def main()" not in content or "if __name__ == \"__main__\":" not in content:
+        print("FAIL: run_tests.py missing a main entrypoint.")
         sys.exit(1)
-    print("PASS: Task 9.3 acceptance (presence and basic structure) verified.")
+    print("PASS: Task 9.3 - run_tests.py exists and has a main entrypoint.")
     sys.exit(0)
 
 if __name__ == "__main__":

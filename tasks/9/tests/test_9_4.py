@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 
 def run():
     path = "docs/PLAN_SPECIFICATION.md"
@@ -7,11 +8,17 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    phrase = "A feature is not considered complete until a corresponding test is written and passes."
-    if phrase not in content:
-        print("FAIL: PLAN_SPECIFICATION.md missing exact test-driven policy phrase.")
+    checks = [
+        "# Plan Specification",
+        "Test-Driven Acceptance",
+        "Use `python scripts/run_tests.py` to discover and run all tests",
+        "A feature is not considered complete until a corresponding test is written and passes."
+    ]
+    missing = [c for c in checks if c not in content]
+    if missing:
+        print("FAIL: PLAN_SPECIFICATION.md missing required phrases: " + ", ".join(missing))
         sys.exit(1)
-    print("PASS: Task 9.4 acceptance verified.")
+    print("PASS: Task 9.4 - PLAN_SPECIFICATION.md documents the test-driven policy and runner usage.")
     sys.exit(0)
 
 if __name__ == "__main__":

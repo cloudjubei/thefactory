@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 
 def run():
     path = "docs/TESTING.md"
@@ -7,10 +8,10 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    if "Agent Testing Specification" not in content:
-        print("FAIL: TESTING.md missing expected title/phrase.")
+    if "# Agent Testing Specification" not in content:
+        print("FAIL: TESTING.md missing '# Agent Testing Specification'.")
         sys.exit(1)
-    print("PASS: Task 8 acceptance verified.")
+    print("PASS: Task 8 - TESTING.md exists with expected heading.")
     sys.exit(0)
 
 if __name__ == "__main__":

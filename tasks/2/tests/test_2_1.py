@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 
 def run():
     path = "docs/SPEC.md"
@@ -7,10 +8,10 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    if "# WHAT:" not in content and "# What:" not in content:
-        print("FAIL: SPEC.md missing WHAT section header.")
+    if "# WHAT:" not in content:
+        print("FAIL: SPEC.md missing '# WHAT:' heading.")
         sys.exit(1)
-    print("PASS: Task 2 acceptance verified.")
+    print("PASS: Task 2 - SPEC.md exists with '# WHAT:' section.")
     sys.exit(0)
 
 if __name__ == "__main__":
