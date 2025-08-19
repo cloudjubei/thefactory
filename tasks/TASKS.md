@@ -15,12 +15,10 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 3) - File organisation specification
    Action: Create a scheme for organising files within the repository.
    Acceptance: docs/FILE_ORGANISATION.md exists and documents the top-level directory layout, file naming conventions, and evolution guidance.
-   Notes: Test file created for Feature 3.1 verification at tasks/3/tests/test_3_2.py (checks required section headings).
 
 4) + Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
    Acceptance: The documentation exists.
-   Notes: A feature in this task should be to create a file `TEMPLATE.md` that has all the required sections from `docs/SPECIFICATION_GUIDE.md`, with examples for each section.
 
 5) + Plan specification
    Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
