@@ -49,7 +49,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 9) - Move tasks around
    Action: Perform the following:
-   - Create a tool for moving a task to a different position in the list of tasks.
+   - Create a tool for moving a task to a different position in the list of tasks - the feature for it should be added to the plan for Task 7, the tests need to be created, and the code also.
    - The testing task - task 8, should be the moved to spot 5.
    - This task is completely removed.
    - All other tasks need to be shifted accordingly to be in order.
