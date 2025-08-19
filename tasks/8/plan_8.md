@@ -11,7 +11,7 @@ Establish the canonical, project-wide testing specification and integrate testin
 - Task 9 is deprecated; removal and renumbering will be handled under Task 15. This task focuses solely on defining the testing specification and integrating it into the planning specification.
 
 ## Features
-8.1) - Author the canonical testing specification
+8.1) + Author the canonical testing specification
    Action: Create docs/TESTING.md describing the philosophy, scope, structure, location, naming conventions, tooling, and workflow for tests in this project.
    Acceptance:
    - docs/TESTING.md exists and includes the following sections:
