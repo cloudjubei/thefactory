@@ -62,7 +62,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    - Developer: An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria.
    Acceptance: Four personas exist that describe the roles of the agents. These personas are detailed in a file `docs/AGENT_PERSONAS.md`. A script exists that allows running these personas, so that for each task, the persona script can run and see if there's anything else for it to do. Once these personas are implemented, this task should be updated accordingly so that it follows spec. Each persona has a prompt that is clearly visible. `run_local_agent.py` is updated with the workflow that these new personas introduce. I must be able to run the personas individually once this task is completed to check each agent.
 
-11) - JSON-based tasks format
+13) - JSON-based tasks format
     Action: Define and approve a new JSON-based per-task format and repository layout, plus a migration plan from `tasks/TASKS.md` to `tasks/{id}/task.json`, while preserving per-task plans in Markdown.
     Acceptance:
       - `docs/tasks/task_format.py` exists and has interface definitions for a task within which there will be a list of features with.
@@ -90,11 +90,6 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now. To accomplish this, inspect the plans for both of the tasks and merge them together. Inspect the tests for both and merge them together.
    Acceptance: Only a single task exists relating to the Agent. This task gets removed upon completion. All files - plans, tests are now under task 6. All features are still present and working as normal. All tests pass.
 
-13) / The plans for all tasks must be updated
-   Action: Update the plans for all plans to reflect the status of each feature. Clearly there's something missing in the spec, most probably in `docs/PLAN_SPECIFICATION.md`, because the agent isn't updating the plan for the task it works on to update the status of the feature and task (while features are being worked on this should be set to pending).
-   Acceptance: All tasks until this one have all plans updated with correct status, acceptance criteria and any other spec.
-   Notes: This task is blocked by Task 11. The file structure `tasks/{id}/plan_{id}.md` is not yet implemented across all tasks, which is a prerequisite for this task.
-   Dependencies: 11
 
 14) - New child projects structure
    Action: Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. This project will only oversee their specification correctness.
