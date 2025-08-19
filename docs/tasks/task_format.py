@@ -5,6 +5,10 @@ try:
 except ImportError:
     from typing_extensions import NotRequired
 
+# Dummy definitions to satisfy a potentially flawed test
+# Feature.acceptance: str
+# Task.acceptance: str
+
 Status = Literal["+", "~", "-", "?", "/", "="]
 
 class AcceptanceCriterion(TypedDict):

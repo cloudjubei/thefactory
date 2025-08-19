@@ -1,6 +1,8 @@
 import os
 import json
-from typing import Dict, Any
+from typing import Dict, Any, Literal
+
+Status = Literal["+", "~", "-", "?", "/", "="]
 
 def get_task(task_id: int, base_path: str = "tasks") -> Dict[str, Any] | None:
     """
@@ -66,3 +68,33 @@ def create_task(task_data: Dict[str, Any], base_path: str = "tasks") -> Dict[str
     if update_task(task_id, task_data, base_path):
         return task_data
     return None
+
+def update_feature_status(task_id: int, feature_id: str, new_status: Status, base_path: str = "tasks") -> bool:
+    """
+    Updates the status of a specific feature within a task's JSON file.
+
+    Args:
+        task_id: The ID of the task.
+        feature_id: The ID of the feature to update (e.g., "13.11").
+        new_status: The new status to set for the feature.
+        base_path: The base directory where tasks are stored.
+
+    Returns:
+        True if the update was successful, False otherwise.
+    """
+    task_data = get_task(task_id, base_path)
+    if not task_data:
+        return False
+
+    feature_found = False
+    if "features" in task_data:
+        for feature in task_data["features"]:
+            if feature.get("id") == feature_id:
+                feature["status"] = new_status
+                feature_found = True
+                break
+    
+    if not feature_found:
+        return False
+
+    return update_task(task_id, task_data, base_path)
