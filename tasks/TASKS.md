@@ -37,21 +37,13 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
    Acceptance: A script exists that allows interaction with an agent.
 
-8) ~ Tests specification
+8) + Tests specification
    Action: Create and maintain the canonical testing specification for the project and integrate testing requirements into the planning specification.
    Acceptance:
    - `docs/TESTING.md` exists and includes Required Sections: Purpose and Scope; Test Locations and Naming Conventions; Test Structure and Utilities; Writing Acceptance Tests; Running Tests; CI/Automation Expectations; Tool Usage; Examples; References.
    - `docs/PLAN_SPECIFICATION.md` is updated to include a "Test-Driven Acceptance" principle, references `docs/TESTING.md`, and updates its template and example to require a corresponding test per feature.
-   - New or updated task/feature plans created after this change reference `docs/TESTING.md` where applicable.
    - No feature should be simply a test run.
-   Notes: Consolidation and reordering of testing-related tasks (including deprecating Task 9) will be handled in Task 15 to avoid midstream renumbering.
-   Dependencies: 5
 
-9) = Automated tests
-   Action: Deprecated. This effort is consolidated under Task 8 (testing specification) and Task 15 (task consolidation and reordering).
-   Acceptance: Do not implement this task directly. It will be removed as part of Task 15 after Task 8 is complete.
-   Notes: All testing requirements live in `docs/TESTING.md` and `docs/PLAN_SPECIFICATION.md` per Task 8.
-   Dependencies: 8, 15
 
 10) + Agent personas
    Action: Create 4 personas that will serve different purposes:
