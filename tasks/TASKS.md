@@ -40,7 +40,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
      - Plans/features from former tasks 7 and 10 are merged into `tasks/6/plan_6.md`; redundant files (if any) under `tasks/7` and `tasks/10` are removed.
      - Tasks 7 and 10 are removed from `tasks/TASKS.md`.
      - Task 12 is marked `=` Deprecated as it is superseded by this merge.
-   Notes: This task replaces the separate Orchestrator and Personas tasks.
+   Notes: This task replaces the separate Orchestrator and Personas tasks. Plan updated to conform to docs/PLAN_SPECIFICATION.md and docs/FEATURE_FORMAT.md.
 
 8) + Tests specification
    Action: Create and maintain the canonical testing specification for the project and integrate testing requirements into the planning specification.
