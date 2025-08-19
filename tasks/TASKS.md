@@ -62,8 +62,29 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    - Developer: An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria.
    Acceptance: Four personas exist that describe the roles of the agents. These personas are detailed in a file `docs/AGENT_PERSONAS.md`. A script exists that allows running these personas, so that for each task, the persona script can run and see if there's anything else for it to do. Once these personas are implemented, this task should be updated accordingly so that it follows spec. Each persona has a prompt that is clearly visible. `run_local_agent.py` is updated with the workflow that these new personas introduce. I must be able to run the personas individually once this task is completed to check each agent.
 
-11) ? Should the tasks and plan format change?
-   Action: Now that the personas exist, it's clear that to be able to provide them with the smallest context possible, we need to change the spec and thus the format of tasks and features. Instead of keeping a task in this markdown file, each task should be in a separate JSON file in its folder - `task.json`. The task should contain all the information that is currently here and all the feature specifics. This way it's easy to extract specific task or feature information and provide it as context to a given agent. The plan in each folder should remain as markdown, as it should be the best way for an LLM to consume information. Appropriate tools need to be in place, so that each persona will only get the relevant context.
+11) - JSON-based tasks format
+    Action: Define and approve a new JSON-based per-task format and repository layout, plus a migration plan from `tasks/TASKS.md` to `tasks/{id}/task.json`, while preserving per-task plans in Markdown.
+    Acceptance:
+      - `docs/tasks/task_format.py` exists and has interface definitions for a task within which there will be a list of features with.
+      - `docs/tasks/task_format.py` contains an interface for `Task`, `Feature`, `TaskStatus`, `FeatureStatus`, `Context`, `Output`, `AcceptanceCriteria`, `Rejection`. All interfaces are fully typed.
+      - `docs/TASK_FORMAT.md` is moved to `docs/tasks/TASKS_GUIDANCE.md` that explains anything that is not related or already covered by the JSON format defined in `docs/tasks/task_format.py`.
+      - `docs/tasks/task_example.json` exists and demonstrates the expected structure of a task based on `docs/tasks/task_format.py`.
+      - A tool `scripts/tools/get_task_and_feature.py` exists that contains a method to get a full task and optionally just a specific feature from it (still with the other task information).
+      - `docs/tasks/TASKS_MIGRATION_GUIDE.md` exists:
+        - A stepwise migration plan with backward compatibility (dual-read from `TASKS.md` and `task.json`).
+        - Tooling requirements for orchestrator/context selection so each persona receives minimal, relevant context.
+        - Test impact and updates referencing `docs/TESTING.md` (validation for JSON schemas, CI expectations).
+        - Rollback plan and deprecation strategy for `TASKS.md`.
+      - `TASKS.md` is removed
+      - `docs/PLAN_SPECIFICATION.md` now contains information how to write a plan for a task, and in turn also for a feature. So that we end up having the following files and structure:
+         - `tasks/{id}/task_{id}.json` - the task itself containing all feature definitions
+         - `tasks/{id}/task_plan_{id}.md` - the plan for the task
+         - `tasks/{id}/features/feature_plan_{id}_{feature_id}.md` - the plan for the feature numbered {feature_id} for task with id {id}
+         - `tasks/{id}/test/test_{id}_{feature_id}.py` - the test for the feature numbered {feature_id} for task with id {id}
+      - All existing tasks & features are migrated to the new format and placed in their respective folders.
+      - All existing plans are migrated to the new format and placed in their respective folders.
+      - All existing tests are migrated to the new format and placed in their respective folders.
+
 
 12) - Tasks 6 & 7 should be joined into one
    Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now. To accomplish this, inspect the plans for both of the tasks and merge them together. Inspect the tests for both and merge them together.
