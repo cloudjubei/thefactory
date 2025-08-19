@@ -30,7 +30,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
    - This task requires to gather context from whichever task is being looked at - if the `docs/PLAN_SPECIFICATION.md` is missing steps relating to this, it should be updated.
    Context: docs/TESTING.md, tasks/TASKS.md
    Output: `tasks/{task_id}/tests/test_{task_id}_{feature_id}.py` for all tasks up to this one and all their features
-   Rejection: Not all features in a task have tests implemented. The test for this task doesn't check for the correct files or phrases.
+   Rejection: Not all features in a task have tests implemented. For instance `tasks/1/test_1_2.py` doesn't exist. The agent must inspect the context to see what's already there.
 
 9.3) + Create a test runner script
    Action: Create a new script `scripts/run_tests.py`. It should run all tests found under `tasks/*/tests/*.py`.
@@ -46,7 +46,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
    - All of the features here are tested by running `python scripts/run_tests.py`
    Context: docs/PLAN_SPECIFICATION.md, docs/TESTING.md
    Output: `tasks/{task_id}/tests/test_{task_id}_{feature_id}.py` for this task and all of its features
-   Rejection: The test for this task doesn't check for the correct files or phrases - i.e. doesn't check that tests for features are done.
+   Rejection: The test for this task doesn't check for the correct files or phrases. For instance `tasks/1/test_1_2.py` doesn't exist. The agent must inspect the context to see what's already there and create such a test that cleverly gathers the requirements and creates the test accordingly.
 
 ## Execution Steps
 1) Implement features
