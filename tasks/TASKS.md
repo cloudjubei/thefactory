@@ -40,7 +40,6 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 9) - Automated tests
    Action: Create tests for every task and feature already existing. 
    Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification. The tests for this task must all pass.
-   Notes: The plan for this task has been updated (tasks/9/plan_9.md) to align with `docs/PLAN_SPECIFICATION.md` and `docs/FEATURE_FORMAT.md`.
 
 10) + Agent personas
    Action: Create 4 personas that will serve different purposes:
