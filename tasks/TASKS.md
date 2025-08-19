@@ -19,7 +19,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a scheme for organising files within the repository.
    Acceptance: The documentation exists.
 
-4) ~ Specification documentation
+4) + Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
    Acceptance:
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
