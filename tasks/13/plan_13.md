@@ -43,7 +43,7 @@ This plan outlines the features required to transition from the current Markdown
    Output: `docs/tasks/TASKS_GUIDANCE.md`
 
 ### Phase 2: Tooling & Integration
-13.5) - Create Task Utility Tooling
+13.5) + Create Task Utility Tooling
    Action: Create a new tool module `scripts/tools/task_utils.py` with functions to reliably read, create, and update tasks in the new JSON format. This will abstract file I/O for task manipulation.
    Acceptance:
      - `scripts/tools/task_utils.py` exists.
