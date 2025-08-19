@@ -228,6 +228,7 @@ class Agent:
             "docs/TESTING.md",
             "docs/TOOL_ARCHITECTURE.md",
             "scripts/run_local_agent.py",
+            "scripts/run_tests.py",
             "scripts/git_manager.py",
             "scripts/tools/ask_question.py",
             "scripts/tools/finish.py",

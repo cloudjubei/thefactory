@@ -42,7 +42,15 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification.
    Notes: These are unit tests that check the agent's ability to perform specific tasks and features. They should cover various scenarios and edge cases to ensure robustness and reliability.
 
-10) - Tasks 6 & 7 should be joined into one
+10) - Require more thorough planning and step taking
+   Action: Update the `docs/PLAN_SPECIFICATION.md` file to require the agent to do the following:
+   - The agent tries to complete a feature as a single step, gathers all the context required, and finishes by writing the tests for that feature.
+   - When a feature is complete the agent sends back a `finish_feature` message that triggers the tool that commits all the current code and completes that feature.
+   - Once all the features are completed and the agent verified that all tests pass, the agent completes the task and submits a pull request.
+   Acceptance: The agent creates a commit per feature completion and writes automated tests for them.
+   Context: docs/PLAN_SPECIFICATION.md, scripts/git_manager.py, scripts/run_local_agent.py, scripts/run_tests.py
+
+11) - Tasks 6 & 7 should be joined into one
    Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now.
    Acceptance: Only a single task exists relating to the Agent. This task gets removed upon completion.
 
