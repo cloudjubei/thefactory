@@ -63,33 +63,30 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: Four personas exist that describe the roles of the agents. These personas are detailed in a file `docs/AGENT_PERSONAS.md`. A script exists that allows running these personas, so that for each task, the persona script can run and see if there's anything else for it to do. Once these personas are implemented, this task should be updated accordingly so that it follows spec. Each persona has a prompt that is clearly visible. `run_local_agent.py` is updated with the workflow that these new personas introduce. I must be able to run the personas individually once this task is completed to check each agent.
 
 13) - JSON-based tasks format
-    Action: Define and approve a new JSON-based per-task format and repository layout, plus a migration plan from `tasks/TASKS.md` to `tasks/{id}/task.json`, while preserving per-task plans in Markdown.
+    Action: Define and implement a new JSON-based format for tasks to replace `tasks/TASKS.md`. This involves defining the schema, creating necessary tooling for interaction, migrating existing tasks, and finally deprecating the old format.
     Acceptance:
-      - `docs/tasks/task_format.py` exists and has interface definitions for a task within which there will be a list of features with.
-      - `docs/tasks/task_format.py` contains an interface for `Task`, `Feature`, `TaskStatus`, `FeatureStatus`, `Context`, `Output`, `AcceptanceCriteria`, `Rejection`. All interfaces are fully typed.
-      - `docs/TASK_FORMAT.md` is moved to `docs/tasks/TASKS_GUIDANCE.md` that explains anything that is not related or already covered by the JSON format defined in `docs/tasks/task_format.py`.
-      - `docs/tasks/task_example.json` exists and demonstrates the expected structure of a task based on `docs/tasks/task_format.py`.
-      - A tool `scripts/tools/get_task_and_feature.py` exists that contains a method to get a full task and optionally just a specific feature from it (still with the other task information).
-      - `docs/tasks/TASKS_MIGRATION_GUIDE.md` exists:
-        - A stepwise migration plan with backward compatibility (dual-read from `TASKS.md` and `task.json`).
-        - Tooling requirements for orchestrator/context selection so each persona receives minimal, relevant context.
-        - Test impact and updates referencing `docs/TESTING.md` (validation for JSON schemas, CI expectations).
-        - Rollback plan and deprecation strategy for `TASKS.md`.
-      - `TASKS.md` is removed
-      - `docs/PLAN_SPECIFICATION.md` now contains information how to write a plan for a task, and in turn also for a feature. So that we end up having the following files and structure:
-         - `tasks/{id}/task_{id}.json` - the task itself containing all feature definitions
-         - `tasks/{id}/task_plan_{id}.md` - the plan for the task
-         - `tasks/{id}/features/feature_plan_{id}_{feature_id}.md` - the plan for the feature numbered {feature_id} for task with id {id}
-         - `tasks/{id}/test/test_{id}_{feature_id}.py` - the test for the feature numbered {feature_id} for task with id {id}
-      - All existing tasks & features are migrated to the new format and placed in their respective folders.
-      - All existing plans are migrated to the new format and placed in their respective folders.
-      - All existing tests are migrated to the new format and placed in their respective folders.
+      - **Phase 1: Specification & Definition**
+        - `docs/tasks/task_format.py` exists. It defines the new task structure using concrete Python data types (e.g., `TypedDict`) for `Task`, `Feature`, and related objects, ensuring clear validation and serialization paths.
+        - `docs/tasks/task_example.json` exists, demonstrating a complete task in the new format.
+        - `docs/TASK_FORMAT.md` is moved to `docs/tasks/TASKS_GUIDANCE.md` and updated to remove content now covered by the JSON schema, focusing only on authoring guidance.
+        - `docs/tasks/TASKS_MIGRATION_GUIDE.md` exists, detailing the step-by-step migration plan, backward compatibility strategy, tooling requirements, and rollback plan.
+      - **Phase 2: Tooling & Integration**
+        - A tool `scripts/tools/task_utils.py` is created with functions to reliably read, create, and update tasks/features in the new JSON format. This will replace direct file I/O for task manipulation.
+        - The Orchestrator (`run_local_agent.py`) is updated to use this new tooling and support a dual-read mode (reading from both `tasks/{id}/task.json` and `tasks/TASKS.md`) during the transition period.
+      - **Phase 3: Migration & Validation**
+        - All existing tasks and their associated plans and tests are migrated to the new file structure:
+          - `tasks/{id}/task.json`: The core task definition, including feature descriptions.
+          - `tasks/{id}/plan.md`: The implementation plan for the task.
+          - `tasks/{id}/tests/test_{feature_id}.py`: The tests for each feature.
+        - All tests must pass after migration to confirm correctness.
+      - **Phase 4: Cleanup**
+        - The dual-read mode in the orchestrator is removed, making the JSON format the sole source of truth.
+        - `tasks/TASKS.md` is removed from the repository.
 
 
 12) - Tasks 6 & 7 should be joined into one
    Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now. To accomplish this, inspect the plans for both of the tasks and merge them together. Inspect the tests for both and merge them together.
    Acceptance: Only a single task exists relating to the Agent. This task gets removed upon completion. All files - plans, tests are now under task 6. All features are still present and working as normal. All tests pass.
-
 
 14) - New child projects structure
    Action: Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. This project will only oversee their specification correctness.
