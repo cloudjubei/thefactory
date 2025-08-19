@@ -3,56 +3,45 @@ import sys
 import re
 
 
-def fail(msg: str):
-    print(f"FAIL: {msg}")
-    sys.exit(1)
-
-
-def success(msg: str):
-    print(f"PASS: {msg}")
-    sys.exit(0)
-
-
-def main():
+def run_test():
+    """
+    Acceptance for Task 2 (Feature 2.1):
+      - docs/SPEC.md exists.
+      - The document references docs/SPECIFICATION_GUIDE.md at the top.
+      - It includes sections: WHAT, CORE IDEAS, ACTIONS.
+    """
     spec_path = "docs/SPEC.md"
 
     # 1) Existence check
     if not os.path.exists(spec_path):
-        fail(f"{spec_path} does not exist.")
+        print(f"FAIL: {spec_path} does not exist.")
+        sys.exit(1)
 
+    # 2) Read content
     with open(spec_path, "r", encoding="utf-8") as f:
-        content = f.read()
+        lines = f.readlines()
+    content = "".join(lines)
 
-    # 2) Reference to SPECIFICATION_GUIDE.md near the top
-    #    We consider the first 20 non-empty lines as the 'top'.
-    lines = [ln.strip() for ln in content.splitlines()]
-    top_non_empty = []
-    for ln in lines:
-        if ln:
-            top_non_empty.append(ln)
-        if len(top_non_empty) >= 20:
-            break
-    top_text = "\n".join(top_non_empty)
-    if "specification_guide.md" not in top_text.lower():
-        fail("docs/SPEC.md does not reference SPECIFICATION_GUIDE.md near the top.")
+    # 3) Top reference to SPECIFICATION_GUIDE.md (within first 20 lines)
+    top_slice = "".join(lines[:20])
+    if "SPECIFICATION_GUIDE.md" not in top_slice:
+        print("FAIL: docs/SPEC.md does not reference docs/SPECIFICATION_GUIDE.md at the top (within first 20 lines).")
+        sys.exit(1)
 
-    # 3) Required sections as headings: WHAT, CORE IDEAS, ACTIONS
-    def has_section(name: str) -> bool:
-        # Strict heading match (e.g., '# WHAT')
-        pat_strict = re.compile(rf"^\s{{0,3}}#{1,6}\s*{re.escape(name)}\s*$", re.IGNORECASE | re.MULTILINE)
-        if pat_strict.search(content):
-            return True
-        # Relaxed: heading line that contains the term in the heading text
-        pat_relaxed = re.compile(rf"^\s{{0,3}}#{1,6}\s*.*{re.escape(name)}.*$", re.IGNORECASE | re.MULTILINE)
-        return bool(pat_relaxed.search(content))
-
-    required = ["WHAT", "CORE IDEAS", "ACTIONS"]
-    missing = [name for name in required if not has_section(name)]
+    # 4) Required section headers as Markdown headings
+    patterns = {
+        "WHAT": re.compile(r"^#{1,6}\s*WHAT\b", re.MULTILINE),
+        "CORE IDEAS": re.compile(r"^#{1,6}\s*CORE\s+IDEAS\b", re.MULTILINE),
+        "ACTIONS": re.compile(r"^#{1,6}\s*ACTIONS\b", re.MULTILINE),
+    }
+    missing = [name for name, pat in patterns.items() if not pat.search(content)]
     if missing:
-        fail("Missing required section headings: " + ", ".join(missing))
+        print("FAIL: docs/SPEC.md is missing required section headers: " + ", ".join(missing))
+        sys.exit(1)
 
-    success("docs/SPEC.md exists, references SPECIFICATION_GUIDE.md at the top, and contains required sections (WHAT, CORE IDEAS, ACTIONS).")
+    print("PASS: docs/SPEC.md exists, references SPECIFICATION_GUIDE.md at the top, and contains required sections WHAT, CORE IDEAS, ACTIONS.")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
-    main()
+    run_test()
