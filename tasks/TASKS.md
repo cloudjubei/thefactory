@@ -19,7 +19,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 4) ~ Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
    Acceptance: `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist; `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
-   Notes: Status set to In Progress pending test features 4.4 and 4.5 in tasks/4/plan_4.md to validate the documentation per `docs/PLAN_SPECIFICATION.md` and `docs/TESTING.md`.
+   Notes: Plan updated to align with docs/PLAN_SPECIFICATION.md (separated Administrative Steps; clarified scope). Status remains In Progress pending test features 4.4 and 4.5 in tasks/4/plan_4.md to validate the documentation per `docs/PLAN_SPECIFICATION.md` and `docs/TESTING.md`.
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
