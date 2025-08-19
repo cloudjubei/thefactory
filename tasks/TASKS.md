@@ -8,7 +8,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create documentation detailing the tasks' format.
    Acceptance: This document adheres to the format created and references it at the top.
 
-2) - The spec
+2) + The spec
    Action: Create docs/SPEC.md as the single entry-point specification for the project.
    Acceptance:
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
