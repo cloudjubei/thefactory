@@ -49,9 +49,42 @@ class AgentTools:
         return run_tests_tool(self.repo_path)
 
 class UnifiedEngine:
-    def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None) -> list:
+    def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None, persona: str = None) -> list:
         context_str = "\n".join(f"--- START of {name} ---\n{content}\n--- END of {name} ---\n" for name, content in context.items())
-        
+
+        persona_blocks = {
+            "manager": (
+                "You are the Manager persona.\n"
+                "Objectives: validate and refine the task description; ensure completeness; create or refine a plan only if needed to unblock work.\n"
+                "Constraints: do not implement code or tests. Prefer minimal, precise edits and reference specs.\n"
+                "Primary tools: retrieve_context_files, write_file, ask_question.\n"
+            ),
+            "planner": (
+                "You are the Planner persona.\n"
+                "Objectives: create/update tasks/{task_id}/plan_{task_id}.md following PLAN_SPECIFICATION and FEATURE_FORMAT.\n"
+                "Constraints: do not implement code. Keep the plan concise and specification-driven.\n"
+                "Primary tools: retrieve_context_files, write_file.\n"
+            ),
+            "tester": (
+                "You are the Tester persona.\n"
+                "Objectives: write tests under tasks/{task_id}/tests/ that encode acceptance criteria for features. Use run_tests to validate.\n"
+                "Constraints: do not implement features. Tests must be deterministic and specific.\n"
+                "Primary tools: retrieve_context_files, write_file, run_tests.\n"
+            ),
+            "developer": (
+                "You are the Developer persona.\n"
+                "Objectives: implement exactly ONE pending feature from tasks/{task_id}/plan_{task_id}.md, write tests, run tests, and complete the feature.\n"
+                "Constraints: one feature per cycle; minimal incremental changes; strictly follow acceptance criteria.\n"
+                "Primary tools: retrieve_context_files, write_file, run_tests, finish_feature.\n"
+                "Note: If update_feature_status is unavailable, update the plan file directly using write_file.\n"
+            ),
+        }
+
+        persona_instructions = ""
+        if persona:
+            block = persona_blocks.get(persona, "")
+            persona_instructions = f"\n\nPersona Mode: {persona}\n{block}\n"
+
         system_prompt = f"""
 You are an autonomous AI agent. Your goal is to advance a software project by completing one task.
 You operate by generating a plan and a sequence of tool calls in a single JSON response.
@@ -88,24 +121,25 @@ The key for a tool's parameters MUST be "arguments".
     d.  `finish` to end the cycle.
 
 If no tasks are eligible, your ONLY tool call is `finish(reason=\"HALT: No eligible tasks found.\")`.
-Respond with a single, valid JSON object.
+Respond with a single, valid JSON object.{persona_instructions}
 """
-        user_prompt_parts = ["### PROJECT CONTEXT"]
-        user_prompt_parts.append(context_str)
+        user_prompt_parts = ["### PROJECT CONTEXT", context_str]
 
         if task_id:
             specific_task_instruction = f"You are instructed to work on Task {task_id}."
             if feature_id:
                 specific_task_instruction += f" Specifically, focus on Feature {task_id}.{feature_id} within this task."
             specific_task_instruction += " Ignore the '1. Analyze the context to identify the next eligible pending task.' step and directly formulate a plan and tool calls for this specific task/feature."
+            if persona:
+                specific_task_instruction += f" You are running in persona mode: {persona}."
             user_prompt_parts.append(specific_task_instruction)
             user_prompt_parts.append("\nGenerate the JSON response to complete the specified task/feature.")
         else:
             user_prompt_parts.append("\nGenerate the JSON response to complete the next task.")
-        
+
         user_prompt = "\n".join(user_prompt_parts)
         return [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
-        
+
     def _make_api_call(self, model: str, messages: list) -> str:
         print(f"Sending prompt to model '{model}' via LiteLLM...")
         try:
@@ -118,14 +152,15 @@ Respond with a single, valid JSON object.
             sys.exit(1)
 
 class Agent:
-    def __init__(self, model: str, mode: str, task_id: int, feature_id: int = None):
+    def __init__(self, model: str, mode: str, task_id: int, feature_id: int = None, persona: str = None):
         self.model = model
         self.mode = mode
-        self.task_id = task_id 
-        self.feature_id = feature_id 
+        self.task_id = task_id
+        self.feature_id = feature_id
+        self.persona = persona
         self.working_dir = f"/tmp/agent_repo_{self.task_id}"
         self.engine = UnifiedEngine()
-        print(f"Agent initialized. Mode: {self.mode}, Model: {self.model}. Running in Safe Mode.")
+        print(f"Agent initialized. Mode: {self.mode}, Model: {self.model}. Persona: {self.persona or 'generic'}. Running in Safe Mode.")
 
     def run(self):
         run_count = 0
@@ -143,10 +178,10 @@ class Agent:
         if not git_manager.setup_repository(branch_name=f"features/{self.task_id}"):
             return False
         tools_instance = AgentTools(git_manager.repo_path, git_manager)
-        context = self._gather_context(git_manager.repo_path)
+        context = self._gather_context(git_manager.repo_path, self.persona)
 
         # Build initial conversation messages
-        messages = self.engine._build_prompt(context, self.task_id, self.feature_id)
+        messages = self.engine._build_prompt(context, self.task_id, self.feature_id, self.persona)
 
         # Conversational loop to support multi-turn tool usage
         max_turns = 8
@@ -179,11 +214,11 @@ class Agent:
             results, halt = self._execute_and_collect_tool_calls(tools_instance, tool_calls)
 
             if halt:
-                return False # ask_question or finish signaled a halt
+                return False  # ask_question or finish signaled a halt
 
             # If the agent invoked finish (even without HALT), end this cycle
             if any(call.get("tool_name") == "finish" for call in tool_calls):
-                return True # Cycle complete, might start another in continuous mode
+                return True  # Cycle complete, might start another in continuous mode
 
             # Provide tool execution results back to the agent for the next turn
             feedback = {"type": "tool_results", "results": results}
@@ -194,7 +229,7 @@ class Agent:
                     "\nContinue by returning your next JSON response following the required schema."
                 )
             })
-        
+
         print("Max conversation turns reached; ending cycle.")
         return True
 
@@ -223,34 +258,75 @@ class Agent:
                 results.append({"tool_name": tool_name, "arguments": arguments, "error": err})
                 return results, True
         return results, False
-    
-    def _gather_context(self, repo_path: str):
-        files = [
-            "tasks/TASKS.md",
-            "docs/AGENT_EXECUTION_CHECKLIST.md",
-            "docs/AGENT_PRINCIPLES.md",
-            "docs/FEATURE_FORMAT.md",
-            "docs/FILE_ORGANISATION.md",
-            "docs/LOCAL_SETUP.md",
-            "docs/PLAN_SPECIFICATION.md",
-            "docs/SPEC.md",
-            "docs/SPECIFICATION_GUIDE.md",
-            "docs/TASK_FORMAT.md",
-            "docs/TESTING.md",
-            "docs/TOOL_ARCHITECTURE.md",
-            "scripts/run_local_agent.py"
-        ]
+
+    def _gather_context(self, repo_path: str, persona: str | None = None):
+        files = []
+
+        # Minimal context selection per persona
+        if persona == 'manager':
+            files = [
+                'tasks/TASKS.md',
+                'docs/TASK_FORMAT.md',
+                'docs/AGENT_PRINCIPLES.md',
+                'docs/TOOL_ARCHITECTURE.md',
+            ]
+        elif persona == 'planner':
+            files = [
+                'tasks/TASKS.md',
+                'docs/PLAN_SPECIFICATION.md',
+                'docs/FEATURE_FORMAT.md',
+                'docs/TASK_FORMAT.md',
+                'docs/TOOL_ARCHITECTURE.md',
+            ]
+        elif persona == 'tester':
+            files = [
+                'tasks/TASKS.md',
+                'docs/TESTING.md',
+                'docs/PLAN_SPECIFICATION.md',
+                'docs/TOOL_ARCHITECTURE.md',
+            ]
+        elif persona == 'developer':
+            files = [
+                'tasks/TASKS.md',
+                'docs/AGENT_EXECUTION_CHECKLIST.md',
+                'docs/PLAN_SPECIFICATION.md',
+                'docs/TESTING.md',
+                'docs/TOOL_ARCHITECTURE.md',
+            ]
+        else:
+            # Generic mode: broader context
+            files = [
+                'tasks/TASKS.md',
+                'docs/AGENT_EXECUTION_CHECKLIST.md',
+                'docs/AGENT_PRINCIPLES.md',
+                'docs/FEATURE_FORMAT.md',
+                'docs/FILE_ORGANISATION.md',
+                'docs/LOCAL_SETUP.md',
+                'docs/PLAN_SPECIFICATION.md',
+                'docs/SPEC.md',
+                'docs/SPECIFICATION_GUIDE.md',
+                'docs/TASK_FORMAT.md',
+                'docs/TESTING.md',
+                'docs/TOOL_ARCHITECTURE.md',
+                'scripts/run_local_agent.py',
+            ]
 
         if self.task_id:
             task_plan_path = f"tasks/{self.task_id}/plan_{self.task_id}.md"
             if task_plan_path not in files:
                 files.append(task_plan_path)
 
+        # Always include the orchestrator file reference for tool contract visibility
+        if 'scripts/run_local_agent.py' not in files:
+            files.append('scripts/run_local_agent.py')
+
         context = {}
         for filename in files:
             try:
-                with open(os.path.join(repo_path, filename), "r") as f: context[filename] = f.read()
-            except FileNotFoundError: pass
+                with open(os.path.join(repo_path, filename), "r") as f:
+                    context[filename] = f.read()
+            except FileNotFoundError:
+                pass
         return context
 
     def _get_repo_url(self):
@@ -272,7 +348,8 @@ if __name__ == "__main__":
     parser.add_argument('--mode', choices=['single', 'continuous'], default='single', help="Execution mode.")
     parser.add_argument('--task', required=True, type=int, help="Specify a task ID to work on.")
     parser.add_argument('--feature', type=int, help="Specify a feature ID within the task to work on.")
+    parser.add_argument('--persona', choices=['manager', 'planner', 'tester', 'developer'], help='Run in persona mode with tailored prompts and minimal context.')
     args = parser.parse_args()
-    
-    agent = Agent(model=args.model, mode=args.mode, task_id=args.task, feature_id=args.feature)
+
+    agent = Agent(model=args.model, mode=args.mode, task_id=args.task, feature_id=args.feature, persona=args.persona)
     agent.run()
