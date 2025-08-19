@@ -18,11 +18,12 @@ Define the specification guide, produce a template and ensure `docs/SPEC.md` adh
    Output: `docs/TEMPLATE.md`
    Dependencies: 4.1
 
-4.3) + Ensure `docs/SPEC.md` adheres to the guide
+4.3) - Ensure `docs/SPEC.md` adheres to the guide
    Action: Align `docs/SPEC.md` with the guide structure.
    Acceptance: `docs/SPEC.md` matches the guide's expectations.
    Context: `docs/SPEC.md`, `docs/SPECIFICATION_GUIDE.md`
    Dependencies: 4.1
+   Notes: Current `docs/SPEC.md` uses sections "WHAT", "CORE IDEAS", and "ACTIONS" rather than the guide's required structure (Problem Statement, Inputs/Outputs, Constraints, Success Criteria, Edge Cases, Examples). This feature remains pending until `docs/SPEC.md` is realigned with the guide.
 
 ## Execution Steps
 1) Implement features

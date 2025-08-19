@@ -16,10 +16,10 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a scheme for organising files within the repository.
    Acceptance: The documentation exists.
 
-4) + Specification documentation
+4) - Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
-   Acceptance: The documentation exists.
-   Notes: A feature in this task should be to create a file `TEMPLATE.md` that has all the required sections from `docs/SPECIFICATION_GUIDE.md`, with examples for each section.
+   Acceptance: `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist; `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
+   Notes: A feature in this task should be to create a file `TEMPLATE.md` that has all the required sections from `docs/SPECIFICATION_GUIDE.md`, with examples for each section. Feature 4.3 is pending until `docs/SPEC.md` is realigned with the guide.
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
@@ -72,7 +72,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 14) - Running in docker
    Action: Create a workflow to running the project in docker, i.e. isolated environment.
-   Acceptance: The file `docs/docker/RUNNING_DOCKER_README.md` exists detailing the steps involved in running the project in a container environment. A `docs/docker/Dockerfile` exists that a user can copy and use. Ideally a script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in the API keys in a prepare `.env` file that the script will look into and set everything up.
+   Acceptance: The file `docs/docker/RUNNING_DOCKER_README.md` exists detailing the steps involved in running the project in a container environment. A `docs/docker/Dockerfile` exists that a user can copy and use. Ideally a script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in a prepare `.env` file that the script will look into and set everything up.
    Remember, this is a regular task and requires a plan and features just like any other task.
    Notes: The purpose is to have an agent periodically run in a container and not affect the host machine.
 
