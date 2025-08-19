@@ -37,18 +37,11 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
    Acceptance: The documentation exists.
 
-9) + Automated tests
+9) - Automated tests
    Action: Create tests for every task and feature already existing. 
-   Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification.
-   Notes: These are unit tests that check the agent's ability to perform specific tasks and features. They should cover various scenarios and edge cases to ensure robustness and reliability.
+   Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification. The tests for this task must all pass.
 
-10) + Require agents to gather context per each feature
-   Action: Update the `docs/PLAN_SPECIFICATION.md` file to require the agent to do the following:
-   - Whenever an agent attempts a task and in turn a feature, they should always have the most cohesive context needed for them.
-   - There are tools missing that are necessary for an agent to complete tasks and features as according to spec. Analyse the specs and create the tools that are missing.
-   Acceptance: All missing documentation and tools exist.
-
-11) - Tasks 6 & 7 should be joined into one
+10) - Tasks 6 & 7 should be joined into one
    Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now.
    Acceptance: Only a single task exists relating to the Agent. This task gets removed upon completion.
 
