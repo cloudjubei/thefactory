@@ -70,7 +70,7 @@ This plan outlines the features required to transition from the current Markdown
    Dependencies: 13.5
    Output: `scripts/migrate_tasks.py`
 
-13.8) - Execute Migration and Validate
+13.8) + Execute Migration and Validate
    Action: Run the migration script to convert all existing tasks and validate that the migration was successful.
    Acceptance:
      - All tasks from `TASKS.md` now exist in the `tasks/{id}/task.json` format.
@@ -79,7 +79,7 @@ This plan outlines the features required to transition from the current Markdown
    Dependencies: 13.7
 
 ### Phase 4: Cleanup
-13.9) - Remove Dual-Read Mode from Orchestrator
+13.9) + Remove Dual-Read Mode from Orchestrator
    Action: Remove the backward-compatibility code (dual-read mode) from `run_local_agent.py`, making the JSON format the sole source of truth for tasks.
    Acceptance:
      - The orchestrator (`run_local_agent.py`) is simplified to only read from `tasks/{id}/task.json` using `task_utils.py`.

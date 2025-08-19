@@ -62,7 +62,7 @@ class UnifiedEngine:
             ),
             "planner": (
                 "You are the Planner persona.\n"
-                "Objectives: create/update tasks/{task_id}/plan_{task_id}.md following PLAN_SPECIFICATION and FEATURE_FORMAT.\n"
+                "Objectives: create/update tasks/{task_id}/plan.md following PLAN_SPECIFICATION and FEATURE_FORMAT.\n"
                 "Constraints: do not implement code. Keep the plan concise and specification-driven.\n"
                 "Primary tools: retrieve_context_files, write_file.\n"
             ),
@@ -74,7 +74,7 @@ class UnifiedEngine:
             ),
             "developer": (
                 "You are the Developer persona.\n"
-                "Objectives: implement exactly ONE pending feature from tasks/{task_id}/plan_{task_id}.md, write tests, run tests, and complete the feature.\n"
+                "Objectives: implement exactly ONE pending feature from tasks/{task_id}/plan.md, write tests, run tests, and complete the feature.\n"
                 "Constraints: one feature per cycle; minimal incremental changes; strictly follow acceptance criteria.\n"
                 "Primary tools: retrieve_context_files, write_file, run_tests, finish_feature.\n"
                 "Note: If update_feature_status is unavailable, update the plan file directly using write_file.\n"
@@ -117,9 +117,8 @@ The key for a tool's parameters MUST be "arguments".
 2.  Formulate a plan to complete the task.
 3.  Generate `tool_calls` to:
     a.  `write_file` for all necessary changes.
-    b.  `write_file` to update the task's status in `TASKS.md`.
-    c.  `submit_for_review` with the correct `task_id` and `task_title`.
-    d.  `finish` to end the cycle.
+    b.  `submit_for_review` with the correct `task_id` and `task_title`.
+    c.  `finish` to end the cycle.
 
 If no tasks are eligible, your ONLY tool call is `finish(reason=\"HALT: No eligible tasks found.\")`.
 Respond with a single, valid JSON object.{persona_instructions}
@@ -266,14 +265,12 @@ class Agent:
         # Minimal context selection per persona
         if persona == 'manager':
             files = [
-                'tasks/TASKS.md',
                 'docs/tasks/TASKS_GUIDANCE.md',
                 'docs/AGENT_PRINCIPLES.md',
                 'docs/TOOL_ARCHITECTURE.md',
             ]
         elif persona == 'planner':
             files = [
-                'tasks/TASKS.md',
                 'docs/PLAN_SPECIFICATION.md',
                 'docs/FEATURE_FORMAT.md',
                 'docs/tasks/TASKS_GUIDANCE.md',
@@ -281,14 +278,12 @@ class Agent:
             ]
         elif persona == 'tester':
             files = [
-                'tasks/TASKS.md',
                 'docs/TESTING.md',
                 'docs/PLAN_SPECIFICATION.md',
                 'docs/TOOL_ARCHITECTURE.md',
             ]
         elif persona == 'developer':
             files = [
-                'tasks/TASKS.md',
                 'docs/AGENT_EXECUTION_CHECKLIST.md',
                 'docs/PLAN_SPECIFICATION.md',
                 'docs/TESTING.md',
@@ -297,7 +292,6 @@ class Agent:
         else:
             # Generic mode: broader context
             files = [
-                'tasks/TASKS.md',
                 'docs/AGENT_EXECUTION_CHECKLIST.md',
                 'docs/AGENT_PRINCIPLES.md',
                 'docs/FEATURE_FORMAT.md',
@@ -313,7 +307,7 @@ class Agent:
             ]
 
         if self.task_id:
-            task_plan_path = f"tasks/{self.task_id}/plan_{self.task_id}.md"
+            task_plan_path = f"tasks/{self.task_id}/plan.md"
             if task_plan_path not in files:
                 files.append(task_plan_path)
 
@@ -322,19 +316,13 @@ class Agent:
             files.append('scripts/run_local_agent.py')
 
         context = {}
-        # DUAL-READ LOGIC: If a task ID is provided, try to load its .json file.
-        # If found, skip loading the main TASKS.md to avoid providing conflicting context.
-        task_json_loaded = False
+        # The sole source of truth for tasks is now the task.json file.
         if self.task_id:
             task_data = get_task(self.task_id, base_path=os.path.join(repo_path, 'tasks'))
             if task_data:
                 context[f'tasks/{self.task_id}/task.json'] = json.dumps(task_data, indent=2)
-                task_json_loaded = True
 
         for filename in files:
-            if filename == 'tasks/TASKS.md' and task_json_loaded:
-                continue
-            # Avoid re-reading if already loaded
             if filename in context:
                 continue
             try:
