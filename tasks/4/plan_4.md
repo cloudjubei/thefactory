@@ -42,6 +42,7 @@ Satisfy the task by ensuring the specification guide and template exist (already
    Context: docs/PLAN_SPECIFICATION.md (Testing), docs/SPECIFICATION_GUIDE.md, docs/TEMPLATE.md
    Dependencies: 4.1, 4.2
    Output: tasks/4/tests/test_4_4.py
+   Rejection: FAIL: docs/SPECIFICATION_GUIDE.md missing: # Problem Statement, # Inputs and Outputs, # Constraints, # Edge Cases, # Examples | docs/TEMPLATE.md missing: # Inputs and Outputs
 
 4.5) - Test for 4.3 (SPEC.md adherence)
    Action: Write a test that verifies docs/SPEC.md adheres to the guide.
