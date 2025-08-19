@@ -1,10 +1,14 @@
 # Task Format Specification
 
+## Note on Source of Truth and Migration
+- Canonical Source of Truth: The per-task JSON file at tasks/{id}/task.json is the canonical representation of task data and features. See docs/TASKS_JSON_FORMAT.md.
+- Compatibility During Migration: The monolithic tasks/TASKS.md remains as a compatibility index until migration completes. See docs/TASKS_MIGRATION_GUIDE.md for dual-read strategy and deprecation plan.
+
 ## 1. Purpose
 This document defines the canonical format for managing Tasks and their Features within this project. It is self-contained and unambiguous, specifying fields, status codes, core rules, examples, and authoring tips so any contributor can read and write tasks consistently.
 
 ## 2. Field Definitions
-A Task entry in tasks/TASKS.md MUST include the following fields in order:
+A Task entry in tasks/TASKS.md MUST include the following fields in order (compatibility index during migration):
 - ID and Status: A numeric ID followed by a status symbol and a short Title line.
   - Example: `12) - Plan specification`
 - Action: A concise imperative statement describing the work to be done.
@@ -20,6 +24,8 @@ A Feature entry in tasks/{task_id}/plan_{task_id}.md MUST include:
 - Dependencies: Other features or tasks that must be completed first, if any.
 - Output: The explicit file(s) or artifact(s) expected from the feature.
 - Notes: Optional clarifications.
+
+Note: While tasks/TASKS.md remains during migration, the canonical task data is in tasks/{id}/task.json. Authors should prioritize updating task.json; tasks/TASKS.md serves as an overview and index until removal per docs/TASKS_MIGRATION_GUIDE.md.
 
 ## 3. Statuses
 Use the following status codes for both tasks and features:
@@ -84,4 +90,6 @@ Notes:
 - No duplicated content; references to canonical docs where appropriate.
 - Tests exist for features that create or modify files and they pass.
 
-This specification governs both the top-level task list (tasks/TASKS.md) and per-task feature plans (tasks/{task_id}/plan_{task_id}.md).
+## 8. References and Canonical JSON Format
+- Canonical JSON format: docs/TASKS_JSON_FORMAT.md
+- Migration and compatibility: docs/TASKS_MIGRATION_GUIDE.md
