@@ -1,27 +1,37 @@
-import os
-import sys
-
-REQUIRED_HEADINGS = [
-    "# Problem Statement",
-    "# Inputs and Outputs",
-    "# Constraints",
-    "# Success Criteria",
-    "# Edge Cases",
-    "# Examples",
-]
+import os, sys
 
 def run():
-    spec_path = "docs/SPEC.md"
-    if not os.path.exists(spec_path):
-        print(f"FAIL: {spec_path} does not exist.")
+    path = "docs/SPEC.md"
+    if not os.path.exists(path):
+        print(f"FAIL: {path} does not exist.")
         sys.exit(1)
-    with open(spec_path, "r", encoding="utf-8") as f:
+    with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    missing = [h for h in REQUIRED_HEADINGS if h not in content]
+
+    required = [
+        "# Problem Statement",
+        "# Inputs and Outputs",
+        "# Constraints",
+        "# Success Criteria",
+        "# Edge Cases",
+        "# Examples",
+    ]
+
+    missing = [h for h in required if h not in content]
     if missing:
-        print(f"FAIL: {spec_path} is missing headings: {', '.join(missing)}")
+        print("FAIL: SPEC.md missing required headings: " + ", ".join(missing))
         sys.exit(1)
-    print("PASS: test_4_5 - SPEC.md contains all required headings.")
+
+    # Verify order of headings is correct
+    indices = [content.find(h) for h in required]
+    if any(i == -1 for i in indices):
+        print("FAIL: Unexpected missing heading when checking order.")
+        sys.exit(1)
+    if any(indices[i] >= indices[i+1] for i in range(len(indices)-1)):
+        print("FAIL: Headings are not in the required order.")
+        sys.exit(1)
+
+    print("PASS: SPEC.md contains required headings in correct order.")
     sys.exit(0)
 
 if __name__ == "__main__":
