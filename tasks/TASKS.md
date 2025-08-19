@@ -62,8 +62,27 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    - Developer: An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria.
    Acceptance: Four personas exist that describe the roles of the agents. These personas are detailed in a file `docs/AGENT_PERSONAS.md`. A script exists that allows running these personas, so that for each task, the persona script can run and see if there's anything else for it to do. Once these personas are implemented, this task should be updated accordingly so that it follows spec. Each persona has a prompt that is clearly visible. `run_local_agent.py` is updated with the workflow that these new personas introduce. I must be able to run the personas individually once this task is completed to check each agent.
 
-11) ? Should the tasks and plan format change?
-   Action: Now that the personas exist, it's clear that to be able to provide them with the smallest context possible, we need to change the spec and thus the format of tasks and features. Instead of keeping a task in this markdown file, each task should be in a separate JSON file in its folder - `task.json`. The task should contain all the information that is currently here and all the feature specifics. This way it's easy to extract specific task or feature information and provide it as context to a given agent. The plan in each folder should remain as markdown, as it should be the best way for an LLM to consume information. Appropriate tools need to be in place, so that each persona will only get the relevant context.
+11) - JSON-based tasks format migration specification
+    Action: Define and approve a new JSON-based per-task format and repository layout, plus a migration plan from `tasks/TASKS.md` to `tasks/{id}/task.json`, while preserving per-task plans in Markdown.
+    Acceptance:
+      - `docs/TASKS_JSON_FORMAT.md` exists and defines:
+        - Folder structure: `tasks/{id}/` containing `task.json`, `plan_{id}.md`, `tests/`, and optional `artifacts/`.
+        - `task.json` schema fields: `id` (int), `status` (one of `+ ~ - ? / =`), `title` (string), `action` (string), `acceptance` (array[string] or structured list), `notes` (string, optional), `dependencies` (array[int], optional), `features` (array of objects with: `number`, `status`, `title`, `action`, `acceptance`, `context`, `dependencies`, `output`, `notes`), and `metadata` (`created`, `updated`, `version`).
+        - Status codes reference and reuse the definitions from `docs/TASK_FORMAT.md`.
+        - End-to-end examples for a task and one feature.
+      - `docs/TASKS_MIGRATION_GUIDE.md` exists and includes:
+        - A stepwise migration plan with backward compatibility (dual-read from `TASKS.md` and `task.json`).
+        - Tooling requirements for orchestrator/context selection so each persona receives minimal, relevant context.
+        - Test impact and updates referencing `docs/TESTING.md` (validation for JSON schemas, CI expectations).
+        - Rollback plan and deprecation strategy for `TASKS.md`.
+      - `docs/TASK_FORMAT.md` is updated to reference the JSON format as the canonical source of truth, adding a compatibility section for `tasks/TASKS.md` until migration completes.
+      - The following implementation tasks are added to `tasks/TASKS.md` (pending) to execute the migration:
+        1) Implement JSON schema files and validation tooling.
+        2) Update `scripts/run_local_agent.py` to read `task.json` and enforce persona-scoped context.
+        3) Migrate existing tasks to per-folder JSON files.
+        4) Remove legacy `tasks/TASKS.md` and finalize docs.
+      - Dependencies: 4, 8, 10.
+    Notes: This is a documentation/specification task only; no code changes are performed here.
 
 12) - Tasks 6 & 7 should be joined into one
    Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now. To accomplish this, inspect the plans for both of the tasks and merge them together. Inspect the tests for both and merge them together.
@@ -114,3 +133,36 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 24) - explore other ways to launch agents locally
    Action: Explore alternative methods for launching agents locally, considering factors like scalability, efficiency, and ease of integration. This task aims to identify potential alternatives to the current approach and evaluate their suitability based on specific criteria.
    Acceptance: A comprehensive analysis report outlining the explored options, their pros and cons, and recommendations for future consideration.
+
+25) - Implement JSON schemas and validation tooling
+    Action: Create JSON Schema files and validation utilities for the new per-task format.
+    Acceptance:
+      - `docs/schemas/task.schema.json` and `docs/schemas/feature.schema.json` exist and validate the fields defined in `docs/TASKS_JSON_FORMAT.md`.
+      - A validation script exists under `scripts/validate_tasks_json.py` that validates all `tasks/{id}/task.json` files and is integrated into tests/CI.
+      - `docs/TESTING.md` is updated to include guidance for schema validation in CI.
+    Dependencies: 11, 8
+
+26) - Update orchestrator for task.json and persona-scoped context
+    Action: Update `scripts/run_local_agent.py` and related tooling to read `tasks/{id}/task.json` and supply minimal persona-specific context.
+    Acceptance:
+      - The orchestrator can load a task by `task.json` and supply feature-scoped context as defined in `docs/TASKS_JSON_FORMAT.md`.
+      - Persona modes retrieve only the necessary files.
+      - Backward compatibility: continues to function with `tasks/TASKS.md` during migration.
+      - Tests exist and pass.
+    Dependencies: 11, 25
+
+27) - Migrate existing tasks to per-folder JSON files
+    Action: For each existing task, create `tasks/{id}/task.json` and ensure `plan_{id}.md` remains or is created as needed, migrating acceptance and feature data.
+    Acceptance:
+      - All current tasks up to this migration's start are represented by `tasks/{id}/task.json` with accurate fields and statuses.
+      - Plans and tests remain intact and correctly linked in the JSON.
+      - Validation passes via `scripts/validate_tasks_json.py`.
+    Dependencies: 25, 26
+
+28) - Remove legacy TASKS.md and finalize documentation
+    Action: Remove `tasks/TASKS.md` after successful migration and update documentation to rely solely on the JSON format.
+    Acceptance:
+      - `tasks/TASKS.md` is removed and all references are updated to point to the JSON-based format.
+      - `docs/TASK_FORMAT.md` and `docs/TASKS_JSON_FORMAT.md` reflect the final, single source of truth.
+      - CI validates only JSON-based tasks.
+    Dependencies: 27
