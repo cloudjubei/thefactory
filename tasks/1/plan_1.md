@@ -18,7 +18,7 @@ Provide a formal, specification-driven task format and ensure the canonical task
    Output: docs/TASK_FORMAT.md
    Rejection: docs/TASK_FORMAT.md is missing required terms/sections: Statuses
 
-1.2) - Apply format to TASKS
+1.2) + Apply format to TASKS
    Action: Update tasks/TASKS.md to follow docs/TASK_FORMAT.md and reference it at the top for readers.
    Acceptance:
    - All tasks follow the required structure and status codes
