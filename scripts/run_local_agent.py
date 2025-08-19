@@ -13,6 +13,8 @@ from scripts.tools.rename_files import rename_files as rename_files_tool
 from scripts.tools.submit_for_review import submit_for_review_tool
 from scripts.tools.ask_question import ask_question_tool
 from scripts.tools.finish import finish_tool
+from scripts.tools.finish_feature import finish_feature_tool
+from scripts.tools.run_tests import run_tests_tool
 
 class AgentTools:
     def __init__(self, repo_path: str, git_manager: GitManager):
@@ -40,6 +42,12 @@ class AgentTools:
     def finish(self, reason: str):
         return finish_tool(reason)
 
+    def finish_feature(self, task_id: int, feature_id: int, title: str, message: str = ""):
+        return finish_feature_tool(self.git_manager, task_id, feature_id, title, message)
+
+    def run_tests(self):
+        return run_tests_tool(self.repo_path)
+
 class UnifiedEngine:
     def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None) -> list:
         context_str = "\n".join(f"--- START of {name} ---\n{content}\n--- END of {name} ---\n" for name, content in context.items())
@@ -52,6 +60,8 @@ You have access to the following SAFE tools:
 - `write_file(path, content)`
 - `retrieve_context_files(paths: list)`
 - `rename_files(operations: list, overwrite: bool, dry_run: bool)`
+- `run_tests()`
+- `finish_feature(task_id, feature_id, title, message)`
 - `submit_for_review(task_id, task_title)`
 - `ask_question(question_text)`
 - `finish(reason)`
@@ -202,7 +212,7 @@ class Agent:
                 continue
             print(f"Calling Tool: {tool_name}({arguments})")
             try:
-                result = tool_method(**arguments)
+                result = tool_method(**arguments) if isinstance(arguments, dict) else tool_method()
                 print(f"Tool Result: {result}")
                 results.append({"tool_name": tool_name, "arguments": arguments, "result": result})
                 if tool_name in ['ask_question', 'finish'] and isinstance(result, str) and "HALT" in result:
@@ -232,6 +242,8 @@ class Agent:
             "scripts/git_manager.py",
             "scripts/tools/ask_question.py",
             "scripts/tools/finish.py",
+            "scripts/tools/finish_feature.py",
+            "scripts/tools/run_tests.py",
             "scripts/tools/rename_files.py",
             "scripts/tools/retrieve_context_files.py",
             "scripts/tools/submit_for_review.py",

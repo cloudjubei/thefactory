@@ -42,7 +42,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification.
    Notes: These are unit tests that check the agent's ability to perform specific tasks and features. They should cover various scenarios and edge cases to ensure robustness and reliability.
 
-10) - Require agents to gather context per each feature
+10) + Require agents to gather context per each feature
    Action: Update the `docs/PLAN_SPECIFICATION.md` file to require the agent to do the following:
    - Whenever an agent attempts a task and in turn a feature, they should always have the most cohesive context needed for them.
    - There are tools missing that are necessary for an agent to complete tasks and features as according to spec. Analyse the specs and create the tools that are missing.

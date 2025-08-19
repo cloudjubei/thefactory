@@ -25,15 +25,30 @@ The plan should be easy for a human to understand. It should be concise and focu
 A feature is not considered complete until a corresponding test is written and passes. This ensures that all work is verifiable.
 - For every feature that produces a tangible output (like a file or a change in a file), a subsequent feature in the plan MUST be created to write a test for it.
 - The acceptance criteria for the "test-writing" feature is that the test script exists under `tasks/{task_id}/tests/` and verifies the acceptance criteria of the previous feature.
-- Use `scripts/run_tests.py` to execute all tests and ensure they pass before submitting the work.
+- Use the `run_tests` tool to execute all tests and ensure they pass before submitting the work. Locally, `scripts/run_tests.py` may be invoked by the orchestrator's tool.
 
 ### 2.6. Per-Feature Single-Step Delivery and Commit (Required)
 To enforce more thorough planning and reliable delivery:
 - The agent should complete each feature as a single cohesive step: gather all necessary context, implement the change, and finish by writing the tests for that feature.
-- When a feature is complete and its tests pass, the agent MUST send a `finish_feature` signal. This triggers the orchestrator to commit the current work for that feature (creating one commit per feature) and push the branch.
+- When a feature is complete and its tests pass, the agent MUST send the `finish_feature` tool call. This triggers the orchestrator to commit the current work for that feature (creating one commit per feature) and push the branch.
 - After all features in the task are completed and all tests pass, the agent submits the task via a pull request.
 
-Note: The `finish_feature` signal is a dedicated completion signal for a feature. It is separate from the final `submit_for_review` and `finish` calls that complete the task.
+Note: The `finish_feature` tool is a dedicated completion signal for a feature. It is separate from the final `submit_for_review` and `finish` calls that complete the task.
+
+### 2.7. Cohesive Context Per Feature (Required)
+Before making any change for a feature, the agent MUST gather the Minimum Cohesive Context (MCC) required to execute that feature safely and correctly.
+
+- Always use `retrieve_context_files` to fetch the MCC at the start of the feature.
+- If the MCC is ambiguous or incomplete, use `ask_question` to clarify before proceeding.
+
+MCC Checklist (adapt as needed per feature):
+- tasks/TASKS.md
+- The current task plan file: `tasks/{task_id}/plan_{task_id}.md`
+- All specification files referenced in the feature's Context section (e.g., `docs/PLAN_SPECIFICATION.md`, `docs/FEATURE_FORMAT.md`, `docs/TOOL_ARCHITECTURE.md`, etc.)
+- Any source files the feature will modify or read
+- Relevant tool files the feature will use (e.g., under `scripts/tools/`)
+
+Rationale: Ensures decisions are made with the most relevant information at hand, reduces rework, and aligns with the Specification-Driven approach.
 
 ## 3. Location and Structure
 - Each task MUST have a dedicated plan file located at `tasks/{task_id}/plan_{task_id}.md`.
@@ -70,13 +85,13 @@ Short, high-level description of how this plan will satisfy the task's Acceptanc
 
 ## Execution Steps
 For each feature in order:
-1) Gather context and implement the feature changes
+1) Gather context (MCC) using `retrieve_context_files` and implement the feature changes
 2) Create the test(s) that verify the feature's acceptance criteria under `tasks/{task_id}/tests/`
-3) Run `python scripts/run_tests.py` and ensure tests pass locally
-4) Send `finish_feature` with a descriptive message (e.g., "Feature {task_id}.{n} complete: {Title}") to create a commit for this feature
+3) Run tests using the `run_tests` tool and ensure tests pass
+4) Call `finish_feature` with a descriptive message (e.g., "Feature {task_id}.{n} complete: {Title}") to create a commit for this feature
 
 After all features are completed:
-5) Run `python scripts/run_tests.py` again and ensure the full suite passes
+5) Run `run_tests` again and ensure the full suite passes
 6) Update `tasks/TASKS.md` with status change for this task
 7) Submit for review (open PR)
 8) Finish
@@ -95,7 +110,7 @@ A good corresponding plan would be:
 
 1. Analyze Task: Review Task 12 to confirm the goal is to create `docs/PLAN_SPECIFICATION.md` with purpose, principles, structure, template, and example.
 2. Draft Specification: Author the content for `docs/PLAN_SPECIFICATION.md` covering purpose, principles, structure, template, and example.
-3. Implement Per-Feature Flow: For each feature, write its tests, run the test suite, and then call `finish_feature` to create a per-feature commit.
+3. Implement Per-Feature Flow: For each feature, write its tests, run the test suite using the `run_tests` tool, and then call `finish_feature` to create a per-feature commit.
 4. Update Task List: Modify `tasks/TASKS.md` to change the status of Task 12 from `-` (Pending) to `+` (Completed).
 5. Execute Changes: Generate the necessary tool calls:
    a. `write_file` to create `docs/PLAN_SPECIFICATION.md` with the drafted content.
@@ -144,7 +159,7 @@ if __name__ == "__main__":
 ```
 
 ### 6.5 Running Tests
-- Use `python scripts/run_tests.py` to discover and run all tests under `tasks/*/tests/*.py`.
+- Use the `run_tests` tool to execute tests and collect results.
 - A feature can only be marked complete when its test(s) pass and `finish_feature` has been sent to create a per-feature commit.
 - A plan is only complete when all related tests pass locally before submission.
 
@@ -154,7 +169,7 @@ if __name__ == "__main__":
 Ensure every feature completion results in an isolated, reviewable commit and that the feature's tests pass before the work is committed.
 
 ### 7.2 Behavior
-- The agent sends `finish_feature` after implementing a feature and creating passing tests.
+- The agent calls `finish_feature(task_id, feature_id, title, message?)` after implementing a feature and creating passing tests.
 - The orchestrator commits all current changes and pushes the branch. One commit per feature is required.
 - Suggested commit message format: `Feature {task_id}.{n}: {Title}`. Include a short description if helpful.
 
@@ -168,7 +183,7 @@ Ensure every feature completion results in an isolated, reviewable commit and th
 
 1. Read the task specification from `tasks/TASKS.md`.
 2. Create `tasks/{task_id}/plan_{task_id}.md` and enumerate features according to `docs/FEATURE_FORMAT.md`.
-3. For each feature: implement, write tests, run `python scripts/run_tests.py`, then call `finish_feature` to commit the feature.
+3. For each feature: gather MCC via `retrieve_context_files`, implement, write tests, run `run_tests`, then call `finish_feature` to commit the feature.
 4. After all features pass tests: update `TASKS.md`, submit for review, and finish.
 
 Context for implementation references: `scripts/run_tests.py`, `scripts/git_manager.py`, `scripts/run_local_agent.py`.

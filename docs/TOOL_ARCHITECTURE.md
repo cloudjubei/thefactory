@@ -48,6 +48,21 @@ The orchestrator will make the following Python functions available as tools to 
 -  Returns: JSON string with keys: `ok` (bool), `summary` ({moved, skipped, errors}), `results` (list per operation with status and message).
 -  Notes: This tool is implemented in `scripts/rename_files.py` and exposed to the agent via `AgentTools.rename_files` in `scripts/run_local_agent.py`.
 
+### `run_tests`
+-  Description: Execute the project's test suite (`scripts/run_tests.py`) and return a structured result.
+-  Arguments: none
+-  Returns: JSON string with keys: `ok` (bool), `exit_code` (int), `stdout` (str), `stderr` (str), `passed` (int|None), `total` (int|None).
+-  Purpose: Enables the agent to verify acceptance criteria programmatically per feature and before submission.
+
+### `finish_feature`
+-  Description: Commit and push the current changes as a single "feature commit" with a standardized message.
+-  Arguments:
+   -  `task_id` (int): Parent task ID.
+   -  `feature_id` (int): Feature index within the task (e.g., 10.1 -> 1).
+   -  `title` (string): Short feature title used in the commit subject.
+   -  `message` (string, optional): Longer description included in the commit body.
+-  Behavior: Creates one commit per feature and pushes the current branch. Does not create a PR.
+
 ### `submit_for_review`
 -  Description: A high-level tool that performs all the necessary steps to submit the agent's work. It automatically adds all file changes, commits them with a standardized message, and creates a pull request. This should be the final step in any successful plan.
 -  Arguments:
@@ -72,3 +87,5 @@ To be considered complete, any plan that successfully addresses a task MUST conc
 1.  `write_file`: All file modifications, including updating the relevant task's status in `TASKS.md`.
 2.  `submit_for_review`: To package and submit all changes for human review.
 3.  `finish`: To signal the successful completion of the work cycle.
+
+Per-feature completion: After implementing and testing each feature, the agent must call `finish_feature` to create an isolated commit before proceeding to the next feature.
