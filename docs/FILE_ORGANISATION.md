@@ -1,57 +1,86 @@
-# File Organisation
+# File Organisation Specification
 
-Authoritative reference: This document defines the repository file organization and is referenced by Task 3 in tasks/TASKS.md per the Non-Redundancy Principle. Tasks should reference this file rather than duplicating its details.
+This document defines how files and directories are structured, named, and evolved in this repository to support specification-driven, tool-using agent workflows.
 
-This document outlines the standard file and directory structure for the project. A consistent structure is essential for maintaining clarity, scalability, and ease of navigation as the project grows.
+## Top-Level Directory Layout
 
-## Guiding Principles
+A concise overview of the repository's root structure and the purpose of each directory.
 
-- **Clarity over Brevity**: Directory and file names should be descriptive and unambiguous.
-- **Logical Grouping**: Related files should be grouped together by function or type.
-- **Scalability**: The structure should accommodate future growth without requiring major refactoring.
+- docs/
+  - Project-wide specifications, guides, and reference documents.
+  - Examples: PLAN_SPECIFICATION.md, TESTING.md, TOOL_ARCHITECTURE.md, AGENT_EXECUTION_CHECKLIST.md.
+- tasks/
+  - Task-scoped plans and tests. Each task has its own folder: tasks/{task_id}/.
+  - Inside each task folder:
+    - plan_{task_id}.md — the task plan enumerating features and their statuses
+    - tests/ — tests validating the features of this task
+- scripts/
+  - Orchestrator, tools, and execution helpers for the agent runtime.
+  - Example: scripts/run_local_agent.py, scripts/tools/*.
+- projects/ (optional, may not exist yet)
+  - Holds child projects/submodules if/when introduced as per CHILD_PROJECTS_SPECIFICATION.
+- .github/ (optional)
+  - CI/CD workflows and repository automation.
+- Other top-level files
+  - README.md, LICENSE, .gitignore, environment/config files as needed.
 
-## Top-Level Directory Structure
+Example tree (illustrative):
 
 ```
-.
-├── .github/         # CI/CD workflows and issue templates
-├── docs/            # All specification, guides, and documentation
-├── scripts/         # Executable scripts (e.g., the Orchestrator)
-├── src/             # Source code for project-specific libraries or modules (if any)
-├── tasks/           # The main task list and per-task plan folders
-├── tests/           # Automated tests
-│
-├── .env.example     # Template for environment variables
-├── .gitignore       # Git ignore rules
-├── LOCAL_SETUP.md   # User guide for local setup and execution
-├── README.md        # High-level project overview and entry point
-└── requirements.txt # Python package dependencies
+/ (repo root)
+├─ docs/
+│  ├─ PLAN_SPECIFICATION.md
+│  ├─ TESTING.md
+│  └─ TOOL_ARCHITECTURE.md
+├─ tasks/
+│  ├─ TASKS.md
+│  └─ 3/
+│     ├─ plan_3.md
+│     └─ tests/
+│        └─ test_3_2.py
+├─ scripts/
+│  ├─ run_local_agent.py
+│  └─ tools/
+│     └─ ...
+└─ .gitignore
 ```
-
-## Directory Descriptions
-
-- **`.github/`**: Contains GitHub-specific configuration, such as action workflows for continuous integration and testing.
-- **`docs/`**: The central repository for all project documentation. This includes high-level specifications, technical guides, architectural documents, and principles.
-  - Examples: `SPEC.md`, `TOOL_ARCHITECTURE.md`, `SPECIFICATION_GUIDE.md`.
-- **`scripts/`**: Contains standalone, executable scripts. The primary example is the agent's Orchestrator.
-  - Example: `run_local_agent.py`.
-- **`src/`**: Reserved for Python source code that is not a standalone script but a module or library to be imported by other parts of the project.
-- **`tasks/`**: Holds the project's task list and per-task plans.
-  - `tasks/TASKS.md`: The canonical task list.
-  - `tasks/{id}/plan_{id}.md`: The plan for task `{id}`, including its feature list.
-- **`tests/`**: Contains all automated tests, including unit tests, integration tests, and end-to-end tests.
 
 ## File Naming Conventions
 
-- **Documentation (`.md`)**: `UPPER_SNAKE_CASE.md`
-  - Rationale: Distinguishes core specification documents as stable, important artifacts.
-  - Example: `FILE_ORGANISATION.md`, `AGENT_PRINCIPLES.md`.
-- **Python Scripts (`.py`)**: `lower_snake_case.py`
-  - Rationale: Follows the standard Python PEP 8 style guide.
-  - Example: `run_local_agent.py`.
-- **Configuration Files**: Use standard names where applicable.
-  - Example: `requirements.txt`, `.gitignore`.
+Consistent naming improves discoverability and automates tooling.
 
-## Future Evolution
+- Markdown specifications (docs/)
+  - Use UPPER_SNAKE_CASE with .md extension for primary specs and guides.
+  - Examples: PLAN_SPECIFICATION.md, TESTING.md, TOOL_ARCHITECTURE.md.
+- Task plans and tests (tasks/{task_id}/)
+  - Plan filename: plan_{task_id}.md (e.g., plan_3.md)
+  - Test filenames: test_{task_id}_{feature_number}.py (e.g., test_3_2.py)
+  - Tests reside under tasks/{task_id}/tests/.
+- Python scripts and modules (scripts/ and subdirs)
+  - Use snake_case.py for modules (e.g., run_local_agent.py, write_file.py)
+  - Packages use snake_case directories; tools live under scripts/tools/.
+- General rules
+  - Prefer ASCII, lowercase (except docs’ spec files, which are uppercase), hyphens or underscores for separators.
+  - Be explicit and descriptive; avoid abbreviations unless well-established.
+  - One logical entity per file (e.g., one plan per task).
 
-This file structure is a living document. As the project evolves, it may be necessary to add new directories or adjust the organization. Any such changes should be proposed via a task and this document should be updated accordingly.
+## Evolution Guidance
+
+How to evolve the structure safely as the project grows.
+
+- Plan changes
+  - Reflect structural updates in relevant docs (e.g., this file) and task plans.
+  - When introducing new directories (e.g., projects/), document purpose and conventions.
+- Safe refactors
+  - Use repository tooling (e.g., rename_files) to move/rename files atomically.
+  - Update references in plans, specs, and tests in the same change.
+- Testing and verification
+  - Add or update tests under tasks/{task_id}/tests/ that assert new or changed conventions.
+  - Run the test suite (run_tests) to ensure no regressions.
+- Versioning and traceability
+  - Make small, incremental changes; one feature per commit using finish_feature.
+  - Clearly describe rationale and impact in commit messages and notes.
+- Backwards compatibility
+  - When breaking changes are necessary, provide migration notes and update affected tasks/features accordingly.
+
+This specification should be revisited as repository needs evolve. Keep conventions simple, explicit, and enforceable via tests.

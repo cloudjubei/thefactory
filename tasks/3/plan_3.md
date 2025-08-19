@@ -8,7 +8,7 @@ Create the File Organisation specification and its verifying test to satisfy Tas
 - Source files: tasks/TASKS.md
 
 ## Features
-3.1) - Author File Organisation specification
+3.1) + Author File Organisation specification
    Action: Write docs/FILE_ORGANISATION.md describing the repository's structure and conventions.
    Acceptance:
    - docs/FILE_ORGANISATION.md exists
