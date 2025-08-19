@@ -118,15 +118,13 @@ For a task like:
 }
 ```
 A good corresponding agent plan (generated in the JSON response) would be:
-1. Analyze Task: Review Task 12 to confirm the goal is to create `docs/PLAN_SPECIFICATION.md` with purpose, principles, structure, template, and example.
+1. Analyze Task: Review Task 12 to confirm the goal is to create `docs/PLAN_SPECIFICATION.md`.
 2. Draft Specification: Author the content for `docs/PLAN_SPECIFICATION.md`.
-3. Implement Per-Feature Flow: For each feature, write its tests, run the test suite using the `run_tests` tool, and then call `finish_feature`.
-4. Update Task Status: Modify `tasks/12/task.json` to change the status of Task 12 from `-` (Pending) to `+` (Completed).
-5. Execute Changes: Generate the necessary tool calls:
-   a. `write_file` to create `docs/PLAN_SPECIFICATION.md` with the drafted content.
-   b. `write_file` to update `tasks/12/task.json`.
-   c. `submit_for_review` to finalize the task.
-   d. `finish` to end the operation.
+3. Create the test(s): Write a test file `tasks/12/tests/test_12_1.py` that verifies the existence and content of the new spec file.
+4. Run tests: Use `run_tests` to ensure the new test passes.
+5. Finish Feature: Call `finish_feature` to commit the work.
+6. Update Task Status: Modify `tasks/12/task.json` to change the status of Task 12 from `-` to `+`.
+7. Execute Changes: Generate the necessary tool calls for the above steps, followed by `submit_for_review` and `finish`.
 
 ## 6. Testing
 
