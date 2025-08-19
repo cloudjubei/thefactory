@@ -1,26 +1,21 @@
-# Plan for Task 6: Define Core Agent Terminology and Principles
+# Plan for Task 6: Agent Orchestration and Principles
 
 ## Intent
-Establish core principles and define the agent's tool-based architecture and terminology.
-
-## Context
-- Specs: `docs/PLAN_SPECIFICATION.md`
+To establish a common vocabulary and guiding principles for the agent project, and create the main script that runs the agent and executes its commands.
 
 ## Features
-6.1) + Create the tools guide
-   Action: Specify the JSON contract, tools, and execution modes.
-   Acceptance: `docs/TOOL_ARCHITECTURE.md` exists with all sections and tool definitions.
-   Output: `docs/TOOL_ARCHITECTURE.md`
+6.1) - Define "Agent" and "Orchestrator"
+   Action: Write definitions for these key terms.
+   Acceptance: The terms are defined in `docs/AGENT_PRINCIPLES.md`.
 
-6.2) + Create the principles guide
-   Action: Define Agent vs Orchestrator and core principles.
-   Acceptance: `docs/AGENT_PRINCIPLES.md` exists and contains required definitions referencing the tools guide.
-   Output: `docs/AGENT_PRINCIPLES.md`
-   Context: `docs/PLAN_SPECIFICATION.md`, `docs/TOOL_ARCHITECTURE.md`
-   Dependencies: 6.1
+6.2) - Document Core Principles
+   Action: Outline the core principles like "Specification-Driven" and "LLM-Led Intelligence".
+   Acceptance: The principles are documented in `docs/AGENT_PRINCIPLES.md`.
 
-## Execution Steps
-1) Implement features
-2) Update `tasks/TASKS.md` with status change
-3) Submit for review
-4) Finish
+6.3) - Create run_local_agent.py script
+   Action: Create the main entry point script.
+   Acceptance: `scripts/run_local_agent.py` exists.
+
+6.4) - Implement tool calling logic
+   Action: Add logic to parse JSON from the agent and call the specified tools.
+   Acceptance: The orchestrator can execute `write_file` and `finish` tools.
