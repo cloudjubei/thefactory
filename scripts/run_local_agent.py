@@ -236,18 +236,7 @@ class Agent:
             "docs/SPECIFICATION_GUIDE.md",
             "docs/TASK_FORMAT.md",
             "docs/TESTING.md",
-            "docs/TOOL_ARCHITECTURE.md",
-            "scripts/run_local_agent.py",
-            "scripts/run_tests.py",
-            "scripts/git_manager.py",
-            "scripts/tools/ask_question.py",
-            "scripts/tools/finish.py",
-            "scripts/tools/finish_feature.py",
-            "scripts/tools/run_tests.py",
-            "scripts/tools/rename_files.py",
-            "scripts/tools/retrieve_context_files.py",
-            "scripts/tools/submit_for_review.py",
-            "scripts/tools/write_file.py",
+            "docs/TOOL_ARCHITECTURE.md"
         ]
 
         if self.task_id:
