@@ -17,6 +17,8 @@ Create automated tests for all currently existing tasks to verify their acceptan
    - In the `tests` folder for a task, there is a test per each feature listed in the task's plan.
    - The feature tests are named according to the format `test_{task_id}_{feature_id}`, e.g. the test for this feature should be `test_9_1`.
    - There is an example test included as part of the description.
+   - The plan doc should specify that the agent tries to complete a feature as a single step, gathers all the context required, and finishes by writing the tests for that feature.
+   - When a feature is complete the agent sends back a `finish_feature` message that triggers the tool that commits all the current code and completes that feature.
    Context: docs/PLAN_SPECIFICATION.md
    Output: `docs/PLAN_SPECIFICATION.md`
 
@@ -26,7 +28,6 @@ Create automated tests for all currently existing tasks to verify their acceptan
    - For each of Tasks 1,2,3,4,5,6,7,8 there exists a test script at tasks/{id}/tests/ for each of the features that passes.
    - Tests check for expected files and key phrases tied to acceptance.
    - This task requires to gather context from whichever task is being looked at - if the `docs/PLAN_SPECIFICATION.md` is missing steps relating to this, it should be updated.
-   - As a further improvement to the above, the plan should specify that the agent tries to complete a feature as a single step, gathers all the context required, and finishes by writing the tests for that feature. This way there's going to be a commit per feature so it should be easy to see the steps taken.
    Context: docs/TESTING.md, tasks/TASKS.md
    Output: `tasks/{task_id}/tests/test_{task_id}_{feature_id}.py` for all tasks up to this one and all their features
 
