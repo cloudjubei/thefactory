@@ -37,7 +37,7 @@ Documentation-only work: plan authoring and structure updates. No code or tests 
    Notes: Current SPEC uses sections (WHAT, CORE IDEAS, ACTIONS); replace/realign to the guide.
    Output: Updated docs/SPEC.md
 
-4.4) - Tests for 4.1 and 4.2 (Guide and Template)
+4.4) + Tests for 4.1 and 4.2 (Guide and Template)
    Action: Write tests that verify both docs/SPECIFICATION_GUIDE.md and docs/TEMPLATE.md exist and include the required section headings.
    Acceptance:
    - tasks/4/tests/test_4_4.py exists
