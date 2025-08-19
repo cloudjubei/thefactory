@@ -8,11 +8,12 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create documentation detailing the tasks' format.
    Acceptance: This document adheres to the format created and references it at the top.
 
-2) - The spec
+2) + The spec
    Action: Create docs/SPEC.md as the single entry-point specification for the project.
    Acceptance:
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
      - `docs/SPEC.md` exists and adheres to `docs/SPECIFICATION_GUIDE.md`.
+   Notes: Plan updated to include test-writing features (2.4–2.6) per docs/PLAN_SPECIFICATION.md Test-Driven Acceptance.
 
 3) + File organisation specification
    Action: Create a scheme for organising files within the repository.
