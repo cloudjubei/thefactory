@@ -19,17 +19,18 @@ Create automated tests for all currently existing tasks to verify their acceptan
    - There is an example test included as part of the description.
    - The plan doc specifies per-feature single-step delivery: the agent gathers context, implements, writes tests, runs tests, and calls `finish_feature`.
    - When a feature is complete the agent sends back a `finish_feature` message that triggers the commit for that feature.
+   - The Testing section (or a clearly labeled "Test-Driven Acceptance" subsection) explicitly contains the exact sentence: "A feature is not complete until a corresponding test is written and passes."
    Context: docs/PLAN_SPECIFICATION.md
    Dependencies: None
    Output: docs/PLAN_SPECIFICATION.md
-   Notes: Completed in prior work; retained here for traceability.
+   Notes: Completed in prior work; retained here for traceability. If missing, coordinate with Task 5 (Plan specification) to ensure the document exists.
 
 9.2) - Create tests for Tasks 1–8
    Action: Write simple Python tests under `tasks/{id}/tests/` to verify each task's acceptance criteria (primarily existence and key content of specified files). Ensure one test per feature in each task's plan.
    Acceptance:
    - For each of Tasks 1,2,3,4,5,6,7,8 there exists a test script at `tasks/{id}/tests/` for each of the features that passes.
    - Tests check for expected files and key phrases tied to acceptance.
-   - This task requires gathering context from each target task; if `docs/PLAN_SPECIFICATION.md` is missing steps relating to this, it should be updated.
+   - This task requires gathering context from each target task; if `docs/PLAN_SPECIFICATION.md` is missing steps relating to this, it should be updated (see Feature 9.1).
    Context: docs/TESTING.md, tasks/TASKS.md, docs/PLAN_SPECIFICATION.md
    Dependencies: 9.3 (test runner available)
    Output: `tasks/{task_id}/tests/test_{task_id}_{feature_id}.py` for all tasks up to this one and all their features
@@ -50,6 +51,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
    Action: Add tests under this task that verify docs/PLAN_SPECIFICATION.md encodes the test-driven policy (section "Test-Driven Acceptance").
    Acceptance:
    - Test checks presence of the section and the phrase that a feature is not complete until a corresponding test is written and passes.
+   - The exact sentence to check for is: "A feature is not complete until a corresponding test is written and passes."
    - All of the features here are tested by running `python scripts/run_tests.py`.
    Context: docs/PLAN_SPECIFICATION.md, docs/TESTING.md
    Dependencies: 9.1, 9.3
@@ -59,6 +61,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
 
 ## Execution Steps
 For each feature in order:
+0) Preflight checks: Use `retrieve_context_files` to ensure referenced specs exist: `docs/PLAN_SPECIFICATION.md`, `docs/TESTING.md`, `docs/TASK_FORMAT.md`, `docs/TOOL_ARCHITECTURE.md`, and this plan. If a required spec is missing, pause and escalate via `ask_question`.
 1) Gather context (Minimum Cohesive Context) using `retrieve_context_files` for: tasks/TASKS.md; this plan file; all referenced specs (docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md, docs/TOOL_ARCHITECTURE.md, docs/TESTING.md); and any files to be created/modified.
 2) Implement the feature changes using `write_file` (create or update the required files under docs/ or tasks/{id}/tests/ as specified).
 3) Create the test(s) that verify the feature's acceptance criteria under `tasks/{task_id}/tests/`, named `test_{task_id}_{feature_id}.py`.
