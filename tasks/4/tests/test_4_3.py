@@ -1,72 +1,57 @@
-import os, sys, re
+import os, sys
 
-
-def read_file(path: str) -> str:
-    with open(path, 'r', encoding='utf-8') as f:
-        return f.read()
-
-
-def extract_headings(content: str):
-    headings = []
-    for line in content.splitlines():
-        if re.match(r'^\s*#{1,6}\s+\S', line):
-            text = re.sub(r'^\s*#{1,6}\s+', '', line).strip()
-            headings.append(text)
-    return headings
+def fail(msg):
+    print(f"FAIL: {msg}")
+    sys.exit(1)
 
 
 def run():
-    path = 'docs/SPEC.md'
+    path = "docs/SPEC.md"
     if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
-        sys.exit(1)
+        fail(f"{path} does not exist.")
 
-    content = read_file(path)
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
 
-    # Check reference to SPECIFICATION_GUIDE at the top (within first 20 non-empty lines)
-    non_empty_lines = [ln for ln in content.splitlines() if ln.strip() != '']
-    top_block = "\n".join(non_empty_lines[:20])
-    if 'docs/SPECIFICATION_GUIDE.md' not in top_block:
-        print('FAIL: docs/SPEC.md does not reference docs/SPECIFICATION_GUIDE.md at the top (first ~20 lines).')
-        sys.exit(1)
+    lines = content.splitlines()
 
-    # Required sections and order
+    # Check guide reference near the top (first 25 lines)
+    top_block = "\n".join(lines[:25])
+    if "docs/SPECIFICATION_GUIDE.md" not in top_block:
+        fail("docs/SPEC.md does not reference docs/SPECIFICATION_GUIDE.md near the top.")
+
+    # Collect section headings as '## '
+    headings = []
+    for line in lines:
+        if line.startswith("## "):
+            headings.append(line[3:].strip())
+
     required = [
-        'Problem Statement',
-        'Inputs and Outputs',
-        'Constraints',
-        'Success Criteria',
-        'Edge Cases',
-        'Examples',
+        "Problem Statement",
+        "Inputs and Outputs",
+        "Constraints",
+        "Success Criteria",
+        "Edge Cases",
+        "Examples",
     ]
 
-    headings = extract_headings(content)
-    if not headings:
-        print('FAIL: No headings found in docs/SPEC.md.')
-        sys.exit(1)
+    # Ensure all required headings exist and capture their order indices
+    indices = []
+    for req in required:
+        if req not in headings:
+            fail(f"Missing required section: {req}")
+        indices.append(headings.index(req))
 
-    # Allow a single document title heading before the required sequence
-    start_index = 0
-    if headings and headings[0] != required[0]:
-        start_index = 1
+    # Verify order is strictly ascending and starts with Problem Statement
+    if indices != sorted(indices):
+        fail("Required sections are not in the correct order.")
 
-    if len(headings) < start_index + len(required):
-        print(f"FAIL: Not enough headings for required sections. Found {len(headings)}, need {len(required)} starting at index {start_index}.")
-        sys.exit(1)
+    if indices[0] != 0:
+        fail("An extraneous section appears before 'Problem Statement'.")
 
-    block = headings[start_index:start_index + len(required)]
-    mismatches = []
-    for i, req in enumerate(required):
-        if req not in block[i]:
-            mismatches.append(f"Expected heading {i+1} to contain '{req}', got '{block[i]}'")
-
-    if mismatches:
-        print('FAIL: Section order/names do not match guide:\n- ' + '\n- '.join(mismatches))
-        sys.exit(1)
-
-    print('PASS: SPEC.md references SPECIFICATION_GUIDE.md at top and includes required sections in correct order (with no extraneous sections before them beyond an optional title).')
+    print("PASS: docs/SPEC.md adheres to SPECIFICATION_GUIDE.md structure and ordering.")
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
