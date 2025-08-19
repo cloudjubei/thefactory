@@ -5,6 +5,11 @@
 -   **The Agent:** The Large Language Model (LLM) that provides the intelligence. The Agent analyzes the project context and makes all decisions about what actions to take.
 -   **The Orchestrator:** The local Python script (`run_local_agent.py`) that the user executes. The Orchestrator is a simple, non-intelligent executor. Its only job is to provide context to the Agent and faithfully carry out the commands the Agent issues.
 
+### 1.1 Agent vs Orchestrator
+- The Agent (LLM) is the "brain": it interprets context, plans work, and issues tool calls via a structured JSON contract.
+- The Orchestrator (`scripts/run_local_agent.py`) is the "hands": it parses the Agent's JSON and executes the specified tools without making autonomous decisions.
+- See docs/TOOL_ARCHITECTURE.md for the full tool contract and available tools. The Orchestrator MUST NOT perform task selection, dependency checks, or other decision-making.
+
 ## 2. Core Principles
 
 ### 2.1 Specification-Driven
