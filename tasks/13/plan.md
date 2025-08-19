@@ -4,8 +4,8 @@
 This plan outlines the features required to transition from the current Markdown-based task management system (`tasks/TASKS.md`) to a structured, JSON-based format. The transition will be phased to ensure stability, starting with schema definition, followed by tooling, migration, and finally, cleanup. This will make task management more robust, machine-readable, and extensible.
 
 ## Context
-- Specs: docs/SPEC.md, docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TESTING.md
-- Source files: tasks/TASKS.md, scripts/run_local_agent.py
+- Specs: docs/SPEC.md, docs/tasks/TASKS_GUIDANCE.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TESTING.md
+- Source files: tasks/13/task.json, scripts/run_local_agent.py
 
 ## Features
 
@@ -70,16 +70,17 @@ This plan outlines the features required to transition from the current Markdown
    Dependencies: 13.5
    Output: `scripts/migrate_tasks.py`
 
-13.8) + Execute Migration and Validate
-   Action: Run the migration script to convert all existing tasks and validate that the migration was successful.
+13.8) - Execute Migration, Embed Plans, and Validate
+   Action: Run the migration script to convert all existing tasks. The script must embed the content of `plan.md` files into the `plan` field of the corresponding `task.json` task and feature objects, and then delete the source `plan.md` files.
    Acceptance:
      - All tasks from `TASKS.md` now exist in the `tasks/{id}/task.json` format.
-     - All associated `plan.md` and test files are moved to their new locations (`tasks/{id}/`).
+     - The `plan` field in each `task.json` and its features contains the content from the original `plan.md`.
+     - All associated `plan.md` files are removed from their new locations (`tasks/{id}/`).
      - All project tests pass after the migration using `run_tests`.
    Dependencies: 13.7
 
 ### Phase 4: Cleanup
-13.9) + Remove Dual-Read Mode from Orchestrator
+13.9) - Remove Dual-Read Mode from Orchestrator
    Action: Remove the backward-compatibility code (dual-read mode) from `run_local_agent.py`, making the JSON format the sole source of truth for tasks.
    Acceptance:
      - The orchestrator (`run_local_agent.py`) is simplified to only read from `tasks/{id}/task.json` using `task_utils.py`.
@@ -87,11 +88,32 @@ This plan outlines the features required to transition from the current Markdown
    Dependencies: 13.8
    Output: Modified `scripts/run_local_agent.py`
 
-13.10) + Remove TASKS.md
+13.10) - Remove TASKS.md
    Action: Delete the old `tasks/TASKS.md` file from the repository to complete the migration.
    Acceptance:
      - `tasks/TASKS.md` is deleted.
    Dependencies: 13.9
+
+13.11) - Update Guidance and Tooling for Plan-in-JSON
+   Action: Update documentation and scripts to align with the plan-in-JSON format. This includes updating `PLAN_SPECIFICATION.md` and `FILE_ORGANISATION.md`. Also, update the `_gather_context` function in `run_local_agent.py` and add a new helper function to `task_utils.py` for updating feature status directly in the `task.json` file.
+   Acceptance:
+     - `docs/PLAN_SPECIFICATION.md` is updated to describe the `plan` field in `task.json`.
+     - `docs/FILE_ORGANISATION.md` is updated to reflect that `plan.md` is deprecated.
+     - A new function, e.g., `update_feature_status(task_id, feature_id, new_status)`, exists in `scripts/tools/task_utils.py`.
+     - `scripts/run_local_agent.py`'s `_gather_context` function is updated to read `task.json` instead of `plan.md`.
+   Dependencies: 13.8
+
+13.12) - Remove Migration Guide
+   Action: Remove `docs/tasks/TASKS_MIGRATION_GUIDE.md` and any references to it, as the migration is complete.
+   Acceptance:
+     - `docs/tasks/TASKS_MIGRATION_GUIDE.md` is removed.
+   Dependencies: 13.10, 13.11
+
+13.13) - Final Cleanup
+   Action: This task definition file (`tasks/13/task.json`) will be removed as the final step of its own completion, closing the loop on the migration.
+   Acceptance:
+     - `tasks/13/task.json` is removed.
+   Dependencies: 13.12
 
 ## Execution Steps
 For each feature in order:
@@ -102,6 +124,5 @@ For each feature in order:
 
 After all features are completed:
 5) Run `run_tests` again and ensure the full suite passes
-6) Update `tasks/TASKS.md` with status change for this task (Note: this step is ironic, as the task's completion removes this file. The final status update will be implicit).
-7) Submit for review (open PR)
-8) Finish
+6) Submit for review (open PR)
+7) Finish
