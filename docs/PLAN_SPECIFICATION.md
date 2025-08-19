@@ -25,7 +25,7 @@ The plan should be easy for a human to understand. It should be concise and focu
 A feature is not considered complete until a corresponding test is written and passes. This ensures that all work is verifiable.
 - For every feature that produces a tangible output (like a file or a change in a file), a subsequent feature in the plan MUST be created to write a test for it.
 - The acceptance criteria for the "test-writing" feature is that the test script exists under `tasks/{task_id}/tests/` and verifies the acceptance criteria of the previous feature.
-- Use the `run_tests` tool to execute all tests and ensure they pass before submitting the work. Locally, `scripts/run_tests.py` may be invoked by the orchestrator's tool.
+- Use the `run_tests` tool to execute all tests and ensure they pass before submitting the work. This process is detailed further in `docs/TESTING.md`.
 
 ### 2.6. Per-Feature Single-Step Delivery and Commit (Required)
 To enforce more thorough planning and reliable delivery:
@@ -69,6 +69,64 @@ A plan should include the following sections within the `task.json`:
 - Features: An array of feature objects using `{task_id}.{n}` as the `id`.
 - Execution Steps: A short ordered list mapping to tool calls (part of the agent's generated `plan` in the JSON response)
 - Administrative Steps: update task status, `submit_for_review`, `finish` (part of the agent's generated `plan` in the JSON response)
+
+## 4. Template
+The `task.json` file itself serves as the template. A new task should conform to the structure defined in `docs/tasks/task_format.py`. The `plan` field within the JSON should be populated with a high-level intent, and each feature object should contain the detailed `action` and `acceptance` criteria.
+
+```json
+{
+  "id": 99,
+  "status": "-",
+  "title": "Example Task Title",
+  "action": "High-level action for the entire task.",
+  "plan": "This is the overall intent and plan for the task. It describes the strategy to meet the acceptance criteria.",
+  "acceptance": [
+    {
+      "phase": "Phase 1: Something",
+      "criteria": ["Criterion 1 for phase 1."]
+    }
+  ],
+  "features": [
+    {
+      "id": "99.1",
+      "status": "-",
+      "title": "First Feature",
+      "action": "Action for the first feature.",
+      "acceptance": [
+        "First acceptance criterion for the feature."
+      ],
+      "plan": "Detailed plan or notes for implementing this specific feature."
+    }
+  ]
+}
+```
+
+## 5. Example
+For a task like:
+```json
+{
+  "id": 12,
+  "status": "-",
+  "title": "Plan specification",
+  "action": "Create a plan specification that describes how each task should be executed.",
+  "acceptance": [
+    {
+      "phase": "Phase 1",
+      "criteria": ["The file `PLAN_SPECIFICATION.md` exists and details the steps involved in creating a task plan."]
+    }
+  ]
+}
+```
+A good corresponding agent plan (generated in the JSON response) would be:
+1. Analyze Task: Review Task 12 to confirm the goal is to create `docs/PLAN_SPECIFICATION.md` with purpose, principles, structure, template, and example.
+2. Draft Specification: Author the content for `docs/PLAN_SPECIFICATION.md`.
+3. Implement Per-Feature Flow: For each feature, write its tests, run the test suite using the `run_tests` tool, and then call `finish_feature`.
+4. Update Task Status: Modify `tasks/12/task.json` to change the status of Task 12 from `-` (Pending) to `+` (Completed).
+5. Execute Changes: Generate the necessary tool calls:
+   a. `write_file` to create `docs/PLAN_SPECIFICATION.md` with the drafted content.
+   b. `write_file` to update `tasks/12/task.json`.
+   c. `submit_for_review` to finalize the task.
+   d. `finish` to end the operation.
 
 ## 6. Testing
 
