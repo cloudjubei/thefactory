@@ -1,0 +1,8 @@
+{
+  "id": 23,
+  "status": "-",
+  "title": "using LM Studio",
+  "action": "Use LM Studio's server API to call different models. This is a local agent launch mode.",
+  "acceptance": [],
+  "features": []
+}

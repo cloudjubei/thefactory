@@ -1,0 +1,12 @@
+{
+  "id": 8,
+  "status": "+",
+  "title": "Tests specification",
+  "action": "Create and maintain the canonical testing specification for the project and integrate testing requirements into the planning specification.",
+  "acceptance": [
+    "`docs/TESTING.md` exists and includes Required Sections: Purpose and Scope; Test Locations and Naming Conventions; Test Structure and Utilities; Writing Acceptance Tests; Running Tests; CI/Automation Expectations; Tool Usage; Examples; References.",
+    "`docs/PLAN_SPECIFICATION.md` is updated to include a \"Test-Driven Acceptance\" principle, references `docs/TESTING.md`, and updates its template and example to require a corresponding test per feature.",
+    "No feature should be simply a test run."
+  ],
+  "features": []
+}

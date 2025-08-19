@@ -70,7 +70,7 @@ This plan outlines the features required to transition from the current Markdown
    Dependencies: 13.5
    Output: `scripts/migrate_tasks.py`
 
-13.8) + Execute Migration and Validate
+13.8) - Execute Migration and Validate
    Action: Run the migration script to convert all existing tasks and validate that the migration was successful.
    Acceptance:
      - All tasks from `TASKS.md` now exist in the `tasks/{id}/task.json` format.

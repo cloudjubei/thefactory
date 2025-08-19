@@ -1,0 +1,10 @@
+{
+  "id": 7,
+  "status": "+",
+  "title": "Agent Orchestrator",
+  "action": "Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.",
+  "acceptance": [
+    "A script exists that allows interaction with an agent."
+  ],
+  "features": []
+}

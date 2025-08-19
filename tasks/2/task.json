@@ -1,0 +1,11 @@
+{
+  "id": 2,
+  "status": "+",
+  "title": "The spec",
+  "action": "Create docs/SPEC.md as the single entry-point specification for the project.",
+  "acceptance": [
+    "`docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.",
+    "`docs/SPEC.md` exists and adheres to `docs/SPECIFICATION_GUIDE.md`."
+  ],
+  "features": []
+}

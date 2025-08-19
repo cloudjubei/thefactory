@@ -1,0 +1,11 @@
+{
+  "id": 4,
+  "status": "+",
+  "title": "Plan specification",
+  "action": "Create a plan specification that describes how each task should be executed with information about creating features for tasks.",
+  "acceptance": [
+    "`docs/FEATURE_FORMAT.md` exists and includes Purpose, Format, Field Definitions, and Examples.",
+    "`docs/PLAN_SPECIFICATION.md` exists and includes purpose, principles, structure, template, and example, and references `docs/FEATURE_FORMAT.md`."
+  ],
+  "features": []
+}

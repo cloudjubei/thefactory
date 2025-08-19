@@ -1,0 +1,8 @@
+{
+  "id": 9,
+  "status": "-",
+  "title": "Move tasks around",
+  "action": "Perform the following:\n   - Create a tool for moving a task to a different position in the list of tasks - the feature for it should be added to the plan for Task 7, the tests need to be created, and the code also.\n   - The testing task - task 8, should be the moved to spot 5.\n   - This task is completely removed.\n   - All other tasks need to be shifted accordingly to be in order.",
+  "acceptance": [],
+  "features": []
+}

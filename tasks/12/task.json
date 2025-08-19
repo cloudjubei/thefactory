@@ -1,0 +1,10 @@
+{
+  "id": 12,
+  "status": "-",
+  "title": "Tasks 6 & 7 should be joined into one",
+  "action": "The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now. To accomplish this, inspect the plans for both of the tasks and merge them together. Inspect the tests for both and merge them together.",
+  "acceptance": [
+    "Only a single task exists relating to the Agent. This task gets removed upon completion. All files - plans, tests are now under task 6. All features are still present and working as normal. All tests pass."
+  ],
+  "features": []
+}

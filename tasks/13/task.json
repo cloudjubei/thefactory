@@ -1,0 +1,160 @@
+{
+  "id": 13,
+  "status": "-",
+  "title": "JSON-based tasks format",
+  "action": "Define and implement a new JSON-based format for tasks to replace `tasks/TASKS.md`. This involves defining the schema, creating necessary tooling for interaction, migrating existing tasks, and finally deprecating the old format.",
+  "acceptance": [
+    {
+      "phase": "Phase 1: Specification & Definition",
+      "criteria": [
+        "`docs/tasks/task_format.py` exists. It defines the new task structure using concrete Python data types (e.g., `TypedDict`) for `Task`, `Feature`, and related objects, ensuring clear validation and serialization paths.",
+        "`docs/tasks/task_example.json` exists, demonstrating a complete task in the new format.",
+        "`docs/TASK_FORMAT.md` is moved to `docs/tasks/TASKS_GUIDANCE.md` and updated to remove content now covered by the JSON schema, focusing only on authoring guidance.",
+        "`docs/tasks/TASKS_MIGRATION_GUIDE.md` exists, detailing the step-by-step migration plan, backward compatibility strategy, tooling requirements, and rollback plan."
+      ]
+    },
+    {
+      "phase": "Phase 2: Tooling & Integration",
+      "criteria": [
+        "A tool `scripts/tools/task_utils.py` is created with functions to reliably read, create, and update tasks/features in the new JSON format. This will replace direct file I/O for task manipulation.",
+        "The Orchestrator (`run_local_agent.py`) is updated to use this new tooling and support a dual-read mode (reading from both `tasks/{id}/task.json` and `tasks/TASKS.md`) during the transition period."
+      ]
+    },
+    {
+      "phase": "Phase 3: Migration & Validation",
+      "criteria": [
+        "All existing tasks and their associated plans and tests are migrated to the new file structure: `tasks/{id}/task.json`, `tasks/{id}/plan.md`, `tasks/{id}/tests/test_{feature_id}.py`",
+        "All tests must pass after migration to confirm correctness."
+      ]
+    },
+    {
+      "phase": "Phase 4: Cleanup",
+      "criteria": [
+        "The dual-read mode in the orchestrator is removed, making the JSON format the sole source of truth.",
+        "`tasks/TASKS.md` is removed from the repository."
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "13.1",
+      "status": "+",
+      "title": "Define Task Schema in Python",
+      "action": "Create `docs/tasks/task_format.py` to define the new task structure using Python's `TypedDict` or similar data classes. This will serve as the canonical schema for tasks, features, and related objects.",
+      "acceptance": [
+        "`docs/tasks/task_format.py` exists.",
+        "The file defines Python types for `Task`, `Feature`, and other relevant data structures.",
+        "The types cover all fields currently used in `TASKS.md` and `plan.md` files."
+      ],
+      "output": "`docs/tasks/task_format.py`"
+    },
+    {
+      "id": "13.2",
+      "status": "+",
+      "title": "Create Example JSON Task File",
+      "action": "Create `docs/tasks/task_example.json` that demonstrates a complete task in the new format, adhering to the schema defined in `task_format.py`.",
+      "acceptance": [
+        "`docs/tasks/task_example.json` exists.",
+        "The JSON is valid and conforms to the structure defined in `docs/tasks/task_format.py`."
+      ],
+      "dependencies": ["13.1"],
+      "output": "`docs/tasks/task_example.json`"
+    },
+    {
+      "id": "13.3",
+      "status": "+",
+      "title": "Write Migration Guide",
+      "action": "Create `docs/tasks/TASKS_MIGRATION_GUIDE.md` detailing the step-by-step plan to migrate from the old format to the new one.",
+      "acceptance": [
+        "`docs/tasks/TASKS_MIGRATION_GUIDE.md` exists.",
+        "The guide includes a migration plan, backward compatibility strategy, tooling requirements, and a rollback plan."
+      ],
+      "output": "`docs/tasks/TASKS_MIGRATION_GUIDE.md`"
+    },
+    {
+      "id": "13.4",
+      "status": "+",
+      "title": "Update Task Authoring Guidance",
+      "action": "Move `docs/TASK_FORMAT.md` to `docs/tasks/TASKS_GUIDANCE.md` and update its content to align with the new JSON format, removing schema definitions now covered by `task_format.py` and focusing on authoring best practices.",
+      "acceptance": [
+        "`docs/TASK_FORMAT.md` is removed.",
+        "`docs/tasks/TASKS_GUIDANCE.md` exists.",
+        "The content of the new guidance file is updated to reflect the JSON-based workflow."
+      ],
+      "dependencies": ["13.1"],
+      "output": "`docs/tasks/TASKS_GUIDANCE.md`"
+    },
+    {
+      "id": "13.5",
+      "status": "+",
+      "title": "Create Task Utility Tooling",
+      "action": "Create a new tool module `scripts/tools/task_utils.py` with functions to reliably read, create, and update tasks in the new JSON format. This will abstract file I/O for task manipulation.",
+      "acceptance": [
+        "`scripts/tools/task_utils.py` exists.",
+        "It contains functions like `get_task(task_id)`, `update_task(task_id, task_data)`, `create_task(...)`.",
+        "Functions are well-documented and include error handling."
+      ],
+      "dependencies": ["13.1"],
+      "output": "`scripts/tools/task_utils.py`"
+    },
+    {
+      "id": "13.6",
+      "status": "+",
+      "title": "Integrate Tooling into Orchestrator with Dual-Read Mode",
+      "action": "Update the orchestrator (`run_local_agent.py`) to use `task_utils.py` for task operations. Implement a dual-read mode that can read from both `tasks/{id}/task.json` and the old `tasks/TASKS.md` during the transition period.",
+      "acceptance": [
+        "`run_local_agent.py` is updated to import and use `task_utils.py`.",
+        "The orchestrator can correctly parse task information from both the old Markdown file and the new JSON file structure."
+      ],
+      "dependencies": ["13.5"],
+      "output": "Modified `scripts/run_local_agent.py`"
+    },
+    {
+      "id": "13.7",
+      "status": "+",
+      "title": "Implement Migration Script",
+      "action": "Create a script `scripts/migrate_tasks.py` that reads all tasks from `tasks/TASKS.md` and their corresponding plans and tests, and converts them to the new directory structure (`tasks/{id}/task.json`, `tasks/{id}/plan.md`, etc.).",
+      "acceptance": [
+        "`scripts/migrate_tasks.py` exists.",
+        "The script can be run to perform the full migration of all existing tasks.",
+        "The script correctly handles task descriptions, features from plans, and relocates test files."
+      ],
+      "dependencies": ["13.5"],
+      "output": "`scripts/migrate_tasks.py`"
+    },
+    {
+      "id": "13.8",
+      "status": "-",
+      "title": "Execute Migration and Validate",
+      "action": "Run the migration script to convert all existing tasks and validate that the migration was successful.",
+      "acceptance": [
+        "All tasks from `TASKS.md` now exist in the `tasks/{id}/task.json` format.",
+        "All associated `plan.md` and test files are moved to their new locations (`tasks/{id}/`).",
+        "All project tests pass after the migration using `run_tests`."
+      ],
+      "dependencies": ["13.7"]
+    },
+    {
+      "id": "13.9",
+      "status": "-",
+      "title": "Remove Dual-Read Mode from Orchestrator",
+      "action": "Remove the backward-compatibility code (dual-read mode) from `run_local_agent.py`, making the JSON format the sole source of truth for tasks.",
+      "acceptance": [
+        "The orchestrator (`run_local_agent.py`) is simplified to only read from `tasks/{id}/task.json` using `task_utils.py`.",
+        "The agent continues to function correctly."
+      ],
+      "dependencies": ["13.8"],
+      "output": "Modified `scripts/run_local_agent.py`"
+    },
+    {
+      "id": "13.10",
+      "status": "-",
+      "title": "Remove TASKS.md",
+      "action": "Delete the old `tasks/TASKS.md` file from the repository to complete the migration.",
+      "acceptance": [
+        "`tasks/TASKS.md` is deleted."
+      ],
+      "dependencies": ["13.9"]
+    }
+  ]
+}

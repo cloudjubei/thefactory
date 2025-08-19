@@ -1,0 +1,14 @@
+{
+  "id": 6,
+  "status": "-",
+  "title": "Define Core Agent Terminology and Principles",
+  "action": "Create the specification that defines the agent's high-level principles and establishes the key terms \"Orchestrator\" and \"Agent\". The agent uses a tool-based architecture.",
+  "acceptance": [
+    "The documentation exists.",
+    "This task is merged with task 7 and task 10 for a single cohesive task about agents.",
+    "The plan and features for tasks 7 and 10 must be merged/included with the plan and features of this task.",
+    "Tasks 7 and 10 should not exist - all their data must be deleted.",
+    "This task description needs to be updated to be a single cohesive description about agents."
+  ],
+  "features": []
+}

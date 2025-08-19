@@ -1,0 +1,8 @@
+{
+  "id": 17,
+  "status": "?",
+  "title": "First child project -> Libraries",
+  "action": "Create a child project that focuses on libraries and tools for the agent. This includes creating reusable components, utilities, and frameworks that enhance the overall functionality and modularity of the agent system. The first things that should be included in there is the agent running code, the test running code, the git manager and all the tools an agent needs. Knowing how child projects work, it needs to make sense for the integration of this child project to work with other child projects.",
+  "acceptance": [],
+  "features": []
+}

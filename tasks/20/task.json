@@ -1,0 +1,11 @@
+{
+  "id": 20,
+  "status": "?",
+  "title": "iOS app",
+  "action": "Develop an iOS application that allows users to interact with the project and thus the agents it runs. Similarly to the Local app project - this is yet another project.",
+  "acceptance": [
+    "The file `docs/MOBILE_APP.md` exists detailing the development process and user interface design for the mobile application.",
+    "Notes: The purpose of this is to allow users to interact with the agent through a mobile device. It could include voice commands, touch gestures, or other input methods depending on the target audience and platform."
+  ],
+  "features": []
+}

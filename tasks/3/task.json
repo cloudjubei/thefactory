@@ -1,0 +1,12 @@
+{
+  "id": 3,
+  "status": "+",
+  "title": "File organisation specification",
+  "action": "Create a scheme for organising files within the repository.",
+  "acceptance": [
+    "`docs/FILE_ORGANISATION.md` exists.",
+    "The specification contains examples of how files should be organised.",
+    "All files are organised according to the specification."
+  ],
+  "features": []
+}
