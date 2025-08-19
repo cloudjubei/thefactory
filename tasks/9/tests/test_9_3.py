@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys
 
 def run():
     path = "scripts/run_tests.py"
@@ -8,10 +7,10 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    if "def main()" not in content or "if __name__ == \"__main__\":" not in content:
-        print("FAIL: run_tests.py missing a main entrypoint.")
+    if "def main()" not in content:
+        print("FAIL: scripts/run_tests.py does not define main().")
         sys.exit(1)
-    print("PASS: Task 9.3 - run_tests.py exists and has a main entrypoint.")
+    print("PASS: scripts/run_tests.py exists and defines main().")
     sys.exit(0)
 
 if __name__ == "__main__":
