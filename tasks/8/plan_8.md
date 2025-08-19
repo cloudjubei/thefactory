@@ -1,12 +1,11 @@
 # Plan for Task 8: Tests specification
 
 ## Intent
-Establish the canonical, project-wide testing specification and integrate test requirements into the planning specification so every feature is verifiable by deterministic tests.
+Establish the canonical, project-wide testing specification and integrate testing requirements into the planning specification so every feature is verifiable by deterministic tests.
 
 ## Context
-- docs/TASK_FORMAT.md
-- docs/PLAN_SPECIFICATION.md
-- docs/TOOL_ARCHITECTURE.md
+- Specs: docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TOOL_ARCHITECTURE.md
+- Source files: tasks/TASKS.md
 
 ## Features
 8.1) - Author the canonical testing specification
@@ -22,7 +21,9 @@ Establish the canonical, project-wide testing specification and integrate test r
      7) Tool Usage (how the run_tests tool is used by the agent)
      8) Examples (a minimal example mapping a feature to a test file)
      9) References (PLAN_SPECIFICATION.md, TASK_FORMAT.md, TOOL_ARCHITECTURE.md)
+   Context: docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TOOL_ARCHITECTURE.md
    Output: docs/TESTING.md
+   Notes: This feature defines the specification only. Task 9 remains responsible for implementing tests.
 
 8.2) - Integrate testing into the planning specification
    Action: Update docs/PLAN_SPECIFICATION.md so testing is a mandatory part of the feature workflow and clearly referenced in the plan template.
@@ -34,12 +35,35 @@ Establish the canonical, project-wide testing specification and integrate test r
    Dependencies: 8.1
    Output: docs/PLAN_SPECIFICATION.md
 
-## Notes
-- This task defines the specification; it does not implement or modify existing tests.
-- Task 9 (Automated tests) remains responsible for implementing tests and ensuring they pass; Task 15 may later restructure/merge tasks, but this plan keeps scope limited to specification.
+8.3) - Acceptance test for 8.1: docs/TESTING.md
+   Action: Write a deterministic test verifying that docs/TESTING.md exists and includes all required sections enumerated in Feature 8.1 Acceptance.
+   Acceptance:
+   - tasks/8/tests/test_8_1.py exists.
+   - The test checks presence of docs/TESTING.md and validates required headings/keywords per 8.1.
+   - Running the test suite via run_tests passes.
+   Context: docs/TESTING.md, docs/PLAN_SPECIFICATION.md (Testing section), docs/TOOL_ARCHITECTURE.md
+   Dependencies: 8.1
+   Output: tasks/8/tests/test_8_1.py
+
+8.4) - Acceptance test for 8.2: PLAN_SPECIFICATION updated
+   Action: Write a deterministic test verifying that docs/PLAN_SPECIFICATION.md contains the "Test-Driven Acceptance" principle, references docs/TESTING.md, and that its template/example require a corresponding test per feature under tasks/{task_id}/tests/.
+   Acceptance:
+   - tasks/8/tests/test_8_2.py exists.
+   - The test asserts presence of the phrase "Test-Driven Acceptance", a reference to "docs/TESTING.md", and template/example language requiring per-feature tests.
+   - Running the test suite via run_tests passes.
+   Context: docs/PLAN_SPECIFICATION.md, docs/TESTING.md
+   Dependencies: 8.2
+   Output: tasks/8/tests/test_8_2.py
 
 ## Execution Steps
-1) Implement features (by appropriate personas) following Context and Acceptance.
-2) Update tasks/TASKS.md to reflect feature/task status changes during execution.
-3) Submit for review.
-4) Finish.
+For each feature in order:
+1) Gather context (MCC) using retrieve_context_files and implement changes per Acceptance.
+2) Create the test(s) that verify the feature's acceptance criteria under tasks/8/tests/.
+3) Run tests using run_tests and ensure they pass.
+4) Call finish_feature with a descriptive message (e.g., "Feature 8.{n} complete: {Title}") to create a per-feature commit.
+
+After all features are completed:
+5) Run run_tests again and ensure the full suite passes.
+6) Update tasks/TASKS.md with status change for this task if applicable.
+7) Submit for review (open PR).
+8) Finish.
