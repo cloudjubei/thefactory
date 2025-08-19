@@ -3,7 +3,7 @@
 Task Reference: See tasks/TASKS.md entry 4.
 
 ## Intent
-Satisfy the task by ensuring the specification guide and template exist (already completed) and that docs/SPEC.md is realigned to the guide. Encode test-first verification via explicit test features per PLAN_SPECIFICATION.
+Satisfy the task by ensuring the specification guide and template exist (already created) and that docs/SPEC.md is realigned to the guide. Encode test-first verification via explicit test features per PLAN_SPECIFICATION.
 
 ## Scope
 Documentation-only work: plan authoring and structure updates. No code or tests are implemented by the Planner.
