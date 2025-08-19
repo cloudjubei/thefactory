@@ -43,7 +43,8 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    - `docs/TESTING.md` exists and includes Required Sections: Purpose and Scope; Test Locations and Naming Conventions; Test Structure and Utilities; Writing Acceptance Tests; Running Tests; CI/Automation Expectations; Tool Usage; Examples; References.
    - `docs/PLAN_SPECIFICATION.md` is updated to include a "Test-Driven Acceptance" principle, references `docs/TESTING.md`, and updates its template and example to require a corresponding test per feature.
    - New or updated task/feature plans created after this change reference `docs/TESTING.md` where applicable.
-   - Task 9 doesn't exist as it was just a placeholder to get tests in place. All information that isn't included in Task 8, but is in Task 9 should be merged into Task 8.
+   - Task 9 is superfluous. All information that isn't included in Task 8, but is in Task 9 should be merged into Task 8.
+   - Task 9 doesn't exist, it's removed from this document and so are all files related to it.
    - No feature should be simply a test run.
 
 9) + Automated tests
