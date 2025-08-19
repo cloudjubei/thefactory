@@ -46,7 +46,7 @@ Create automated tests for all currently existing tasks to verify their acceptan
    Output: scripts/run_tests.py
    Notes: Completed in prior work; retained here for traceability.
 
-9.4) - Create tests for this task
+9.4) + Create tests for this task
    Action: Add tests under this task that verify docs/PLAN_SPECIFICATION.md encodes the test-driven policy (section "Test-Driven Acceptance").
    Acceptance:
    - Test checks presence of the section and the phrase that a feature is not complete until a corresponding test is written and passes.
