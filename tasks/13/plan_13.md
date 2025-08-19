@@ -52,7 +52,7 @@ This plan outlines the features required to transition from the current Markdown
    Dependencies: 13.1
    Output: `scripts/tools/task_utils.py`
 
-13.6) - Integrate Tooling into Orchestrator with Dual-Read Mode
+13.6) + Integrate Tooling into Orchestrator with Dual-Read Mode
    Action: Update the orchestrator (`run_local_agent.py`) to use `task_utils.py` for task operations. Implement a dual-read mode that can read from both `tasks/{id}/task.json` and the old `tasks/TASKS.md` during the transition period.
    Acceptance:
      - `run_local_agent.py` is updated to import and use `task_utils.py`.

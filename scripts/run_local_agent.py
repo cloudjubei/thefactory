@@ -15,6 +15,7 @@ from scripts.tools.ask_question import ask_question_tool
 from scripts.tools.finish import finish_tool
 from scripts.tools.finish_feature import finish_feature_tool
 from scripts.tools.run_tests import run_tests_tool
+from scripts.tools.task_utils import get_task
 
 class AgentTools:
     def __init__(self, repo_path: str, git_manager: GitManager):
@@ -31,7 +32,7 @@ class AgentTools:
         try:
             return json.dumps(rename_files_tool(operations=operations, base_dir=self.repo_path, overwrite=overwrite, dry_run=dry_run))
         except Exception as e:
-            return json.dumps({"ok": False, "error": f"Failed to execute rename_files tool: {e}"})
+            return json.dumps({"ok": False, "error": f"Failed to execute rename_files tool: {e}"}) 
 
     def submit_for_review(self, task_id: int, task_title: str):
         return submit_for_review_tool(self.git_manager, task_id, task_title)
@@ -266,7 +267,7 @@ class Agent:
         if persona == 'manager':
             files = [
                 'tasks/TASKS.md',
-                'docs/TASK_FORMAT.md',
+                'docs/tasks/TASKS_GUIDANCE.md',
                 'docs/AGENT_PRINCIPLES.md',
                 'docs/TOOL_ARCHITECTURE.md',
             ]
@@ -275,7 +276,7 @@ class Agent:
                 'tasks/TASKS.md',
                 'docs/PLAN_SPECIFICATION.md',
                 'docs/FEATURE_FORMAT.md',
-                'docs/TASK_FORMAT.md',
+                'docs/tasks/TASKS_GUIDANCE.md',
                 'docs/TOOL_ARCHITECTURE.md',
             ]
         elif persona == 'tester':
@@ -305,7 +306,7 @@ class Agent:
                 'docs/PLAN_SPECIFICATION.md',
                 'docs/SPEC.md',
                 'docs/SPECIFICATION_GUIDE.md',
-                'docs/TASK_FORMAT.md',
+                'docs/tasks/TASKS_GUIDANCE.md',
                 'docs/TESTING.md',
                 'docs/TOOL_ARCHITECTURE.md',
                 'scripts/run_local_agent.py',
@@ -321,7 +322,21 @@ class Agent:
             files.append('scripts/run_local_agent.py')
 
         context = {}
+        # DUAL-READ LOGIC: If a task ID is provided, try to load its .json file.
+        # If found, skip loading the main TASKS.md to avoid providing conflicting context.
+        task_json_loaded = False
+        if self.task_id:
+            task_data = get_task(self.task_id, base_path=os.path.join(repo_path, 'tasks'))
+            if task_data:
+                context[f'tasks/{self.task_id}/task.json'] = json.dumps(task_data, indent=2)
+                task_json_loaded = True
+
         for filename in files:
+            if filename == 'tasks/TASKS.md' and task_json_loaded:
+                continue
+            # Avoid re-reading if already loaded
+            if filename in context:
+                continue
             try:
                 with open(os.path.join(repo_path, filename), "r") as f:
                     context[filename] = f.read()
