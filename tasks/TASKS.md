@@ -8,24 +8,15 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create documentation detailing the tasks' format.
    Acceptance: This document adheres to the format created and references it at the top.
 
-2) + The spec
+2) - The spec
    Action: Create docs/SPEC.md as the single entry-point specification for the project.
    Acceptance:
-     - docs/SPEC.md exists.
-     - The document references docs/SPECIFICATION_GUIDE.md at the top.
-     - It includes sections: WHAT, CORE IDEAS, ACTIONS.
+     - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
+     - `docs/SPEC.md` exists and adheres to `docs/SPECIFICATION_GUIDE.md`.
 
 3) + File organisation specification
    Action: Create a scheme for organising files within the repository.
    Acceptance: The documentation exists.
-
-4) + Specification documentation
-   Action: Analyse the specification format and what requirements it needs to provide.
-   Acceptance:
-     - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
-     - `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
-   Rejection: test doesn't exist
-   Note: Test for Feature 4.3 added at tasks/4/tests/test_4_3.py
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
