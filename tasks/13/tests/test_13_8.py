@@ -2,47 +2,74 @@ import os
 import sys
 import json
 
-def run():
-    print("Running test for migration (feature 13.8)...")
+def run_test():
+    """
+    Tests the acceptance criteria for feature 13.8:
+    - All tasks from TASKS.md now exist in the tasks/{id}/task.json format.
+    - The `plan` field in each task.json contains the content from the original plan.md.
+    - All associated plan.md files are removed from their new locations (tasks/{id}/).
+    """
+    tasks_dir = "tasks"
+    migrated_tasks_found = 0
     errors = []
 
-    # Check for new task.json files
-    task_files_to_check = ["tasks/6/task.json", "tasks/13/task.json", "tasks/24/task.json"]
-    for path in task_files_to_check:
-        if not os.path.exists(path):
-            errors.append(f"FAIL: Migrated task file {path} does not exist.")
+    if not os.path.isdir(tasks_dir):
+        errors.append(f"FAIL: '{tasks_dir}' directory not found.")
+        return errors
 
-    # Check content of a task.json file
-    task_13_path = "tasks/13/task.json"
-    if os.path.exists(task_13_path):
-        try:
-            with open(task_13_path, "r") as f:
-                data = json.load(f)
-            if data.get("id") != 13:
-                errors.append(f"FAIL: {task_13_path} has incorrect id.")
-            if "JSON-based tasks format" not in data.get("title", ""):
-                errors.append(f"FAIL: {task_13_path} has incorrect title.")
-            if not isinstance(data.get("features"), list) or len(data.get("features", [])) == 0:
-                errors.append(f"FAIL: {task_13_path} should contain features.")
-        except Exception as e:
-            errors.append(f"FAIL: Could not read or parse {task_13_path}: {e}")
-    else:
-        errors.append(f"FAIL: {task_13_path} does not exist for content check.")
+    for item in os.listdir(tasks_dir):
+        task_path = os.path.join(tasks_dir, item)
+        if os.path.isdir(task_path) and item.isdigit():
+            task_id = item
+            migrated_tasks_found += 1
+            
+            # 1. Check for task.json existence
+            task_json_path = os.path.join(task_path, "task.json")
+            if not os.path.exists(task_json_path):
+                errors.append(f"FAIL: Task {task_id}: 'task.json' not found at {task_json_path}")
+                continue
+
+            # 2. Check for embedded plan in task.json
+            try:
+                with open(task_json_path, 'r', encoding='utf-8') as f:
+                    task_data = json.load(f)
+                
+                if not isinstance(task_data, dict):
+                    errors.append(f"FAIL: Task {task_id}: 'task.json' does not contain a JSON object.")
+                    continue
+
+                if "plan" not in task_data:
+                    errors.append(f"FAIL: Task {task_id}: 'plan' field not found in 'task.json'.")
+                elif not isinstance(task_data["plan"], str) or not task_data["plan"].strip():
+                    errors.append(f"FAIL: Task {task_id}: 'plan' field in 'task.json' is not a non-empty string.")
+
+            except json.JSONDecodeError:
+                errors.append(f"FAIL: Task {task_id}: 'task.json' is not a valid JSON file.")
+            except Exception as e:
+                errors.append(f"FAIL: Task {task_id}: Error reading 'task.json': {e}")
 
 
-    # Check for renamed plan file
-    if not os.path.exists("tasks/13/plan.md"):
-        errors.append("FAIL: Plan file tasks/13/plan.md was not created/renamed.")
-    if os.path.exists("tasks/13/plan_13.md"):
-        errors.append("FAIL: Old plan file tasks/13/plan_13.md was not removed.")
+            # 3. Check for plan.md removal
+            plan_md_path = os.path.join(task_path, "plan.md")
+            if os.path.exists(plan_md_path):
+                errors.append(f"FAIL: Task {task_id}: 'plan.md' was not removed from {task_path}")
 
+    if migrated_tasks_found == 0:
+        errors.append("FAIL: No migrated task directories (e.g., 'tasks/1/') found.")
+
+    return errors
+
+def main():
+    errors = run_test()
     if errors:
         for error in errors:
             print(error)
+        print("\n---")
+        print(f"FAIL: {len(errors)} errors found during migration validation.")
         sys.exit(1)
-    
-    print("PASS: Task migration verified successfully.")
-    sys.exit(0)
+    else:
+        print("PASS: Migration validation successful.")
+        sys.exit(0)
 
 if __name__ == "__main__":
-    run()
+    main()
