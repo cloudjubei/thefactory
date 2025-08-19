@@ -34,7 +34,7 @@ Establish core principles, terminology, and tool-based architecture for the Agen
    Context: tasks/TASKS.md, docs/TASK_FORMAT.md
    Output: tasks/TASKS.md
 
-6.5) - Tests for tools guide (6.1)
+6.5) + Tests for tools guide (6.1)
    Action: Create a deterministic test that verifies docs/TOOL_ARCHITECTURE.md exists and includes key sections.
    Acceptance:
    - tasks/6/tests/test_6_5.py exists
