@@ -43,13 +43,13 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
    Acceptance: A script exists that allows interaction with an agent.
 
-8) - Tests specification
-   Action: Create a test documentation for testing the agent's functionality for any task or feature.
-   Acceptance: The documentation exists. Task 8 does't need to exist as all tasks up to this point have tests. If there's any missing information relating to Task 8 it should be incorporated into this one. Task 9 should be removed.
+8) + Tests specification
+   Action: Create and maintain the canonical testing specification for the project and integrate testing requirements into the planning specification.
+   Acceptance:
+   - `docs/TESTING.md` exists and includes Required Sections: Purpose and Scope; Test Locations and Naming Conventions; Test Structure and Utilities; Writing Acceptance Tests; Running Tests; CI/Automation Expectations; Tool Usage; Examples; References.
+   - `docs/PLAN_SPECIFICATION.md` is updated to include a "Test-Driven Acceptance" principle, references `docs/TESTING.md`, and updates its template and example to require a corresponding test per feature.
+   - No feature should be simply a test run.
 
-9) + Automated tests
-   Action: Create tests for every task and feature already existing. 
-   Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification. The tests for this task must all pass.
 
 10) + Agent personas
    Action: Create 4 personas that will serve different purposes:

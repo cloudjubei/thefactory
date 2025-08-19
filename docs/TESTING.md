@@ -1,94 +1,76 @@
 # Agent Testing Specification
 
-## 1. Philosophy
-Testing is a critical part of the agent's development process. It ensures that features and tasks are completed correctly, and that the agent's behavior is verifiable and reproducible. Every feature should be testable, and the tests serve as a concrete definition of "done."
+## 1) Purpose and Scope
+Testing encodes acceptance criteria into deterministic, executable checks so feature completion is objective and reproducible. This specification defines where tests live, how they are named, how they are structured, how to write them from acceptance criteria, how to run them, and how the agent uses the testing tools. It applies to all tasks and features in this repository.
 
-Tests are not a separate, optional step; they are an integral part of the feature delivery process. The acceptance criteria of a feature directly inform the creation of its tests.
+## 2) Test Locations and Naming Conventions
+- Location per task: tests for a given task reside under tasks/{task_id}/tests/.
+- File naming per feature: test_{task_id}_{feature_number}.py
+  - Example: Task 15, Feature 3 -> tasks/15/tests/test_15_3.py
+- One-to-one mapping: each feature that produces tangible output has at least one corresponding test file that verifies its acceptance criteria.
+- Cohesion: tests must only assert the acceptance criteria for their corresponding feature, avoiding cross-feature coupling.
 
-## 2. Test Location
-- All tests for a specific task reside within that task's directory.
-- The standard location for tests is `tasks/{task_id}/tests/`.
-- For a feature `X.Y`, its test might be located at `tasks/X/tests/test_feature_Y.py`.
+## 3) Test Structure and Utilities
+- Simplicity: tests are plain Python scripts using only the standard library (os, sys, json, etc.). Avoid frameworks unless explicitly required by a task.
+- Determinism: tests must not depend on network calls or non-deterministic inputs. Use fixed strings and file assertions.
+- Assertions: prefer explicit checks with clear PASS/FAIL messages and exit codes (0 success, 1 failure).
+- Utilities: if simple helper logic is needed, keep it within the test file or a dedicated helper in the same task folder to avoid global coupling. Introduce shared utilities only when clearly warranted by multiple tasks and document them.
 
-This co-location ensures that tests are tightly coupled with the task and features they validate.
+## 4) Writing Acceptance Tests
+- Start from the feature's Acceptance section in the task plan and translate each criterion into a concrete assertion.
+- Typical checks include:
+  - File existence: verify required files were created/updated at the correct paths.
+  - Content validation: check presence of required headings, phrases, or structural markers.
+  - Structure: ensure directory layout and naming conventions match the spec.
+- One test per feature: encode all acceptance points for that feature in its corresponding test file.
+- Independence: tests should set up only what they need and make no assumptions about other features beyond documented dependencies.
 
-## 3. Test Structure
-Tests should be simple, executable scripts (e.g., Python scripts using the standard library) that verify the acceptance criteria of a feature. They should be self-contained and not require complex frameworks unless absolutely necessary.
+## 5) Running Tests
+- Tool: use the run_tests tool exposed by the orchestrator. It invokes scripts/run_tests.py.
+- Expected outputs: the tool returns a JSON-like result with fields such as ok, exit_code, stdout, stderr, and optionally passed/total.
+- Local behavior: tests are executed from the repository root; relative paths in tests should be rooted appropriately.
+- Passing rule: a test must exit with code 0 and print a clear PASS message for success.
 
-A typical test script for a feature that creates a file might:
-1. Check for the existence of the output file(s).
-2. Read the content of the file(s).
-3. Assert that the content matches the expected structure or contains specific key phrases.
-4. Exit with a status code of `0` for success and `1` for failure.
+## 6) CI/Automation Expectations
+- Gating: a feature cannot be marked complete until its corresponding test passes.
+- Per-feature commits: upon completing and validating a feature, the agent must call finish_feature to create an isolated commit for that feature.
+- Task completion: a task is only submitted for review when all features and their tests pass across the full suite.
+- Stability: tests should produce identical results across environments given the same repo state.
 
-### Example Test (`tasks/4/tests/test_feature_1.py`)
+## 7) Tool Usage
+- run_tests: the agent calls the run_tests tool to execute the suite and uses the returned result to decide whether to proceed or fix failures.
+- finish_feature: after a feature's test passes, the agent calls finish_feature to create a per-feature commit (distinct from the final submit_for_review call used to open a PR after all features are done).
 
-Suppose Task 4, Feature 1 was "Create a specification template."
+## 8) Examples
+Minimal example mapping a feature to a test:
+
+Feature (Task 4, Feature 1): "Create a specification template at docs/TEMPLATE.md with required headings."
+
+Example test file: tasks/4/tests/test_4_1.py
 
 ```python
-# tasks/4/tests/test_feature_1.py
-import os
-import sys
+import os, sys
 
-def run_test():
-    """
-    Tests that TEMPLATE.md was created correctly.
-    - Checks if docs/TEMPLATE.md exists.
-    - Checks if it contains required sections.
-    """
-    template_path = "docs/TEMPLATE.md"
-    
-    # 1. Check for file existence
-    if not os.path.exists(template_path):
-        print(f"FAIL: {template_path} does not exist.")
+def run():
+    path = "docs/TEMPLATE.md"
+    if not os.path.exists(path):
+        print(f"FAIL: {path} does not exist.")
         sys.exit(1)
-        
-    # 2. Check for content
-    with open(template_path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    
-    required_sections = [
-        "# Problem Statement",
-        "# Inputs and Outputs",
-        "# Constraints",
-        "# Success Criteria",
-        "# Edge Cases"
-    ]
-    
-    missing_sections = []
-    for section in required_sections:
-        if section not in content:
-            missing_sections.append(section)
-            
-    if missing_sections:
-        print(f"FAIL: {template_path} is missing sections: {', '.join(missing_sections)}")
+    required = ["# Problem Statement", "# Inputs and Outputs"]
+    missing = [s for s in required if s not in content]
+    if missing:
+        print("FAIL: Missing sections: " + ", ".join(missing))
         sys.exit(1)
-        
-    print("PASS: docs/TEMPLATE.md exists and contains all required sections.")
+    print("PASS: TEMPLATE.md has required sections.")
     sys.exit(0)
 
 if __name__ == "__main__":
-    run_test()
+    run()
 ```
 
-## 4. The Testing Workflow
-The requirement to create and pass tests is integrated into the planning and execution process. See `docs/PLAN_SPECIFICATION.md` for how this is formally included in the agent's workflow.
-
-### 4.1 Within Feature Execution
-Testing is integrated into each feature cycle:
-1. **Implementation**: Complete the feature's primary work
-2. **Test Creation**: Write test file at `tasks/{task_id}/tests/test_{task_id}_{feature_number}.py`
-3. **Test Validation**: Run `run_tests` tool to verify test passes
-4. **Feature Completion**: Only mark feature complete (`+`) when test passes
-
-### 4.2 Test File Naming Convention
-- Format: `test_{task_id}_{feature_number}.py`
-- Example: Feature 15.3 → `tasks/15/tests/test_15_3.py`
-- Location: Always in `tasks/{task_id}/tests/` directory
-
-### 4.3 Test Failure Protocol
-If tests fail:
-1. **Do NOT mark feature complete**
-2. Fix the implementation or test as needed
-3. Re-run `run_tests` until passing
-4. Only then update feature status to `+`
+## 9) References
+- docs/PLAN_SPECIFICATION.md
+- docs/TASK_FORMAT.md
+- docs/TOOL_ARCHITECTURE.md
