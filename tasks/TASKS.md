@@ -29,10 +29,12 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 6) + Define Core Agent Terminology and Principles
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
    Acceptance: The documentation exists. This task is merged with task 7 and task 10 for a single cohesive task about agents. Tasks 7 and 10 should not exist separately.
+   Notes: Plan updated to conform with docs/PLAN_SPECIFICATION.md. Added test-writing features (6.5–6.8) in tasks/6/plan_6.md to validate the produced documentation and deprecations.
 
-7) + Agent Orchestrator
+7) = Agent Orchestrator
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
-   Acceptance: A script exists that allows interaction with an agent.
+   Acceptance: Deprecated. Merged into Task 6. See Task 6, docs/TOOL_ARCHITECTURE.md, and scripts/run_local_agent.py.
+   Notes: This task is superseded by Task 6; do not work on it separately.
 
 8) + Tests specification
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
@@ -42,13 +44,14 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create tests for every task and feature already existing. 
    Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification. The tests for this task must all pass.
 
-10) + Agent personas
+10) = Agent personas
    Action: Create 4 personas that will serve different purposes:
    - Manager: An agent that looks at the task description and identifies any missing specification or context. They must identify all necessary information to be in place for the other agents to proceed with their work. They are responsible for seeing if the work has been done, or whether it couldn't due to bad/missing spec. This agent is the one that can edit the task description.
    - Planner: An agent that looks at the task description and creates a plan for completing a task following the given specifications. This agent is the one that can edit the plan description.
    - Tester: An agent that looks at the task description, and then for each feature creates the most appropriate acceptance criteria. Based on that criteria the agent creates a test case for each feature. This agent is the one that can edit the tests.
    - Developer: An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria.
-   Acceptance: Four personas exist that describe the roles of the agents. These personas are detailed in a file `docs/AGENT_PERSONAS.md`. A script exists that allows running these personas, so that for each task, the persona script can run and see if there's anything else for it to do. Once these personas are implemented, this task should be updated accordingly so that it follows spec. Each persona has a prompt that is clearly visible. `run_local_agent.py` is updated with the workflow that these new personas introduce. I must be able to run the personas individually once this task is completed to check each agent.
+   Acceptance: Deprecated. Merged into Task 6. See Task 6 and docs/AGENT_PERSONAS.md for the consolidated personas documentation.
+   Notes: This task is superseded by Task 6; do not work on it separately. `run_local_agent.py` already supports persona workflows.
 
 11) ? Should the tasks and plan format change?
    Action: Now that the personas exist, it's clear that to be able to provide them with the smallest context possible, we need to change the spec and thus the format of tasks and features. Instead of keeping a task in this markdown file, each task should be in a separate JSON file in its folder - `task.json`. The task should contain all the information that is currently here and all the feature specifics. This way it's easy to extract specific task or feature information and provide it as context to a given agent. The plan in each folder should remain as markdown, as it should be the best way for an LLM to consume information. Appropriate tools need to be in place, so that each persona will only get the relevant context.
