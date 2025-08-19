@@ -21,7 +21,10 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 4) + Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
-   Acceptance: `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist; `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
+   Acceptance:
+     - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
+     - `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
+     - Tests exist under `tasks/4/tests/` (test_4_4.py and test_4_5.py) that verify the guide, template, and SPEC.md adherence, and they pass via run_tests.
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
@@ -49,12 +52,15 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    - `docs/PLAN_SPECIFICATION.md` is updated to include a "Test-Driven Acceptance" principle, references `docs/TESTING.md`, and updates its template and example to require a corresponding test per feature.
    - No feature should be simply a test run.
 
+<<<<<<< HEAD
 9) - Move tasks around
    Action: Perform the following:
    - Create a tool for moving a task to a different position in the list of tasks.
    - The testing task - task 8, should be the moved to spot 6.
    - All other tasks need to be shifted accordingly.
 
+=======
+>>>>>>> fd54ef87326735dec4697f315f9400718b23da21
 10) + Agent personas
    Action: Create 4 personas that will serve different purposes:
    - Manager: An agent that looks at the task description and identifies any missing specification or context. They must identify all necessary information to be in place for the other agents to proceed with their work. They are responsible for seeing if the work has been done, or whether it couldn't due to bad/missing spec. This agent is the one that can edit the task description.
