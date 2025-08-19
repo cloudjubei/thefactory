@@ -10,7 +10,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 2) + The spec
    Action: Create the spec that is the entry point for anyone to begin work on the project.
-   Acceptance: The documentation exists.
+   Acceptance: docs/SPEC.md exists as the entry-point document, includes WHAT, CORE IDEAS, and ACTIONS sections, and references SPECIFICATION_GUIDE.md.
 
 3) + File organisation specification
    Action: Create a scheme for organising files within the repository.
