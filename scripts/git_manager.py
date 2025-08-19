@@ -66,7 +66,9 @@ class GitManager:
             
         if not self._run_command(["git", "checkout", "main"]): return False
         if not self._run_command(["git", "pull"]): return False
-        if (branch_name != "main") and (not self._run_command(["git", "checkout", "-b", branch_name])): return False
+        if (branch_name != "main"):
+            if not self._run_command(["git", "checkout", "-b", branch_name]): return False
+            if not self._run_command(["git", "pull"]): return False
             
         print(f"Successfully created and checked out branch '{branch_name}' in '{self.repo_path}'")
         return True
