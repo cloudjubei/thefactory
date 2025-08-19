@@ -1,17 +1,16 @@
-import os
-import sys
+import os, sys
 
 def run():
-    path = "docs/PLAN_SPECIFICATION.md"
-    if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
+    doc = "docs/PLAN_SPECIFICATION.md"
+    if not os.path.exists(doc):
+        print(f"FAIL: {doc} does not exist.")
         sys.exit(1)
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-    if "# Plan Specification" not in content:
-        print("FAIL: PLAN_SPECIFICATION.md is missing '# Plan Specification'.")
+    with open(doc, "r", encoding="utf-8") as f:
+        c = f.read()
+    if "# Plan Specification" not in c or "Feature Completion Protocol" not in c:
+        print("FAIL: PLAN_SPECIFICATION.md missing key sections.")
         sys.exit(1)
-    print("PASS: Task 5 - PLAN_SPECIFICATION.md exists with expected heading.")
+    print("PASS: PLAN_SPECIFICATION.md exists with key sections.")
     sys.exit(0)
 
 if __name__ == "__main__":

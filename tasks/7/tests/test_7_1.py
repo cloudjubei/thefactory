@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys
 
 def run():
     path = "scripts/run_local_agent.py"
@@ -7,13 +6,13 @@ def run():
         print(f"FAIL: {path} does not exist.")
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-    required = ["class Agent", "class AgentTools"]
-    missing = [s for s in required if s not in content]
+        c = f.read()
+    required = ["class Agent", "class UnifiedEngine", "class AgentTools"]
+    missing = [x for x in required if x not in c]
     if missing:
         print("FAIL: run_local_agent.py missing: " + ", ".join(missing))
         sys.exit(1)
-    print("PASS: Task 7 - run_local_agent.py exists and contains Agent classes.")
+    print("PASS: run_local_agent.py exists with expected classes.")
     sys.exit(0)
 
 if __name__ == "__main__":

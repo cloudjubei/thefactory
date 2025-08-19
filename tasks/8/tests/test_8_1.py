@@ -1,17 +1,16 @@
-import os
-import sys
+import os, sys
 
 def run():
-    path = "docs/TESTING.md"
-    if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
+    doc = "docs/TESTING.md"
+    if not os.path.exists(doc):
+        print(f"FAIL: {doc} does not exist.")
         sys.exit(1)
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-    if "# Agent Testing Specification" not in content:
-        print("FAIL: TESTING.md missing '# Agent Testing Specification'.")
+    with open(doc, "r", encoding="utf-8") as f:
+        c = f.read()
+    if "# Agent Testing Specification" not in c:
+        print("FAIL: TESTING.md missing title.")
         sys.exit(1)
-    print("PASS: Task 8 - TESTING.md exists with expected heading.")
+    print("PASS: TESTING.md exists with expected title.")
     sys.exit(0)
 
 if __name__ == "__main__":
