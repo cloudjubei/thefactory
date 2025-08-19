@@ -88,7 +88,9 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
         - All existing tasks, features, plans, and tests are migrated to the new structure and pass tests.
         - All references to `docs/TASK_FORMAT.md` are updated to `docs/tasks/TASKS_GUIDANCE.md`.
         - `tasks/TASKS.md` is removed only in the final migration feature, after dual-read is no longer needed and CI passes.
-    Notes: Defer removal of `tasks/TASKS.md` to the final feature of this task to avoid breaking orchestration during migration.
+    Notes:
+      - Defer removal of `tasks/TASKS.md` to the final feature of this task to avoid breaking orchestration during migration.
+      - Plan exists: tasks/11/plan_11.md (created per docs/PLAN_SPECIFICATION.md). Status remains pending until all features and tests are complete.
 
 12) - Tasks 6 & 7 should be joined into one
    Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now. To accomplish this, inspect the plans for both of the tasks and merge them together. Inspect the tests for both and merge them together.
