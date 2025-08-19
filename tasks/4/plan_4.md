@@ -21,7 +21,7 @@ Satisfy the task by ensuring the specification guide and template exist (already
    Dependencies: 4.1
    Output: docs/TEMPLATE.md
 
-4.3) - Ensure docs/SPEC.md adheres to the guide
+4.3) + Ensure docs/SPEC.md adheres to the guide
    Action: Align docs/SPEC.md with the guide structure and section requirements.
    Acceptance:
    - docs/SPEC.md exists and includes sections: Problem Statement, Inputs and Outputs, Constraints, Success Criteria, Edge Cases, Examples
