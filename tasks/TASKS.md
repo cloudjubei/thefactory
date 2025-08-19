@@ -22,7 +22,9 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 5) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
-    Acceptance: The documentation exists.
+    Acceptance: 
+      - `docs/FEATURE_FORMAT.md` exists and includes Purpose, Format, Field Definitions, and Examples.
+      - `docs/PLAN_SPECIFICATION.md` exists and includes purpose, principles, structure, template, and example, and references `docs/FEATURE_FORMAT.md`.
 
 6) + Define Core Agent Terminology and Principles
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
