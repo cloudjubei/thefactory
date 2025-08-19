@@ -60,10 +60,10 @@ Create automated tests for all currently existing tasks to verify their acceptan
 
 ## Execution Steps
 For each feature in order:
-1) Gather context (Minimum Cohesive Context) using `retrieve_context_files` for: tasks/TASKS.md; this plan file; all referenced specs (docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md, docs/TOOL_ARCHITECTURE.md, docs/TESTING.md); and any files to be created/modified.
+1) Update the feature's status in this plan from `-` to `~` and gather context (Minimum Cohesive Context) using `retrieve_context_files` for: tasks/TASKS.md; this plan file; all referenced specs (docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md, docs/TOOL_ARCHITECTURE.md, docs/TESTING.md); and any files to be created/modified.
 2) Implement the feature changes using `write_file` (create or update the required files under docs/ or tasks/{id}/tests/ as specified).
 3) Create the test(s) that verify the feature's acceptance criteria under `tasks/{task_id}/tests/`, named `test_{task_id}_{feature_id}.py`.
-4) Run tests using the `run_tests` tool and ensure tests pass. Then call `finish_feature` with a descriptive message (e.g., "Feature 9.{n} complete: {Title}") to create a commit for this feature.
+4) Run tests using the `run_tests` tool and ensure tests pass. Then update the feature status to `+` in this plan and call `finish_feature` with a descriptive message (e.g., "Feature 9.{n} complete: {Title}") to create a commit for this feature.
 
 After all features are completed:
 5) Run `run_tests` again and ensure the full suite passes.
