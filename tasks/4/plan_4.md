@@ -1,7 +1,7 @@
-# Plan for Task 5: Plan specification
+# Plan for Task 4: Plan specification
 
 ## Intent
-Create and maintain the specification-driven plan for Task 5, ensuring it adheres to docs/PLAN_SPECIFICATION.md and uses the feature format from docs/FEATURE_FORMAT.md. This plan documents how the task's acceptance criteria are met.
+Create and maintain the specification-driven plan for Task 4, ensuring it adheres to docs/PLAN_SPECIFICATION.md and uses the feature format from docs/FEATURE_FORMAT.md. This plan documents how the task's acceptance criteria are met.
 
 ## Context
 - Specs: docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md
@@ -9,7 +9,7 @@ Create and maintain the specification-driven plan for Task 5, ensuring it adhere
 - Outputs referenced: docs/FEATURE_FORMAT.md, docs/PLAN_SPECIFICATION.md
 
 ## Features
-5.1) + Create the Feature Format specification
+4.1) + Create the Feature Format specification
    Action: Provide a dedicated specification for describing features so plans can reference and structure them consistently.
    Acceptance:
    - docs/FEATURE_FORMAT.md exists
@@ -19,13 +19,13 @@ Create and maintain the specification-driven plan for Task 5, ensuring it adhere
    Output: docs/FEATURE_FORMAT.md
    Notes: Enables consistent plan authoring across tasks.
 
-5.2) + Create the Plan Specification
+4.2) + Create the Plan Specification
    Action: Document purpose, principles, structure, template, and example for plans, referencing docs/FEATURE_FORMAT.md.
    Acceptance:
    - docs/PLAN_SPECIFICATION.md exists and includes purpose, principles, structure, template, and example
    - The document references docs/FEATURE_FORMAT.md
    Context: docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md
-   Dependencies: 5.1
+   Dependencies: 4.1
    Output: docs/PLAN_SPECIFICATION.md
 
 ## Execution Steps

@@ -14,14 +14,14 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
      - `docs/SPEC.md` exists and adheres to `docs/SPECIFICATION_GUIDE.md`.
 
-3) - File organisation specification
+3) + File organisation specification
    Action: Create a scheme for organising files within the repository.
    Acceptance: 
    - `docs/FILE_ORGANISATION.md` exists.
    - The specification contains examples of how files should be organised.
    - All files are organised according to the specification.
 
-5) + Plan specification
+4) + Plan specification
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
     Acceptance: 
       - `docs/FEATURE_FORMAT.md` exists and includes Purpose, Format, Field Definitions, and Examples.
@@ -50,8 +50,9 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 9) - Move tasks around
    Action: Perform the following:
    - Create a tool for moving a task to a different position in the list of tasks.
-   - The testing task - task 8, should be the moved to spot 6.
-   - All other tasks need to be shifted accordingly.
+   - The testing task - task 8, should be the moved to spot 5.
+   - This task is completely removed.
+   - All other tasks need to be shifted accordingly to be in order.
 
 10) + Agent personas
    Action: Create 4 personas that will serve different purposes:

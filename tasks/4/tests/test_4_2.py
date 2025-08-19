@@ -3,7 +3,7 @@ import sys
 
 def run_test():
     """
-    Feature 5.2 Acceptance Tests:
+    Feature 4.2 Acceptance Tests:
     - docs/PLAN_SPECIFICATION.md exists
     - Includes sections: Purpose, Core Principles, Location and Structure, Template, Example
     - References docs/FEATURE_FORMAT.md

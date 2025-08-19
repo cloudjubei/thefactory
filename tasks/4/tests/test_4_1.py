@@ -3,7 +3,7 @@ import sys
 
 def run_test():
     """
-    Feature 5.1 Acceptance Tests:
+    Feature 4.1 Acceptance Tests:
     - docs/FEATURE_FORMAT.md exists
     - Contains sections: Purpose, Where Features Live, Format, Field Definitions, Examples
     - References project specs: docs/TASK_FORMAT.md and docs/SPECIFICATION_GUIDE.md
