@@ -1,28 +1,25 @@
 # Plan for Task 8: Tests specification
 
 ## Intent
-To establish a clear and mandatory testing framework for the project. This involves creating a specification document for how tests are written and located, and integrating this testing requirement directly into the core planning process to ensure all features are verifiable.
+Create the testing documentation describing how to test the agent's functionality for any task or feature.
 
 ## Context
-- Specs: `docs/SPECIFICATION_GUIDE.md`, `docs/PLAN_SPECIFICATION.md`
+- Specs: docs/TESTING.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md
+- Source files: tasks/TASKS.md
 
 ## Features
-8.1) - Create the testing specification document
-   Action: Create a new specification document that defines the philosophy, location, structure, and workflow for writing tests for the agent's work.
-   Acceptance: The file `docs/TESTING.md` exists and contains the required sections detailing the project's testing strategy.
-   Output: `docs/TESTING.md`
-
-8.2) - Integrate testing into the planning specification
-   Action: Update the `docs/PLAN_SPECIFICATION.md` to make testing a mandatory part of the feature development workflow.
+8.1) + Create the Agent Testing specification
+   Action: Author docs/TESTING.md detailing philosophy, location, structure, example, and workflow.
    Acceptance:
-   - `docs/PLAN_SPECIFICATION.md` includes a new principle, "Test-Driven Acceptance".
-   - The plan template in `docs/PLAN_SPECIFICATION.md` is updated to show an example of a feature followed by its corresponding test feature.
-   Context: `docs/PLAN_SPECIFICATION.md`, `docs/TESTING.md`
-   Dependencies: 8.1
-   Output: `docs/PLAN_SPECIFICATION.md`
+   - docs/TESTING.md exists and includes the defined sections
+   Output: docs/TESTING.md
+
+8.2) / Write tests for Testing specification
+   Action: Add a test under tasks/8/tests/ that verifies presence and section headers.
+   Acceptance:
+   - Test asserts existence and headings
+   Dependencies: 9.1
+   Notes: Legacy task; tests to be implemented under Task 9.
 
 ## Execution Steps
-1) Implement features
-2) Update `tasks/TASKS.md` with status change
-3) Submit for review
-4) Finish
+- Backfilled; tests deferred to Task 9. Task 9 will implement automation.

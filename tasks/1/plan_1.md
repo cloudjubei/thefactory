@@ -1,26 +1,28 @@
 # Plan for Task 1: Task format
 
 ## Intent
-Provide a formal task format and ensure the canonical task list adheres to it.
+Document the canonical task format to ensure consistency and testability across the project.
 
 ## Context
-- Source files: `tasks/TASKS.md`
+- Specs: docs/SPEC.md, docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TESTING.md
+- Source files: tasks/TASKS.md
 
 ## Features
-1.1) + Create Task Format specification
-   Action: Author `docs/TASK_FORMAT.md` defining task fields, statuses, rules, and examples.
-   Acceptance: `docs/TASK_FORMAT.md` exists and is unambiguous.
-   Output: `docs/TASK_FORMAT.md`
+1.1) + Create the Task Format specification
+   Action: Author docs/TASK_FORMAT.md defining the fields, statuses, rules, and examples for tasks.
+   Acceptance:
+   - docs/TASK_FORMAT.md exists and describes ID, Status, Action, Acceptance, Notes
+   - Includes Rules and Tips and examples
+   Context: docs/SPECIFICATION_GUIDE.md, docs/FEATURE_FORMAT.md
+   Output: docs/TASK_FORMAT.md
 
-1.2) + Apply format to TASKS
-   Action: Update `tasks/TASKS.md` to follow `docs/TASK_FORMAT.md`.
-   Acceptance: All tasks follow the required structure and status codes.
-   Context: `tasks/TASKS.md`
-   Output: Updated `tasks/TASKS.md`
-   Dependencies: 1.1
+1.2) / Write tests for the Task Format specification
+   Action: Create a test under tasks/1/tests/ that verifies docs/TASK_FORMAT.md exists and contains required sections.
+   Acceptance:
+   - tests under tasks/1/tests/ verify presence and sections
+   Dependencies: 9.1
+   Notes: Legacy task; tests to be implemented under Task 9.
 
 ## Execution Steps
-1) Implement features
-2) Update `tasks/TASKS.md` with status change
-3) Submit for review
-4) Finish
+- Backfilled: No further action required for 1.1 (already completed).
+- Tests for 1.2 will be added by Task 9; no status change needed for Task 1.

@@ -1,26 +1,25 @@
 # Plan for Task 6: Define Core Agent Terminology and Principles
 
 ## Intent
-Establish core principles and define the agent's tool-based architecture and terminology.
+Define the high-level principles and key terms (Orchestrator and Agent) for the tool-based architecture, ensuring a clear contract.
 
 ## Context
-- Specs: `docs/PLAN_SPECIFICATION.md`
+- Specs: docs/AGENT_PRINCIPLES.md, docs/TOOL_ARCHITECTURE.md, docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md
+- Source files: tasks/TASKS.md
 
 ## Features
-6.1) + Create the tools guide
-   Action: Specify the JSON contract, tools, and execution modes.
-   Acceptance: `docs/TOOL_ARCHITECTURE.md` exists with all sections and tool definitions.
-   Output: `docs/TOOL_ARCHITECTURE.md`
+6.1) + Create Agent Principles documentation
+   Action: Author docs/AGENT_PRINCIPLES.md defining terms and core principles.
+   Acceptance:
+   - docs/AGENT_PRINCIPLES.md exists and defines Agent, Orchestrator, and core principles
+   Output: docs/AGENT_PRINCIPLES.md
 
-6.2) + Create the principles guide
-   Action: Define Agent vs Orchestrator and core principles.
-   Acceptance: `docs/AGENT_PRINCIPLES.md` exists and contains required definitions referencing the tools guide.
-   Output: `docs/AGENT_PRINCIPLES.md`
-   Context: `docs/PLAN_SPECIFICATION.md`, `docs/TOOL_ARCHITECTURE.md`
-   Dependencies: 6.1
+6.2) / Write tests for Agent Principles
+   Action: Add a test under tasks/6/tests/ verifying the document exists and includes key terms and principles.
+   Acceptance:
+   - Test asserts existence and keywords
+   Dependencies: 9.1
+   Notes: Legacy task; tests to be implemented under Task 9.
 
 ## Execution Steps
-1) Implement features
-2) Update `tasks/TASKS.md` with status change
-3) Submit for review
-4) Finish
+- Backfilled; tests deferred to Task 9.
