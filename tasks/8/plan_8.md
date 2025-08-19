@@ -4,7 +4,7 @@
 Establish the canonical, project-wide testing specification and integrate testing requirements into the planning specification so every feature is verifiable by deterministic tests.
 
 ## Context
-- Specs: docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TOOL_ARCHITECTURE.md
+- Specs: docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TOOL_ARCHITECTURE.md, docs/TESTING.md
 - Source files: tasks/TASKS.md
 
 ## Notes
