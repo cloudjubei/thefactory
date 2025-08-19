@@ -61,7 +61,7 @@ This plan outlines the features required to transition from the current Markdown
    Output: Modified `scripts/run_local_agent.py`
 
 ### Phase 3: Migration & Validation
-13.7) - Implement Migration Script
+13.7) + Implement Migration Script
    Action: Create a script `scripts/migrate_tasks.py` that reads all tasks from `tasks/TASKS.md` and their corresponding plans and tests, and converts them to the new directory structure (`tasks/{id}/task.json`, `tasks/{id}/plan.md`, etc.).
    Acceptance:
      - `scripts/migrate_tasks.py` exists.
