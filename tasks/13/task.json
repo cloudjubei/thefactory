@@ -57,7 +57,9 @@
         "`docs/tasks/task_example.json` exists.",
         "The JSON is valid and conforms to the structure defined in `docs/tasks/task_format.py`."
       ],
-      "dependencies": ["13.1"],
+      "dependencies": [
+        "13.1"
+      ],
       "output": "`docs/tasks/task_example.json`"
     },
     {
@@ -81,7 +83,9 @@
         "`docs/tasks/TASKS_GUIDANCE.md` exists.",
         "The content of the new guidance file is updated to reflect the JSON-based workflow."
       ],
-      "dependencies": ["13.1"],
+      "dependencies": [
+        "13.1"
+      ],
       "output": "`docs/tasks/TASKS_GUIDANCE.md`"
     },
     {
@@ -94,7 +98,9 @@
         "It contains functions like `get_task(task_id)`, `update_task(task_id, task_data)`, `create_task(...)`.",
         "Functions are well-documented and include error handling."
       ],
-      "dependencies": ["13.1"],
+      "dependencies": [
+        "13.1"
+      ],
       "output": "`scripts/tools/task_utils.py`"
     },
     {
@@ -106,7 +112,9 @@
         "`run_local_agent.py` is updated to import and use `task_utils.py`.",
         "The orchestrator can correctly parse task information from both the old Markdown file and the new JSON file structure."
       ],
-      "dependencies": ["13.5"],
+      "dependencies": [
+        "13.5"
+      ],
       "output": "Modified `scripts/run_local_agent.py`"
     },
     {
@@ -119,20 +127,25 @@
         "The script can be run to perform the full migration of all existing tasks.",
         "The script correctly handles task descriptions, features from plans, and relocates test files."
       ],
-      "dependencies": ["13.5"],
+      "dependencies": [
+        "13.5"
+      ],
       "output": "`scripts/migrate_tasks.py`"
     },
     {
       "id": "13.8",
       "status": "-",
-      "title": "Execute Migration and Validate",
-      "action": "Run the migration script to convert all existing tasks and validate that the migration was successful.",
+      "title": "Execute Migration, Embed Plans, and Validate",
+      "action": "Run the migration script to convert all existing tasks. The script must embed the content of `plan.md` files into the `plan` field of the corresponding `task.json` task and feature objects, and then delete the source `plan.md` files.",
       "acceptance": [
         "All tasks from `TASKS.md` now exist in the `tasks/{id}/task.json` format.",
-        "All associated `plan.md` and test files are moved to their new locations (`tasks/{id}/`).",
+        "The `plan` field in each `task.json` and its features contains the content from the original `plan.md`.",
+        "All associated `plan.md` files are removed from their new locations (`tasks/{id}/`).",
         "All project tests pass after the migration using `run_tests`."
       ],
-      "dependencies": ["13.7"]
+      "dependencies": [
+        "13.7"
+      ]
     },
     {
       "id": "13.9",
@@ -143,7 +156,9 @@
         "The orchestrator (`run_local_agent.py`) is simplified to only read from `tasks/{id}/task.json` using `task_utils.py`.",
         "The agent continues to function correctly."
       ],
-      "dependencies": ["13.8"],
+      "dependencies": [
+        "13.8"
+      ],
       "output": "Modified `scripts/run_local_agent.py`"
     },
     {
@@ -154,51 +169,49 @@
       "acceptance": [
         "`tasks/TASKS.md` is deleted."
       ],
-      "dependencies": ["13.9"]
+      "dependencies": [
+        "13.9"
+      ]
     },
     {
       "id": "13.11",
       "status": "-",
-      "title": "User added a plan field for each task and feature that completely supercedes plan.md.",
-      "action": "Update all tasks to store the plan in the new field.",
+      "title": "Update Guidance and Tooling for Plan-in-JSON",
+      "action": "Update documentation and scripts to align with the plan-in-JSON format. This includes updating `PLAN_SPECIFICATION.md` and `FILE_ORGANISATION.md`. Also, update the `_gather_context` function in `run_local_agent.py` and add a new helper function to `task_utils.py` for updating feature status directly in the `task.json` file.",
       "acceptance": [
-        "each task and its features have a plan field that replaces the contents of plan.md",
-        "each plan.md is removed"
+        "`docs/PLAN_SPECIFICATION.md` is updated to describe the `plan` field in `task.json`.",
+        "`docs/FILE_ORGANISATION.md` is updated to reflect that `plan.md` is deprecated.",
+        "A new function, e.g., `update_feature_status(task_id, feature_id, new_status)`, exists in `scripts/tools/task_utils.py`.",
+        "`scripts/run_local_agent.py`'s `_gather_context` function is updated to read `task.json` instead of `plan.md`."
       ],
-      "dependencies": ["13.10"]
+      "dependencies": [
+        "13.8"
+      ]
     },
     {
       "id": "13.12",
       "status": "-",
-      "title": "Process change requires guidance change",
-      "action": "Update all relevant guidance to have information about the new formatting and rules",
+      "title": "Remove Migration Guide",
+      "action": "Remove `docs/tasks/TASKS_MIGRATION_GUIDE.md` and any references to it, as the migration is complete.",
       "acceptance": [
-        "docs/PLAN_SPECIFICATION.md is updated with rules to follow the new format",
-        "the agents need to update the status of each feature they work on direcly in task.json - for this there needs to be a helper function present",
-        "docs/FILE_ORGANISATION.md is updated to reflect all the new changes",
-        "scripts/run_local_agent.py is updated to reflect the new context and files. Especially the function `_gather_context` should be changed to reflect all these new changes."
+        "`docs/tasks/TASKS_MIGRATION_GUIDE.md` is removed."
       ],
-      "dependencies": ["13.11"]
+      "dependencies": [
+        "13.10",
+        "13.11"
+      ]
     },
     {
       "id": "13.13",
       "status": "-",
-      "title": "Migration is done",
-      "action": "Remove the migration guide",
+      "title": "Final Cleanup",
+      "action": "This task definition file (`tasks/13/task.json`) will be removed as the final step of its own completion, closing the loop on the migration.",
       "acceptance": [
-        "docs/tasks/TASKS_MIGRATION_GUIDE.md is removed and any task or agent references to it are also removed"
+        "`tasks/13/task.json` is removed."
       ],
-      "dependencies": ["13.12"]
-    },
-    {
-      "id": "13.14",
-      "status": "-",
-      "title": "Cleanup",
-      "action": "Remove all tasks that no longer serve their purpose due to cascading changes",
-      "acceptance": [
-        "this task is removed"
-      ],
-      "dependencies": ["13.13"]
+      "dependencies": [
+        "13.12"
+      ]
     }
   ]
 }
