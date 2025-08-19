@@ -3,14 +3,12 @@
 Task Reference: See tasks/TASKS.md entry 4.
 
 ## Intent
-Satisfy the task by ensuring the specification guide and template exist (already created) and that docs/SPEC.md is realigned to the guide. Encode test-first verification via explicit test features per PLAN_SPECIFICATION.
-
-## Scope
-Documentation-only work: plan authoring and structure updates. No code or tests are implemented by the Planner.
+Deliver a concise, specification-driven plan that ensures the specification guide and template exist, docs/SPEC.md adheres to the guide, and tests validate these outputs. This plan follows PLAN_SPECIFICATION and FEATURE_FORMAT and uses a test-driven approach.
 
 ## Context
-- Specs: docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md, docs/SPECIFICATION_GUIDE.md, docs/SPEC.md
-- Purpose: Provide a clear, test-driven path to complete Task 4 and verify outputs.
+- Specs: docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md, docs/TESTING.md, docs/SPECIFICATION_GUIDE.md
+- Target docs: docs/SPEC.md, docs/TEMPLATE.md
+- Task list: tasks/TASKS.md
 
 ## Features
 4.1) + Create the specification guide
@@ -34,7 +32,7 @@ Documentation-only work: plan authoring and structure updates. No code or tests 
    - No extraneous sections superseding these core sections remain
    Context: docs/SPEC.md, docs/SPECIFICATION_GUIDE.md
    Dependencies: 4.1, 4.2
-   Notes: Current SPEC uses sections (WHAT, CORE IDEAS, ACTIONS); replace/realign to the guide.
+   Notes: Current SPEC used (WHAT, CORE IDEAS, ACTIONS); ensure realignment to the guide.
    Output: Updated docs/SPEC.md
 
 4.4) + Tests for 4.1 and 4.2 (Guide and Template)
@@ -47,7 +45,7 @@ Documentation-only work: plan authoring and structure updates. No code or tests 
    Context: docs/PLAN_SPECIFICATION.md (Testing), docs/SPECIFICATION_GUIDE.md, docs/TEMPLATE.md
    Dependencies: 4.1, 4.2
    Output: tasks/4/tests/test_4_4.py
-   Notes: Test updated and docs adjusted to satisfy acceptance.
+   Notes: Tests cover the guide and template concurrently.
 
 4.5) - Test for 4.3 (SPEC.md adherence)
    Action: Write a test that verifies docs/SPEC.md adheres to the guide.
