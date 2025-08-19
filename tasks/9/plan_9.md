@@ -23,7 +23,6 @@ Create automated tests for all currently existing tasks to verify their acceptan
    Context: docs/PLAN_SPECIFICATION.md
    Dependencies: None
    Output: docs/PLAN_SPECIFICATION.md
-   Notes: Completed in prior work; retained here for traceability. If missing, coordinate with Task 5 (Plan specification) to ensure the document exists.
 
 9.2) - Create tests for Tasks 1–8
    Action: Write simple Python tests under `tasks/{id}/tests/` to verify each task's acceptance criteria (primarily existence and key content of specified files). Ensure one test per feature in each task's plan.
@@ -61,7 +60,6 @@ Create automated tests for all currently existing tasks to verify their acceptan
 
 ## Execution Steps
 For each feature in order:
-0) Preflight checks: Use `retrieve_context_files` to ensure referenced specs exist: `docs/PLAN_SPECIFICATION.md`, `docs/TESTING.md`, `docs/TASK_FORMAT.md`, `docs/TOOL_ARCHITECTURE.md`, and this plan. If a required spec is missing, pause and escalate via `ask_question`.
 1) Gather context (Minimum Cohesive Context) using `retrieve_context_files` for: tasks/TASKS.md; this plan file; all referenced specs (docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md, docs/TOOL_ARCHITECTURE.md, docs/TESTING.md); and any files to be created/modified.
 2) Implement the feature changes using `write_file` (create or update the required files under docs/ or tasks/{id}/tests/ as specified).
 3) Create the test(s) that verify the feature's acceptance criteria under `tasks/{task_id}/tests/`, named `test_{task_id}_{feature_id}.py`.
