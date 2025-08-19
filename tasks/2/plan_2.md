@@ -18,8 +18,6 @@ Ensure Task 2 is satisfied by maintaining a concise, specification-driven plan t
    Context: docs/SPECIFICATION_GUIDE.md, docs/TASK_FORMAT.md, docs/PLAN_SPECIFICATION.md, docs/SPEC.md
    Dependencies: None
    Output: docs/SPEC.md
-   Notes: This task predated the mandatory per-feature test protocol; legacy test coverage is addressed under the testing tasks.
-   Rejection: Missing required section headers: WHAT, CORE IDEAS, ACTIONS
 
 ## Execution Steps
 For each feature in order:

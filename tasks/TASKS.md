@@ -14,7 +14,6 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
      - docs/SPEC.md exists.
      - The document references docs/SPECIFICATION_GUIDE.md at the top.
      - It includes sections: WHAT, CORE IDEAS, ACTIONS.
-   Notes: docs/SPEC.md must adhere to docs/SPECIFICATION_GUIDE.md. See also docs/TASK_FORMAT.md and docs/PLAN_SPECIFICATION.md.
 
 3) + File organisation specification
    Action: Create a scheme for organising files within the repository.
