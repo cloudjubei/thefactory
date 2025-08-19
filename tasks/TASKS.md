@@ -25,13 +25,9 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
     Action: Create a plan specification that describes how each task should be executed with information about creating features for tasks.
     Acceptance: The documentation exists.
 
-6) + Define Core Agent Terminology and Principles
-   Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
-   Acceptance: The documentation exists.
-
-7) + Agent Orchestrator
-   Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
-   Acceptance: A script exists that allows interaction with an agent.
+6) + Agent Principles and Orchestrator
+   Action: Define the agent's high-level principles and establish the key terms "Orchestrator" and "Agent", and implement the Orchestrator script used for direct interaction with an LLM agent.
+   Acceptance: The documentation exists and a script exists that allows interaction with an agent.
 
 8) + Tests specification
    Action: Create a test documentation for testing the agent's functionality for any task or feature.
@@ -40,10 +36,6 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 9) - Automated tests
    Action: Create tests for every task and feature already existing. 
    Acceptance: Automated tests pass for all tasks and features. All plans for tasks have information about writing tests included in their action steps. All features have a corresponding test file and this is described as a mandatory step in `docs/PLAN_SPECIFICATION.md`. A feature is only ever completely done when there is a test written for it and it passed. This should also be described in the plan specification. The tests for this task must all pass.
-
-10) - Tasks 6 & 7 should be joined into one
-   Action: The tasks are about the agent and running it - they should be merged together and their plans should be merged and updated accordingly. Only files relating to task 6 should remain and everything relating to task 7 should be removed as it is all task 6 now.
-   Acceptance: Only a single task exists relating to the Agent. This task gets removed upon completion. All files - plans, tests are now under task 6. All features are still present and working as normal. All tests pass.
 
 11) - The plans for all tasks must be updated
    Action: Update the plans for all plans to reflect the status of each feature. Clearly there's something missing in the spec, most probably in `docs/PLAN_SPECIFICATION.md`, because the agent isn't updating the plan for the task it works on to update the status of the feature and task (while features are being worked on this should be set to pending).
