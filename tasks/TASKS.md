@@ -16,7 +16,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Action: Create a scheme for organising files within the repository.
    Acceptance: The documentation exists.
 
-4) - Specification documentation
+4) + Specification documentation
    Action: Analyse the specification format and what requirements it needs to provide.
    Acceptance: `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist; `docs/SPEC.md` adheres to `docs/SPECIFICATION_GUIDE.md`.
 
@@ -26,7 +26,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 
 6) + Define Core Agent Terminology and Principles
    Action: Create the specification that defines the agent's high-level principles and establishes the key terms "Orchestrator" and "Agent". The agent uses a tool-based architecture.
-   Acceptance: The documentation exists.
+   Acceptance: The documentation exists. This task is merged with task 7 and task 10 for a single cohesive task about agents. Tasks 7 and 10 should not exist separately.
 
 7) + Agent Orchestrator
    Action: Create a script that functions as the Agent's Orchestrator - used for direct interaction with an LLM agent.
