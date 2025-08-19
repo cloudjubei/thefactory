@@ -41,10 +41,6 @@ class AgentTools:
 
     def finish(self, reason: str):
         return finish_tool(self.git_manager, reason)
-<<<<<<< HEAD
-
-=======
->>>>>>> 2ad38549f051afb786c8fff4a32dc98b638dc295
 
     def finish_feature(self, task_id: int, feature_id: int, title: str, message: str = ""):
         return finish_feature_tool(self.git_manager, task_id, feature_id, title, message)
