@@ -57,6 +57,10 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
 11) ? Should the tasks and plan format change?
    Action: Now that the personas exist, it's clear that to be able to provide them with the smallest context possible, we need to change the spec and thus the format of tasks and features. Instead of keeping a task in this markdown file, each task should be in a separate JSON file in its folder - `task.json`. The task should contain all the information that is currently here and all the feature specifics. This way it's easy to extract specific task or feature information and provide it as context to a given agent. The plan in each folder should remain as markdown, as it should be the best way for an LLM to consume information. Appropriate tools need to be in place, so that each persona will only get the relevant context.
 
+12) = Deprecated - Superseded by Task 6 consolidation
+   Action: Deprecated. Consolidated into Task 6: Define Core Agent Terminology, Orchestrator, and Personas.
+   Acceptance: No work to be done. See Task 6 and docs/AGENT_PERSONAS.md and docs/TOOL_ARCHITECTURE.md for current spec.
+   Notes: Former scope merged under Task 6 per its acceptance criteria.
 
 13) - The plans for all tasks must be updated
    Action: Update the plans for all plans to reflect the status of each feature. Clearly there's something missing in the spec, most probably in `docs/PLAN_SPECIFICATION.md`, because the agent isn't updating the plan for the task it works on to update the status of the feature and task (while features are being worked on this should be set to pending).
