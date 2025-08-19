@@ -4,7 +4,7 @@
 Establish core principles, define the tool-based agent architecture and terminology, and consolidate Orchestrator and Personas under a cohesive specification. This plan aligns with PLAN_SPECIFICATION and FEATURE_FORMAT and reflects the completed state of work while documenting the required execution steps for traceability.
 
 ## Context
-- Specs: docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md, docs/TOOL_ARCHITECTURE.md
+- Specs: docs/PLAN_SPECIFICATION.md, docs/FEATURE_FORMAT.md, docs/TASK_FORMAT.md, docs/TOOL_ARCHITECTURE.md, docs/AGENT_PRINCIPLES.md
 - Source files: scripts/run_local_agent.py, tasks/TASKS.md
 
 ## Features
