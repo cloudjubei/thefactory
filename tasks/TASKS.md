@@ -13,6 +13,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance:
      - `docs/SPECIFICATION_GUIDE.md` and `docs/TEMPLATE.md` exist.
      - `docs/SPEC.md` exists and adheres to `docs/SPECIFICATION_GUIDE.md`.
+   Notes: Plan updated to include test-writing features (2.4–2.6) per docs/PLAN_SPECIFICATION.md Test-Driven Acceptance.
 
 3) + File organisation specification
    Action: Create a scheme for organising files within the repository.
