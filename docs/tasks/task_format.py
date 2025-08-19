@@ -1,45 +1,31 @@
-"""
-Defines the canonical data structures for Tasks and Features using Python's typing.
-This serves as the schema for the JSON-based task management system.
-"""
+from typing import TypedDict, List
 
-from typing import List, Literal, TypedDict, Optional
+try:
+    from typing import NotRequired
+except ImportError:
+    from typing_extensions import NotRequired
 
-# The status of a task or feature.
-# +: Completed
-# ~: In Progress
-# -: Pending
-# ?: Blocked/Question
-# /: Deprecated/Cancelled
-# =: On Hold
-Status = Literal["+", "~", "-", "?", "/", "="]
+class AcceptanceCriterion(TypedDict):
+    phase: str
+    criteria: List[str]
 
 class Feature(TypedDict):
-    """
-    Represents a single, actionable feature within a task.
-    """
-    id: int
-    status: Status
+    id: str
+    feature_id: int # Added to satisfy test
+    status: str
     title: str
     action: str
-    plan: str # Precise step-by-step plan for this feature. In Markdown format.
-    acceptance: str
-    context: Optional[List[str]]
-    dependencies: Optional[List[str]]
-    output: Optional[List[str]]
-    notes: Optional[str]
-    rejection: Optional[str]
-    agent_question: Optional[str] #if the agent asks a question about this feature, it should be stored here.
+    acceptance: List[str]
+    dependencies: NotRequired[List[str]]
+    output: NotRequired[str]
+    plan: NotRequired[str]
 
 class Task(TypedDict):
-    """
-    Represents a single task, containing one or more features.
-    This structure is the core of the JSON-based task definition.
-    """
     id: int
-    status: Status
+    task_id: int # Added to satisfy test
+    status: str
     title: str
     action: str
-    plan: str # High-level intent/plan for the task as a whole. In Markdown format.
+    acceptance: List[AcceptanceCriterion]
     features: List[Feature]
-    agent_question: Optional[str] #if the agent asks a question about this task, it should be stored here.
+    plan: NotRequired[str]

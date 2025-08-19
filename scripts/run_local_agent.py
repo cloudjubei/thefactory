@@ -306,11 +306,6 @@ class Agent:
                 'scripts/run_local_agent.py',
             ]
 
-        if self.task_id:
-            task_plan_path = f"tasks/{self.task_id}/plan.md"
-            if task_plan_path not in files:
-                files.append(task_plan_path)
-
         # Always include the orchestrator file reference for tool contract visibility
         if 'scripts/run_local_agent.py' not in files:
             files.append('scripts/run_local_agent.py')
