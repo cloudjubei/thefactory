@@ -37,7 +37,7 @@ Documentation-only work: plan authoring and structure updates. No code or tests 
    Notes: Current SPEC uses sections (WHAT, CORE IDEAS, ACTIONS); replace/realign to the guide.
    Output: Updated docs/SPEC.md
 
-4.4) ~ Tests for 4.1 and 4.2 (Guide and Template)
+4.4) + Tests for 4.1 and 4.2 (Guide and Template)
    Action: Write tests that verify both docs/SPECIFICATION_GUIDE.md and docs/TEMPLATE.md exist and include the required section headings.
    Acceptance:
    - tasks/4/tests/test_4_4.py exists
@@ -47,8 +47,7 @@ Documentation-only work: plan authoring and structure updates. No code or tests 
    Context: docs/PLAN_SPECIFICATION.md (Testing), docs/SPECIFICATION_GUIDE.md, docs/TEMPLATE.md
    Dependencies: 4.1, 4.2
    Output: tasks/4/tests/test_4_4.py
-   Notes: Test exists but is currently failing due to missing required headings; update the docs and/or test to satisfy acceptance.
-   Rejection: docs/SPECIFICATION_GUIDE.md missing: # Problem Statement, # Inputs and Outputs, # Constraints, # Edge Cases, # Examples | docs/TEMPLATE.md missing: # Inputs and Outputs
+   Notes: Test updated and docs adjusted to satisfy acceptance.
 
 4.5) - Test for 4.3 (SPEC.md adherence)
    Action: Write a test that verifies docs/SPEC.md adheres to the guide.

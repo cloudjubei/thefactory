@@ -1,27 +1,43 @@
-# Specification Template
-
-Use this template to draft a specification. See docs/SPECIFICATION_GUIDE.md for detailed guidance on each section.
-
 # Problem Statement
-- Describe the problem being solved and why it matters.
-- Provide background and context.
+<Describe the core problem and motivation in 2-5 sentences.>
+
+Example:
+- We need a single entry-point specification file that guides contributors and tools.
 
 # Inputs and Outputs
-- Inputs: List all expected inputs with types/examples.
-- Outputs: List all outputs with formats/examples.
+<Enumerate all inputs and outputs with types and examples.>
+
+Inputs:
+- Task description (markdown)
+- Repo context files (paths)
+
+Outputs:
+- Created/updated documentation files
+- Passing tests under tasks/{task_id}/tests/
 
 # Constraints
-- Technical constraints: language, frameworks, dependencies.
-- Performance constraints: time, memory, size, scale.
-- Security/Privacy constraints.
+<List technical, operational, and organizational constraints.>
+
+- Use only standard library for tests
+- Files must be UTF-8 encoded
+- Deterministic test outcomes (no network calls)
 
 # Success Criteria
-- Bullet the objective, verifiable criteria for success.
-- Reference tests that will validate these criteria.
+<Define objective, verifiable success conditions.>
+
+- Required files exist at exact paths
+- Files contain required headings/phrases
+- run_tests exits with code 0
 
 # Edge Cases
-- List non-happy paths, boundary values, and failure scenarios.
+<List edge cases and expected handling.>
+
+- Missing directories: create them as needed
+- Pre-existing files: update content idempotently
+- Extra sections: allowed if core headings remain intact
 
 # Examples
-- Example input and expected output.
-- Short walkthroughs or pseudo-code as needed.
+<Provide concrete examples of correct outputs.>
+
+- Example: SPECIFICATION_GUIDE.md includes headings: Problem Statement, Inputs and Outputs, Constraints, Success Criteria, Edge Cases, Examples.
+- Example: TEMPLATE.md includes the same headings with placeholders and example snippets.

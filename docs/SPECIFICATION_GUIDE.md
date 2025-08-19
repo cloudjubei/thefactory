@@ -1,40 +1,55 @@
-# Specification Guide
-
-This guide defines the structure and content that all specifications in this repository must follow. Use this document together with docs/TEMPLATE.md to ensure consistent, testable specs.
-
 # Problem Statement
-Describe the core problem or need. Provide enough context for a reader to understand why this specification exists.
-- What user or system problem is being solved?
-- What is the scope of the problem?
-- What is out of scope?
+Describe the core problem the specification addresses. State the goal in simple, precise terms and define the stakeholders.
+
+Key elements:
+- What is being built and why
+- Who benefits and how
+- Scope and non-goals
 
 # Inputs and Outputs
-Enumerate the inputs the system or feature receives, and the outputs it produces.
-- Inputs: data sources, files, API payloads, CLI args, environment variables
-- Outputs: files created, console output, API responses, side effects
+List all inputs the system consumes and the outputs it produces. Be explicit and unambiguous.
+
+Include for each input/output:
+- Name
+- Type/format
+- Source/Destination
+- Validation rules
+- Example value(s)
 
 # Constraints
-List all constraints that affect the solution.
-- Technical (language, frameworks, tooling)
-- Performance (time, memory, size)
-- Security and privacy
-- Compliance or organizational policies
+List limitations and rules that shape the solution.
+
+Consider:
+- Technical constraints (APIs, libraries, environment)
+- Performance and scalability targets
+- Security, privacy, and compliance
+- Operational constraints (deployment, runtime)
+- Compatibility and interoperability
 
 # Success Criteria
-Define objective, verifiable criteria that indicate completion.
-- Explicit acceptance checks
-- Measurable conditions
-- Links to tests where applicable
+Define how success is measured. These become acceptance tests and KPIs.
+
+Examples:
+- Files created/updated with specific sections
+- Scripts executable with zero exit code
+- Deterministic outputs based on inputs
+- Quantitative SLAs (latency, throughput, uptime)
 
 # Edge Cases
-Identify unusual or boundary scenarios that must be considered.
-- Empty inputs
-- Malformed inputs
-- Resource limits
-- Failure modes and recovery
+Identify unusual but possible scenarios and how the system should behave.
+
+Consider:
+- Empty, null, or malformed inputs
+- Boundary values and large sizes
+- Timeouts, retries, and partial failures
+- Conflicts and race conditions
 
 # Examples
-Provide concrete examples to clarify expectations and reduce ambiguity.
-- Sample inputs/outputs
-- Mini-walkthroughs of typical flows
-- Pseudocode or short snippets when useful
+Provide concrete, end-to-end examples illustrating expected behavior.
+
+Example structure:
+- Context: Short narrative of the scenario
+- Input(s): Sample input payload(s)
+- Steps: What the system does
+- Output(s): Expected outputs with sample content
+- Notes: Any caveats or clarifications
