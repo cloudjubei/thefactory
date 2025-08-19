@@ -33,7 +33,7 @@ This plan outlines the features required to transition from the current Markdown
      - The guide includes a migration plan, backward compatibility strategy, tooling requirements, and a rollback plan.
    Output: `docs/tasks/TASKS_MIGRATION_GUIDE.md`
 
-13.4) - Update Task Authoring Guidance
+13.4) + Update Task Authoring Guidance
    Action: Move `docs/TASK_FORMAT.md` to `docs/tasks/TASKS_GUIDANCE.md` and update its content to align with the new JSON format, removing schema definitions now covered by `task_format.py` and focusing on authoring best practices.
    Acceptance:
      - `docs/TASK_FORMAT.md` is removed.
