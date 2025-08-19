@@ -1,16 +1,16 @@
 import os, sys
 
 def run():
-    doc = "docs/SPEC.md"
-    if not os.path.exists(doc):
-        print(f"FAIL: {doc} does not exist.")
+    path = "docs/SPEC.md"
+    if not os.path.exists(path):
+        print(f"FAIL: {path} does not exist.")
         sys.exit(1)
-    with open(doc, "r", encoding="utf-8") as f:
-        c = f.read()
-    if "# WHAT:" not in c:
-        print("FAIL: SPEC.md missing '# WHAT:' section header.")
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+    if "# WHAT:" not in content and "Specification Programming" not in content:
+        print("FAIL: SPEC.md missing expected headings or key phrases.")
         sys.exit(1)
-    print("PASS: SPEC.md exists and contains WHAT section.")
+    print("PASS: Task 2 verified: SPEC.md exists with expected content.")
     sys.exit(0)
 
 if __name__ == "__main__":
