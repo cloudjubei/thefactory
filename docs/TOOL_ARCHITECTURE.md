@@ -77,6 +77,24 @@ The orchestrator will make the following Python functions available as tools to 
 ### `finish`
 -  Description: A special tool to indicate that the agent's work is complete for this cycle. Use it after creating a pull request or when no eligible tasks are found. In continuous mode, the orchestrator will start a new cycle after this tool is called.
 
+### `read_plan_feature`
+- Description: Retrieve details for a specific feature within a task plan, ensuring focused single-feature execution.
+- Arguments:
+  - `task_id` (integer): The task ID.
+  - `feature_number` (integer): The feature number within the task (e.g., for feature 10.3, use 3).
+- Returns: JSON string with keys: `ok` (bool), `feature` (object with status, action, acceptance, context, dependencies, output, notes), `error` (string if ok=false).
+- Purpose: Enables atomic feature-focused execution by providing complete context for one feature only.
+
+### `update_feature_status`
+- Description: Update the status of a specific feature in its plan file, ensuring accurate progress tracking.
+- Arguments:
+  - `task_id` (integer): The task ID.
+  - `feature_number` (integer): The feature number within the task.
+  - `new_status` (string): One of `+`, `~`, `-`, `?`, `/`, `=`.
+  - `reason` (string, optional): Explanation for the status change.
+- Returns: JSON string with keys: `ok` (bool), `message` (string), `previous_status` (string).
+- Purpose: Provides atomic status updates without requiring full plan file rewrites.
+
 ## 5. Execution Modes
 -  Single Mode: The orchestrator will execute one plan (one set of tool calls from the LLM) and then exit.
 -  Continuous Mode: The orchestrator will execute a plan. If the plan ends with `finish`, it will re-clone the repository to get the latest state and start a new cycle by asking the agent for the next plan. The loop terminates only if the agent calls `ask_question` or if the `finish` tool is called because no tasks were found.

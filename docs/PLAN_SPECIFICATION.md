@@ -50,6 +50,15 @@ MCC Checklist (adapt as needed per feature):
 
 Rationale: Ensures decisions are made with the most relevant information at hand, reduces rework, and aligns with the Specification-Driven approach.
 
+### 2.8. Atomic Feature Execution
+The agent MUST work on exactly ONE feature per execution cycle. This principle ensures:
+- Complete context gathering for each feature
+- Proper status tracking
+- Reliable test creation and validation
+- Predictable progress tracking
+
+**Rule: One Cycle = One Feature = Complete Success**
+
 ## 3. Location and Structure
 - Each task MUST have a dedicated plan file located at `tasks/{task_id}/plan_{task_id}.md`.
 - The plan enumerates the FEATURES that make up the task. Each feature follows `docs/FEATURE_FORMAT.md`.
@@ -165,13 +174,22 @@ if __name__ == "__main__":
 
 ## 7. Feature Completion Protocol (finish_feature)
 
-### 7.1 Intent
-Ensure every feature completion results in an isolated, reviewable commit and that the feature's tests pass before the work is committed.
+### 7.1 Single Feature Cycle
+Each execution cycle completes exactly one feature:
+1. **Feature Selection**: Identify next Pending (`-`) feature from plan
+2. **Status Update**: Change feature status from `-` to `~` (In Progress)
+3. **Context Gathering**: Retrieve all required context using `retrieve_context_files`
+4. **Implementation**: Complete the feature following its Action and Acceptance criteria
+5. **Testing**: Create and validate tests for the feature
+6. **Completion**: Update feature status to `+`, call `finish_feature`, then `finish`
 
-### 7.2 Behavior
-- The agent calls `finish_feature(task_id, feature_id, title, message?)` after implementing a feature and creating passing tests.
-- The orchestrator commits all current changes and pushes the branch. One commit per feature is required.
-- Suggested commit message format: `Feature {task_id}.{n}: {Title}`. Include a short description if helpful.
+### 7.2 Context Requirements Checklist
+Before any feature implementation, verify:
+- [ ] Current plan file read and understood
+- [ ] Feature's Context files all retrieved
+- [ ] Existing files to be modified inspected (not assumed)
+- [ ] Related test files examined
+- [ ] Dependencies satisfied
 
 ### 7.3 Finalization of the Task
 - After all features send `finish_feature` and all tests pass, the agent:

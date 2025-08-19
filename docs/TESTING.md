@@ -74,8 +74,21 @@ if __name__ == "__main__":
 ## 4. The Testing Workflow
 The requirement to create and pass tests is integrated into the planning and execution process. See `docs/PLAN_SPECIFICATION.md` for how this is formally included in the agent's workflow.
 
-In short:
-1. A feature's `Acceptance` criteria are defined.
-2. The implementation is planned (e.g., `write_file` calls).
-3. A subsequent feature is defined to write a test that verifies the `Acceptance` criteria of the previous feature.
-4. The plan must show that the test passes. In the future, a tool will exist to run these tests. For now, the creation of the test file is sufficient.
+### 4.1 Within Feature Execution
+Testing is integrated into each feature cycle:
+1. **Implementation**: Complete the feature's primary work
+2. **Test Creation**: Write test file at `tasks/{task_id}/tests/test_{task_id}_{feature_number}.py`
+3. **Test Validation**: Run `run_tests` tool to verify test passes
+4. **Feature Completion**: Only mark feature complete (`+`) when test passes
+
+### 4.2 Test File Naming Convention
+- Format: `test_{task_id}_{feature_number}.py`
+- Example: Feature 15.3 → `tasks/15/tests/test_15_3.py`
+- Location: Always in `tasks/{task_id}/tests/` directory
+
+### 4.3 Test Failure Protocol
+If tests fail:
+1. **Do NOT mark feature complete**
+2. Fix the implementation or test as needed
+3. Re-run `run_tests` until passing
+4. Only then update feature status to `+`
