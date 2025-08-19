@@ -19,6 +19,17 @@ Establish core principles and define the agent's tool-based architecture and ter
    Context: `docs/PLAN_SPECIFICATION.md`, `docs/TOOL_ARCHITECTURE.md`
    Dependencies: 6.1
 
+6.3) + Document agent personas
+   Action: Author `docs/AGENT_PERSONAS.md` describing Manager, Planner, Tester, Developer personas, including objectives, constraints, prompts, minimal context, and instructions to run each via `scripts/run_local_agent.py`.
+   Acceptance: `docs/AGENT_PERSONAS.md` exists with clear definitions and run examples; references `docs/TOOL_ARCHITECTURE.md` and `docs/AGENT_PRINCIPLES.md`.
+   Context: `docs/PLAN_SPECIFICATION.md`, `docs/TOOL_ARCHITECTURE.md`, `scripts/run_local_agent.py`
+   Output: `docs/AGENT_PERSONAS.md`
+
+6.4) + Deprecate tasks 7 and 10 (merged into Task 6)
+   Action: Update `tasks/TASKS.md` to mark tasks 7 (Agent Orchestrator) and 10 (Agent personas) as `=` Deprecated with notes referencing Task 6.
+   Acceptance: `tasks/TASKS.md` shows tasks 7 and 10 as deprecated and pointing to Task 6 and relevant docs.
+   Output: `tasks/TASKS.md`
+
 ## Execution Steps
 1) Implement features
 2) Update `tasks/TASKS.md` with status change
