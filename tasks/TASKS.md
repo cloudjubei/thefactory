@@ -46,7 +46,7 @@ See **[TASK_FORMAT.md](../docs/TASK_FORMAT.md)** for format reference and how to
    Acceptance: Only a single task exists relating to the Agent. This task gets removed upon completion.
 
 11) - The plans for all tasks must be updated
-   Action: Update the plans for all plans to reflect the status of each feature.
+   Action: Update the plans for all plans to reflect the status of each feature. Clearly there's something missing in the spec, most probably in `docs/PLAN_SPECIFICATION.md`, because the agent isn't updating the plan for the task it works on to update the status of the feature and task (while features are being worked on this should be set to pending).
    Acceptance: All tasks until this one have all plans updated with correct status, acceptance criteria and any other spec.
 
 12) - New child projects structure
