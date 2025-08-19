@@ -7,10 +7,12 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    if "class Agent" not in content and "class AgentTools" not in content:
-        print("FAIL: run_local_agent.py missing Agent or AgentTools class definitions.")
+    required_snippets = ["class Agent", "def run(self)", "class AgentTools", "UnifiedEngine"]
+    missing = [s for s in required_snippets if s not in content]
+    if missing:
+        print("FAIL: run_local_agent.py missing indicators of an interactive orchestrator: " + ", ".join(missing))
         sys.exit(1)
-    print("PASS: Task 7 verified: run_local_agent.py exists and contains agent-related classes.")
+    print("PASS: Task 7 acceptance verified: Orchestrator script exists and exposes agent interaction constructs.")
     sys.exit(0)
 
 if __name__ == "__main__":

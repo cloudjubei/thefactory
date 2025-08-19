@@ -7,10 +7,10 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    if "# Agent Testing Specification" not in content and "Testing is a critical part" not in content:
-        print("FAIL: TESTING.md missing expected heading or intro.")
+    if "Agent Testing Specification" not in content:
+        print("FAIL: TESTING.md missing expected title.")
         sys.exit(1)
-    print("PASS: Task 8 verified: TESTING.md exists with expected content.")
+    print("PASS: Task 8 acceptance verified: TESTING.md exists.")
     sys.exit(0)
 
 if __name__ == "__main__":

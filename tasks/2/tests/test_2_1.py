@@ -7,10 +7,10 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    if "# WHAT:" not in content and "Specification Programming" not in content:
-        print("FAIL: SPEC.md missing expected headings or key phrases.")
+    if "# WHAT:" not in content:
+        print("FAIL: SPEC.md missing '# WHAT:' section header.")
         sys.exit(1)
-    print("PASS: Task 2 verified: SPEC.md exists with expected content.")
+    print("PASS: Task 2 acceptance verified: SPEC.md exists with content.")
     sys.exit(0)
 
 if __name__ == "__main__":

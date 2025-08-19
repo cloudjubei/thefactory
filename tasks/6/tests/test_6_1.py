@@ -7,10 +7,10 @@ def run():
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
-    if "The Agent" not in content or "The Orchestrator" not in content:
-        print("FAIL: AGENT_PRINCIPLES.md missing key terminology.")
+    if "Autonomous Agent Principles" not in content or "The Agent" not in content or "The Orchestrator" not in content:
+        print("FAIL: AGENT_PRINCIPLES.md missing key terms or title.")
         sys.exit(1)
-    print("PASS: Task 6 verified: AGENT_PRINCIPLES.md defines Agent and Orchestrator.")
+    print("PASS: Task 6 acceptance verified: AGENT_PRINCIPLES.md exists with key terms.")
     sys.exit(0)
 
 if __name__ == "__main__":

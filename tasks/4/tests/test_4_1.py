@@ -6,10 +6,11 @@ def run():
         print(f"FAIL: {path} does not exist.")
         sys.exit(1)
     with open(path, "r", encoding="utf-8") as f:
-        if "# Specification Guide" not in f.read():
-            print("FAIL: SPECIFICATION_GUIDE.md missing '# Specification Guide' heading.")
-            sys.exit(1)
-    print("PASS: Task 4 verified: SPECIFICATION_GUIDE.md exists with expected heading.")
+        content = f.read()
+    if "# Specification Guide" not in content:
+        print("FAIL: SPECIFICATION_GUIDE.md missing expected header.")
+        sys.exit(1)
+    print("PASS: Task 4 acceptance verified: SPECIFICATION_GUIDE.md exists.")
     sys.exit(0)
 
 if __name__ == "__main__":
