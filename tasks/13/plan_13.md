@@ -26,7 +26,7 @@ This plan outlines the features required to transition from the current Markdown
    Dependencies: 13.1
    Output: `docs/tasks/task_example.json`
 
-13.3) - Write Migration Guide
+13.3) + Write Migration Guide
    Action: Create `docs/tasks/TASKS_MIGRATION_GUIDE.md` detailing the step-by-step plan to migrate from the old format to the new one.
    Acceptance:
      - `docs/tasks/TASKS_MIGRATION_GUIDE.md` exists.
