@@ -1,6 +1,6 @@
 {
   "id": 1,
-  "status": "~",
+  "status": "+",
   "title": "Task Management System Definition",
   "action": "Define and maintain the core components of the agent's task management system. This task serves as the canonical source of truth for task structure, guidance, and tooling.",
   "plan": "This meta-task consolidates the definitions and references for the entire task-driven workflow. Its features point to the key artifacts that govern how tasks are defined, authored, and processed.",
@@ -92,7 +92,7 @@
     },
     {
       "id": "1.7",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification",
       "action": "Document purpose, principles, structure, template, and example for plans",
       "plan": "1. Create `docs/PLAN_SPECIFICATION.md`. 2. Add sections for Purpose, Principles, Structure, Template, and Example. 3. Ensure all acceptance criteria are covered, including referencing other key documents and explaining the task/feature lifecycle.",
