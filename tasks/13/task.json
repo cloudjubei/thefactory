@@ -202,15 +202,32 @@
       ]
     },
     {
-      "id": "13.13",
+      "id": "13.15",
       "status": "-",
-      "title": "Final Cleanup",
+      "title": "Cleanup",
       "action": "This task definition file (`tasks/13/task.json`) will be removed as the final step of its own completion, closing the loop on the migration.",
       "acceptance": [
-        "`tasks/13/task.json` is removed."
+        "all tasks that are complete have their status set to `+`",
+        "all tasks folders only have the tests folder and a `task.json` file",
+        "any other feature in this task that was about cleanup or deprecation is removed",
+        "any other feature that no longer applied should be refined or removed",
+        "Task 1 was all about tasks - it needs be updated to reflect the new JSON-based format - essentially being migrated with this task. After which this whole task is removed."
       ],
       "dependencies": [
-        "13.12"
+        "13.14"
+      ]
+    },
+    {
+      "id": "13.16",
+      "status": "-",
+      "title": "Final Migration and Cleanup",
+      "action": "Task 1 requires updating",
+      "acceptance": [
+        "Task 1 was all about tasks - it needs be updated to reflect the new JSON-based format - essentially being migrated with this task.",
+        "This whole task is removed - everything important that was here should now live in Task 1."
+      ],
+      "dependencies": [
+        "13.15"
       ]
     }
   ]
