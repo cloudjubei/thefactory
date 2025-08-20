@@ -27,10 +27,11 @@ def run():
     except Exception as e:
         print(f"FAIL: Could not import Task schema from docs/tasks/task_format.py. Error: {e}")
         sys.exit(1)
-
-    required_task_fields = set(Task.__annotations__.keys()) - set(getattr(task_format, 'NotRequired', {}).__args__)
+    
+    # Task has no optional fields, so we check all its annotations.
+    required_task_fields = set(Task.__annotations__.keys())
     if not required_task_fields.issubset(data.keys()):
-        missing = required_task_fields - data.keys()
+        missing = required_task_fields - set(data.keys())
         print(f"FAIL: {file_path} is missing required Task fields: {missing}")
         sys.exit(1)
 
