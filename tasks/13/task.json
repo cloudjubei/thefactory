@@ -32,7 +32,7 @@
     },
     {
       "id": "13.3",
-      "status": "-",
+      "status": "+",
       "title": "Update Task Authoring Guidance",
       "action": "Move `docs/TASK_FORMAT.md` to `docs/tasks/TASKS_GUIDANCE.md` and update its content to align with the new JSON format, removing schema definitions now covered by `task_format.py` and focusing on authoring best practices.",
       "acceptance": [
@@ -59,7 +59,7 @@
         "It contains the function `create_task(task_data: Task) -> Task` creating a new task file in the system",
         "It contains the function `update_task_status(task_id: int, status: Status) -> Task` updating a task status",
         "It contains the function `update_feature_status(task_id: int, feature_id: int, status: Status) -> Feature` updating a feature status",
-        "It contains the function `ask_agent_question(task_id: int, feature_id: int?, question: str) -> Task` editing the task's/feature's `agent_question` field. This function should replace completely `tools/ask_question.py`",
+        "It contains the function `ask_agent_question(task_id: int, feature_id: int?, question: str) -> Task` editing the task's/feature's `agent_question` field. This function should replace completely `tools/ask_question.py`"
       ],
       "dependencies": [
         "13.1",
