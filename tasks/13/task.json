@@ -32,7 +32,7 @@
     },
     {
       "id": "13.3",
-      "status": "-",
+      "status": "+",
       "title": "Create Task Utility Tooling",
       "action": "Create a new tool module `scripts/tools/task_utils.py` with functions to reliably read, create, and update tasks in the new JSON format. This will abstract file I/O for task manipulation.",
       "acceptance": [
