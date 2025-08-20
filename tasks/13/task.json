@@ -4,6 +4,30 @@
   "title": "JSON-based tasks format",
   "action": "Define and implement a new JSON-based format for tasks to replace `tasks/TASKS.md`. This involves defining the schema, creating necessary tooling for interaction, migrating existing tasks, and finally deprecating the old format.",
   "plan": "1. Define the new task schema as Python TypedDicts in `docs/tasks/task_format.py`.\n2. Create an example JSON file (`docs/tasks/task_example.json`) to demonstrate the new format.\n3. Develop utility functions in `scripts/tools/task_utils.py` for programmatic interaction with task files.\n4. Update the task authoring guidance in `docs/tasks/TASKS_GUIDANCE.md` to reflect the new JSON-based workflow.\n5. Integrate the new task utilities into the main orchestrator (`run_local_agent.py`).\n6. Populate the `plan` field for this task and all its features to be LLM-friendly.\n7. Perform cleanup of task files and statuses.\n8. Consolidate task-related definitions into Task 1.",
+  "acceptance": [
+    {
+      "phase": "Phase 1: Schema and Guidance",
+      "criteria": [
+        "The task schema is defined in `docs/tasks/task_format.py`.",
+        "An example task file exists at `docs/tasks/task_example.json`.",
+        "Task authoring guidance is updated in `docs/tasks/TASKS_GUIDANCE.md`."
+      ]
+    },
+    {
+      "phase": "Phase 2: Tooling and Integration",
+      "criteria": [
+        "Utility functions for task manipulation are created in `scripts/tools/task_utils.py`.",
+        "The orchestrator in `run_local_agent.py` is updated to use the new task utilities."
+      ]
+    },
+    {
+      "phase": "Phase 3: Cleanup and Finalization",
+      "criteria": [
+        "Task files and statuses are cleaned up and consistent with the new format.",
+        "Task-related definitions are consolidated into a single source of truth (Task 1)."
+      ]
+    }
+  ],
   "features": [
     {
       "id": "13.1",
@@ -105,7 +129,7 @@
     },
     {
       "id": "13.7",
-      "status": "-",
+      "status": "+",
       "title": "Migrate to task 1",
       "action": "Task 1 is the task that defines all information surrounding tasks, thus it is the one that should have all the features and definitions that are currently described here",
       "acceptance": [

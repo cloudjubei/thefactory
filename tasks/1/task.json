@@ -1,10 +1,73 @@
 {
   "id": 1,
   "status": "+",
-  "title": "Task format",
-  "action": "Create documentation detailing the tasks' format.",
+  "title": "Task Management System Definition",
+  "action": "Define and maintain the core components of the agent's task management system. This task serves as the canonical source of truth for task structure, guidance, and tooling.",
+  "plan": "This meta-task consolidates the definitions and references for the entire task-driven workflow. Its features point to the key artifacts that govern how tasks are defined, authored, and processed.",
   "acceptance": [
-    "This document adheres to the format created and references it at the top."
+    {
+      "phase": "System Definition",
+      "criteria": [
+        "The task schema is formally defined and maintained in a Python file.",
+        "Clear authoring guidance is provided for developers and managers.",
+        "A valid example task file is available as a reference.",
+        "Utility tools for task manipulation are implemented and documented."
+      ]
+    }
   ],
-  "features": []
+  "features": [
+    {
+      "id": "1.1",
+      "status": "+",
+      "title": "Canonical Task Schema",
+      "action": "Define and maintain the canonical schema for tasks in `docs/tasks/task_format.py` using Python's TypedDict.",
+      "plan": "1. The `docs/tasks/task_format.py` file serves as the single source of truth for the data structures of `Task` and `Feature` objects. 2. Any changes to the task format must be reflected here first.",
+      "context": ["docs/tasks/task_format.py"],
+      "acceptance": [
+        "`docs/tasks/task_format.py` exists.",
+        "The file defines Python TypedDicts for `Task` and `Feature`.",
+        "The schema covers all required and optional fields for tasks and features."
+      ]
+    },
+    {
+      "id": "1.2",
+      "status": "+",
+      "title": "Task Authoring Guidance",
+      "action": "Provide clear guidance for authoring and maintaining tasks in `docs/tasks/TASKS_GUIDANCE.md`.",
+      "plan": "1. The guidance document should focus on best practices for writing tasks, features, plans, and acceptance criteria. 2. It must reference the canonical schema, example file, and utility tools rather than duplicating their content.",
+      "context": ["docs/tasks/TASKS_GUIDANCE.md"],
+      "acceptance": [
+        "`docs/tasks/TASKS_GUIDANCE.md` exists.",
+        "The document references `docs/tasks/task_format.py` for the schema.",
+        "The document references `docs/tasks/task_example.json` as an example.",
+        "The document references `scripts/tools/task_utils.py` for tooling."
+      ]
+    },
+    {
+      "id": "1.3",
+      "status": "+",
+      "title": "Example Task File",
+      "action": "Maintain a complete and valid example task file at `docs/tasks/task_example.json`.",
+      "plan": "1. This file serves as a practical, copy-pasteable template for new tasks. 2. It must always be kept in sync with the canonical schema defined in `task_format.py`.",
+      "context": ["docs/tasks/task_example.json", "docs/tasks/task_format.py"],
+      "acceptance": [
+        "`docs/tasks/task_example.json` exists.",
+        "The file contains a valid JSON object.",
+        "The JSON object structure conforms to the `Task` schema."
+      ]
+    },
+    {
+      "id": "1.4",
+      "status": "+",
+      "title": "Task Utility Tooling",
+      "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/tools/task_utils.py`.",
+      "plan": "1. The `task_utils.py` module abstracts file I/O and manipulation of task JSON files. 2. It provides reliable functions for reading, creating, and updating tasks and features, which are used by the orchestrator and potentially by the agent.",
+      "context": ["scripts/tools/task_utils.py", "docs/tasks/task_format.py"],
+      "acceptance": [
+        "`scripts/tools/task_utils.py` exists.",
+        "It provides functions such as `get_task`, `update_task`, `create_task`, and status update functions.",
+        "The functions correctly handle JSON serialization and deserialization based on the `task_format.py` schema."
+      ]
+    }
+  ]
 }
