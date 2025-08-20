@@ -22,7 +22,7 @@
     },
     {
       "id": "1.2",
-      "status": "-",
+      "status": "+",
       "title": "Task Authoring Guidance",
       "action": "Provide clear guidance for authoring and maintaining tasks in `docs/tasks/TASKS_GUIDANCE.md`.",
       "plan": "1. The guidance document should focus on best practices for writing tasks, features, plans, and acceptance criteria. 2. It must reference the canonical schema, example file, and utility tools rather than duplicating their content.",
