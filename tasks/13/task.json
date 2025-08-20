@@ -52,7 +52,7 @@
     },
     {
       "id": "13.4",
-      "status": "-",
+      "status": "+",
       "title": "Update Task Authoring Guidance",
       "action": "update `docs/tasks/TASKS_GUIDANCE.md`  to align with the new JSON format, removing schema definitions now covered by `task_format.py` and focusing on authoring best practices.",
       "acceptance": [

@@ -1,6 +1,6 @@
 # Task Authoring Guidance (JSON-based)
 
-This guide describes how to author and maintain tasks using the JSON-based format. The canonical schema lives in `docs/tasks/task_format.py`. Do not duplicate schema details in docs; instead, reference the schema and focus on practical authoring guidance.
+This guide describes how to author and maintain tasks using the JSON-based format. The canonical schema lives in `docs/tasks/task_format.py`. Do not duplicate schema details in docs; instead, reference the schema and focus on practical authoring guidance. For programmatic interaction with tasks, use the utilities in `scripts/tools/task_utils.py`.
 
 ## Where tasks live
 - One JSON file per task: `tasks/{task_id}/task.json`
@@ -30,7 +30,7 @@ Each feature in `features` should have:
 - Optional: `dependencies`, `rejection`, `agent_question`
 
 ## Example
-See `docs/tasks/task_exampl.json` for an example task with features.
+See `docs/tasks/task_example.json` for an example task with features.
 
 ## Writing plans (LLM-friendly)
 - Keep plans concise and structured with ordered steps.
@@ -52,6 +52,7 @@ See `docs/tasks/task_exampl.json` for an example task with features.
 
 ## References
 - Canonical schema: `docs/tasks/task_format.py`
+- Task manipulation utilities: `scripts/tools/task_utils.py`
 - Example: `docs/tasks/task_example.json`
 - Plan spec: `docs/PLAN_SPECIFICATION.md`
 - Testing spec: `docs/TESTING.md`
