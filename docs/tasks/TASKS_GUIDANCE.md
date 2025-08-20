@@ -13,10 +13,7 @@ This guide describes how to author and maintain tasks using the JSON-based forma
 - `title` (str): Short, human-readable title.
 - `action` (str): High-level description of the task’s purpose.
 - `plan` (str, Markdown): LLM-friendly overview of how to execute the task.
-- `acceptance` (list[object]|optional): Optional structured acceptance checklist.
 - `features` (list[object]): Atomized units of work.
-
-See `docs/tasks/task_format.py` for the definitive schema and optional fields.
 
 ## Feature objects
 Each feature in `features` should have:
@@ -24,9 +21,16 @@ Each feature in `features` should have:
 - `status` (same codes as tasks)
 - `title` (str)
 - `action` (str)
-- `acceptance` (list[str]) encoding verifiable criteria
 - `plan` (str, Markdown) with step-by-step, LLM-friendly guidance
-- Optional: `dependencies`, `context`, `output`, `notes`
+- `context` (list[str]) minimal context (files) that are required to execute on this feature
+- `acceptance` (list[str]) encoding verifiable criteria
+- `dependencies` (list[str]) any features that must be completed before this feature can be worked on
+- `rejection` (str) reasons as to why this feature is marked as rejected (e.g., “not feasible”). Can lead to rewriting spec, rewriting plan, rewriting tests and further dev work
+- `agent_question` (str) place where agent puts any pending questions that need answering for the feature to be carried out
+- Optional: `dependencies`, `rejection`, `agent_question`
+
+## Example
+See `docs/tasks/task_exampl.json` for an example task with features.
 
 ## Writing plans (LLM-friendly)
 - Keep plans concise and structured with ordered steps.
@@ -46,11 +50,9 @@ Each feature in `features` should have:
 - After implementing a feature and writing tests, run tests. When they pass, mark the feature `+` and call `finish_feature` (per-feature commit). Submit a PR only after the entire task is complete.
 - The orchestrator may read tasks using helper utilities; ensure your JSON remains valid.
 
-## Deprecations
-- The legacy markdown files `docs/TASK_FORMAT.md` and `docs/FEATURE_FORMAT.md` are removed in favor of this guidance and the canonical schema in `docs/tasks/task_format.py`.
-
 ## References
 - Canonical schema: `docs/tasks/task_format.py`
+- Example: `docs/tasks/task_example.json`
 - Plan spec: `docs/PLAN_SPECIFICATION.md`
 - Testing spec: `docs/TESTING.md`
 - Tool architecture: `docs/TOOL_ARCHITECTURE.md`

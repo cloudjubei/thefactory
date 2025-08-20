@@ -11,27 +11,22 @@ except ImportError:
 
 Status = Literal["+", "~", "-", "?", "/", "="]
 
-class AcceptanceCriterion(TypedDict):
-    phase: str
-    criteria: List[str]
-
 class Feature(TypedDict):
     id: str
-    feature_id: int
     status: Status
     title: str
     action: str
+    plan: str
+    context: List[str]
     acceptance: List[str]
     dependencies: NotRequired[List[str]]
-    output: NotRequired[str]
-    plan: NotRequired[str]
+    rejection: NotRequired[str]
+    agent_question: NotRequired[str]
 
 class Task(TypedDict):
-    id: int
-    task_id: int
+    id: str
     status: Status
     title: str
     action: str
-    acceptance: List[AcceptanceCriterion]
+    plan: str
     features: List[Feature]
-    plan: NotRequired[str]
