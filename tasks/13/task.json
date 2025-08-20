@@ -135,7 +135,7 @@
     },
     {
       "id": "13.8",
-      "status": "-",
+      "status": "+",
       "title": "Embed Plans in JSON and Finalize Orchestrator",
       "action": "Complete the data migration and orchestrator update. This must be done in sequence: 1. Update `scripts/migrate_tasks.py` to embed `plan.md` content into a `plan` field within each task and feature object in `task.json`. 2. Run the script to perform the migration. 3. Validate that plan content is correctly moved and delete the source `plan.md` files. 4. Remove any dual-read/backward-compatibility logic from `run_local_agent.py`, ensuring it reads plans exclusively from `task.json`. 5. Verify the system works by running all tests.",
       "acceptance": [
@@ -151,7 +151,7 @@
     },
     {
       "id": "13.9",
-      "status": "-",
+      "status": "+",
       "title": "Update Docs and Tooling for Plan-in-JSON",
       "action": "Update documentation and scripts to align with the plan-in-JSON format. This includes updating `PLAN_SPECIFICATION.md` and `FILE_ORGANISATION.md`. Also, add a new helper function to `task_utils.py` for updating feature status directly in the `task.json` file, and expose it in the orchestrator.",
       "acceptance": [
@@ -163,33 +163,6 @@
         "13.8"
       ],
       "plan": "This feature has two parts: documentation and tooling. 1. (Planner/Developer) Update `docs/PLAN_SPECIFICATION.md` and `docs/FEATURE_FORMAT.md` to reflect that plans are now embedded in `task.json`. Also update `docs/FILE_ORGANISATION.md` to remove references to `plan.md`. 2. (Developer) Implement a new function `update_feature_status` in `scripts/tools/task_utils.py`. 3. (Developer) Expose this new function as a tool in `run_local_agent.py` so the agent can use it."
-    },
-    {
-      "id": "13.10",
-      "status": "-",
-      "title": "Remove TASKS.md",
-      "action": "Delete the old `tasks/TASKS.md` file from the repository to complete the migration.",
-      "acceptance": [
-        "`tasks/TASKS.md` is deleted."
-      ],
-      "dependencies": [
-        "13.8"
-      ],
-      "plan": "This is a simple cleanup task. The developer will delete the `tasks/TASKS.md` file using the appropriate tool. This should only be done after verifying that all task information has been successfully migrated to the new JSON format and the system operates correctly without the old file."
-    },
-    {
-      "id": "13.11",
-      "status": "-",
-      "title": "Remove Migration Guide",
-      "action": "Remove `docs/tasks/TASKS_MIGRATION_GUIDE.md` and any references to it, as the migration is complete.",
-      "acceptance": [
-        "`docs/tasks/TASKS_MIGRATION_GUIDE.md` is removed."
-      ],
-      "dependencies": [
-        "13.9",
-        "13.10"
-      ],
-      "plan": "Post-migration cleanup. The developer will delete the `docs/tasks/TASKS_MIGRATION_GUIDE.md` file as it is no longer needed once the migration is complete and validated."
     },
     {
       "id": "13.12",
