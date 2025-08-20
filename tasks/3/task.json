@@ -1,12 +1,20 @@
 {
   "id": 3,
-  "status": "+",
+  "status": "-",
   "title": "File organisation specification",
   "action": "Create a scheme for organising files within the repository.",
-  "acceptance": [
-    "`docs/FILE_ORGANISATION.md` exists.",
-    "The specification contains examples of how files should be organised.",
-    "All files are organised according to the specification."
-  ],
-  "features": []
+  "features": [
+    {
+      "id": "3.1",
+      "status": "-",
+      "title": "File Organisation specification",
+      "action": "Write docs/FILE_ORGANISATION.md describing the repository's structure and conventions.",
+      "plan": "",
+      "acceptance": [
+        "`docs/FILE_ORGANISATION.md` exists",
+        "It includes clearly titled sections: `Top-Level Directory Layout`, `File Naming Conventions`, and `Evolution Guidance`",
+        "Each section provides concise explanations and examples where helpful"
+      ]
+    }
+  ]
 }

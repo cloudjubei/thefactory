@@ -19,9 +19,6 @@ class Feature(TypedDict):
     rejection: NotRequired[str]
     agent_question: NotRequired[str]
 
-class AcceptanceCriterion(TypedDict):
-    phase: str
-    criteria: List[str]
 
 class Task(TypedDict):
     id: int
@@ -29,5 +26,4 @@ class Task(TypedDict):
     title: str
     action: str
     plan: str
-    acceptance: List[AcceptanceCriterion]
     features: List[Feature]
