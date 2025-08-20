@@ -165,7 +165,7 @@
       "plan": "This feature has two parts: documentation and tooling. 1. (Planner/Developer) Update `docs/PLAN_SPECIFICATION.md` and `docs/FEATURE_FORMAT.md` to reflect that plans are now embedded in `task.json`. Also update `docs/FILE_ORGANISATION.md` to remove references to `plan.md`. 2. (Developer) Implement a new function `update_feature_status` in `scripts/tools/task_utils.py`. 3. (Developer) Expose this new function as a tool in `run_local_agent.py` so the agent can use it."
     },
     {
-      "id": "13.12",
+      "id": "13.10",
       "status": "-",
       "title": "Cleanup",
       "action": "This task definition file (`tasks/13/task.json`) will be removed as the final step of its own completion, closing the loop on the migration.",
@@ -177,12 +177,12 @@
         "Task 1 was all about tasks - it needs be updated to reflect the new JSON-based format - essentially being migrated with this task. After which this whole task is removed."
       ],
       "dependencies": [
-        "13.11"
+        "13.9"
       ],
       "plan": "Final cleanup of this migration task itself. The developer will review all features in this task, ensure completed ones are marked `+`, remove any now-redundant features, and most importantly, update Task 1 to reflect the new JSON-based task management system. After Task 1 is updated, this Task 13 definition can be removed."
     },
     {
-      "id": "13.13",
+      "id": "13.11",
       "status": "-",
       "title": "Final Migration and Cleanup",
       "action": "Task 1 requires updating",
@@ -190,7 +190,7 @@
         "Task 1 was all about tasks - it needs be updated to reflect the new JSON-based format - essentially being migrated with this task."
       ],
       "dependencies": [
-        "13.12"
+        "13.10"
       ],
       "plan": "This feature is a final check and transfer of ownership. The developer must ensure that Task 1, which defines the project's task management process, is fully updated to reflect the new JSON format. All relevant concepts from Task 13 (like JSON schema, tooling, etc.) should be integrated into Task 1. Once Task 1 is the new source of truth for the task system, this entire Task 13 and its directory can be deleted."
     }
