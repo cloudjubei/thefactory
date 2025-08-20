@@ -70,7 +70,7 @@
     },
     {
       "id": "1.5",
-      "status": "-",
+      "status": "+",
       "title": "File Organisation specification",
       "action": "Create a scheme for organising files within the repository.",
       "plan": "1. Create the file `docs/FILE_ORGANISATION.md`. 2. Add the required sections: `Top-Level Directory Layout`, `File Naming Conventions`, and `Evolution Guidance`. 3. Populate each section with clear, concise guidelines and examples relevant to this project structure.",
