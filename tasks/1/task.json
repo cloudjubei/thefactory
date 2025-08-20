@@ -1,6 +1,6 @@
 {
   "id": 1,
-  "status": "~",
+  "status": "+",
   "title": "Task Management System Definition",
   "action": "Define and maintain the core components of the agent's task management system. This task serves as the canonical source of truth for task structure, guidance, and tooling.",
   "plan": "This meta-task consolidates the definitions and references for the entire task-driven workflow. Its features point to the key artifacts that govern how tasks are defined, authored, and processed.",
@@ -54,7 +54,7 @@
     },
     {
       "id": "1.4",
-      "status": "-",
+      "status": "+",
       "title": "Task Utility Tooling",
       "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/tools/task_utils.py`.",
       "plan": "1. The `task_utils.py` module abstracts file I/O and manipulation of task JSON files. 2. It provides reliable functions for reading, creating, and updating tasks and features, which are used by the orchestrator and potentially by the agent.",
