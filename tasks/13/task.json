@@ -3,6 +3,7 @@
   "status": "-",
   "title": "JSON-based tasks format",
   "action": "Define and implement a new JSON-based format for tasks to replace `tasks/TASKS.md`. This involves defining the schema, creating necessary tooling for interaction, migrating existing tasks, and finally deprecating the old format.",
+  "plan": "This task migrates the project from a Markdown-based task management system (`TASKS.md`, `plan.md`) to a structured, directory-based JSON format (`tasks/{id}/task.json`). This plan adds detailed implementation notes to each remaining feature to guide the Developer persona through the final migration and cleanup steps.",
   "acceptance": [
     {
       "phase": "Phase 1: Specification & Definition",
@@ -145,7 +146,8 @@
       ],
       "dependencies": [
         "13.7"
-      ]
+      ],
+      "plan": "This feature will be executed by the Developer persona. The steps are: 1. Modify `scripts/migrate_tasks.py` to read each `tasks/{id}/plan.md`, parse its content, and insert it into the `plan` field of the corresponding `task.json` and its features. 2. Execute the modified migration script. 3. Delete the now-redundant `plan.md` files. 4. Modify `run_local_agent.py` to remove any logic for reading `plan.md` files, making `task.json` the single source of truth. 5. Run all tests using the `run_tests` tool to ensure the system is still functional."
     },
     {
       "id": "13.9",
@@ -159,7 +161,8 @@
       ],
       "dependencies": [
         "13.8"
-      ]
+      ],
+      "plan": "This feature has two parts: documentation and tooling. 1. (Planner/Developer) Update `docs/PLAN_SPECIFICATION.md` and `docs/FEATURE_FORMAT.md` to reflect that plans are now embedded in `task.json`. Also update `docs/FILE_ORGANISATION.md` to remove references to `plan.md`. 2. (Developer) Implement a new function `update_feature_status` in `scripts/tools/task_utils.py`. 3. (Developer) Expose this new function as a tool in `run_local_agent.py` so the agent can use it."
     },
     {
       "id": "13.10",
@@ -171,7 +174,8 @@
       ],
       "dependencies": [
         "13.8"
-      ]
+      ],
+      "plan": "This is a simple cleanup task. The developer will delete the `tasks/TASKS.md` file using the appropriate tool. This should only be done after verifying that all task information has been successfully migrated to the new JSON format and the system operates correctly without the old file."
     },
     {
       "id": "13.11",
@@ -184,7 +188,8 @@
       "dependencies": [
         "13.9",
         "13.10"
-      ]
+      ],
+      "plan": "Post-migration cleanup. The developer will delete the `docs/tasks/TASKS_MIGRATION_GUIDE.md` file as it is no longer needed once the migration is complete and validated."
     },
     {
       "id": "13.12",
@@ -200,7 +205,8 @@
       ],
       "dependencies": [
         "13.11"
-      ]
+      ],
+      "plan": "Final cleanup of this migration task itself. The developer will review all features in this task, ensure completed ones are marked `+`, remove any now-redundant features, and most importantly, update Task 1 to reflect the new JSON-based task management system. After Task 1 is updated, this Task 13 definition can be removed."
     },
     {
       "id": "13.13",
@@ -213,7 +219,8 @@
       ],
       "dependencies": [
         "13.12"
-      ]
+      ],
+      "plan": "This feature is a final check and transfer of ownership. The developer must ensure that Task 1, which defines the project's task management process, is fully updated to reflect the new JSON format. All relevant concepts from Task 13 (like JSON schema, tooling, etc.) should be integrated into Task 1. Once Task 1 is the new source of truth for the task system, this entire Task 13 and its directory can be deleted."
     }
   ]
 }
