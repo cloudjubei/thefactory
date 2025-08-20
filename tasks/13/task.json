@@ -48,16 +48,18 @@
     },
     {
       "id": "13.4",
-      "status": "+",
+      "status": "-",
       "title": "Create Task Utility Tooling",
       "action": "Create a new tool module `scripts/tools/task_utils.py` with functions to reliably read, create, and update tasks in the new JSON format. This will abstract file I/O for task manipulation.",
       "acceptance": [
         "`scripts/tools/task_utils.py` exists.",
         "it uses docs/tasks/task_format.py directly to reference the interfaces",
-        "It contains functions like `get_task(task_id)`, `update_task(task_id, task_data)`, `create_task(...), update_task_status(tasK_id, feature_id?, status)",
-        "It contains the function ask_agent_question() which should replace completely `tools/ask_question.py` - this edits the tasks/features `agent_question` field",
-        "The script has all functions that enable an agent to interact with tasks and features in a controlled way - i.e. no direct text editing outside these functions.",
-        "Functions are well-documented and include error handling."
+        "It contains the function `get_task(task_id: int) -> Task` returning a given task",
+        "It contains the function `update_task(task_id: int, task_data: Task) -> Task` updating a given task",
+        "It contains the function `create_task(task_data: Task) -> Task` creating a new task file in the system",
+        "It contains the function `update_task_status(task_id: int, status: Status) -> Task` updating a task status",
+        "It contains the function `update_feature_status(task_id: int, feature_id: int, status: Status) -> Feature` updating a feature status",
+        "It contains the function `ask_agent_question(task_id: int, feature_id: int?, question: str) -> Task` editing the task's/feature's `agent_question` field. This function should replace completely `tools/ask_question.py`",
       ],
       "dependencies": [
         "13.1",
