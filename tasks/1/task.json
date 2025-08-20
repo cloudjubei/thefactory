@@ -7,7 +7,7 @@
   "features": [
     {
       "id": "1.1",
-      "status": "+",
+      "status": "-",
       "title": "Canonical Task Schema",
       "action": "Define and maintain the canonical schema for tasks in `docs/tasks/task_format.py` using Python's TypedDict.",
       "plan": "1. The `docs/tasks/task_format.py` file serves as the single source of truth for the data structures of `Task` and `Feature` objects. 2. Any changes to the task format must be reflected here first.",
@@ -22,7 +22,7 @@
     },
     {
       "id": "1.2",
-      "status": "+",
+      "status": "-",
       "title": "Task Authoring Guidance",
       "action": "Provide clear guidance for authoring and maintaining tasks in `docs/tasks/TASKS_GUIDANCE.md`.",
       "plan": "1. The guidance document should focus on best practices for writing tasks, features, plans, and acceptance criteria. 2. It must reference the canonical schema, example file, and utility tools rather than duplicating their content.",
@@ -38,7 +38,7 @@
     },
     {
       "id": "1.3",
-      "status": "+",
+      "status": "-",
       "title": "Example Task File",
       "action": "Maintain a complete and valid example task file at `docs/tasks/task_example.json`.",
       "plan": "1. This file serves as a practical, copy-pasteable template for new tasks. 2. It must always be kept in sync with the canonical schema defined in `task_format.py`.",
