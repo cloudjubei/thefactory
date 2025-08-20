@@ -1,242 +1,190 @@
-from __future__ import annotations
-import json
 import os
-from typing import Any, Optional, Tuple, List, cast
+import json
+import errno
+import importlib.util
+from typing import Any, Dict, Optional
 
-# Use the canonical schema types
+# Load canonical types from docs/tasks/task_format.py even if 'docs' is not a package
+
+def _load_task_format_module():
+    """Dynamically load docs/tasks/task_format.py as a module and return it.
+    This allows us to reference the canonical Task/Feature/Status types directly
+    even if 'docs' isn't a Python package.
+    """
+    here = os.path.abspath(os.path.dirname(__file__))
+    repo_root = os.path.abspath(os.path.join(here, "..", ".."))
+    tf_path = os.path.join(repo_root, "docs", "tasks", "task_format.py")
+    spec = importlib.util.spec_from_file_location("task_format", tf_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load task_format module from {tf_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)  # type: ignore[attr-defined]
+    return module
+
 try:
-    from docs.tasks.task_format import Task, Feature
+    # Try normal import first in case docs is a package in this environment
+    from docs.tasks.task_format import Task as _Task, Feature as _Feature, Status as _Status  # type: ignore
 except Exception:
-    # Fallback to loose typing if schema import fails at runtime
-    Task = dict  # type: ignore
-    Feature = dict  # type: ignore
+    # Fallback to dynamic import
+    _tf = _load_task_format_module()
+    _Task = _tf.Task
+    _Feature = _tf.Feature
+    _Status = _tf.Status
+
+# Re-export canonical types for visibility and testability
+Task = _Task
+Feature = _Feature
+Status = _Status
+
+__all__ = [
+    "Task",
+    "Feature",
+    "Status",
+    "get_task",
+    "update_task",
+    "create_task",
+    "update_task_status",
+    "update_feature_status",
+    "ask_agent_question",
+]
 
 
-def _task_path(task_id: int, base_path: str = "tasks") -> str:
-    """Return the absolute path to a task.json file under tasks/{task_id}/.
-
-    Args:
-        task_id: The numeric task ID.
-        base_path: Root folder for tasks (default: "tasks").
-    Returns:
-        The filesystem path to tasks/{task_id}/task.json.
-    """
-    return os.path.join(base_path, str(task_id), "task.json")
+def _task_dir(task_id: int, base_path: str) -> str:
+    return os.path.join(base_path, str(task_id))
 
 
-def _ensure_task_dir(task_id: int, base_path: str = "tasks") -> str:
-    """Ensure the directory tasks/{task_id}/ exists and return its path."""
-    task_dir = os.path.join(base_path, str(task_id))
-    os.makedirs(task_dir, exist_ok=True)
-    return task_dir
+def _task_path(task_id: int, base_path: str) -> str:
+    return os.path.join(_task_dir(task_id, base_path), "task.json")
 
 
-def _read_json(path: str) -> dict:
-    """Read a JSON file and return its contents.
+def _ensure_dir(path: str) -> None:
+    os.makedirs(path, exist_ok=True)
 
-    Raises:
-        FileNotFoundError: if the file does not exist.
-        ValueError: if the file cannot be parsed as JSON.
-    """
+
+def _read_json(path: str) -> Dict[str, Any]:
     if not os.path.exists(path):
-        raise FileNotFoundError(f"Task file does not exist: {path}")
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
     with open(path, "r", encoding="utf-8") as f:
-        try:
-            return json.load(f)
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON at {path}: {e}")
+        return json.load(f)
 
 
-def _write_json(path: str, data: dict) -> None:
-    """Write a JSON file with UTF-8 encoding and pretty formatting."""
+def _write_json(path: str, data: Dict[str, Any]) -> None:
+    _ensure_dir(os.path.dirname(path))
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
         f.write("\n")
 
 
-# Public API
-
-def get_task(task_id: int, base_path: str = "tasks") -> Task | None:
-    """Load and return a Task by ID.
+def get_task(task_id: int, base_path: str = "tasks") -> Task:
+    """Return the task data for the given task_id from base_path.
 
     Args:
-        task_id: Numeric task ID.
-        base_path: Root folder for tasks.
+        task_id: The task numeric identifier.
+        base_path: The base directory containing task folders.
     Returns:
-        The Task dict if found, else None.
+        Task: The parsed task object.
     """
     path = _task_path(task_id, base_path)
-    try:
-        data = _read_json(path)
-        return cast(Task, data)
-    except FileNotFoundError:
-        return None
-    except ValueError:
-        # Malformed JSON
-        return None
+    data = _read_json(path)
+    return data  # type: ignore[return-value]
 
 
-def update_task(task_id: int, task_data: Task, base_path: str = "tasks") -> None:
-    """Persist the provided Task data to tasks/{task_id}/task.json.
+def update_task(task_id: int, task_data: Task, base_path: str = "tasks") -> Task:
+    """Update the entire task.json for a given task_id with provided task_data.
 
-    Args:
-        task_id: Numeric task ID.
-        task_data: The full Task object to write.
-        base_path: Root folder for tasks.
-    Raises:
-        ValueError: if task_data.id does not match task_id.
+    Raises if the task directory does not exist.
     """
-    if isinstance(task_data, dict) and str(task_data.get("id")) != str(task_id):
-        raise ValueError("update_task: task_data.id does not match task_id")
-    _ensure_task_dir(task_id, base_path)
-    _write_json(_task_path(task_id, base_path), cast(dict, task_data))
+    path = _task_path(task_id, base_path)
+    if not os.path.isdir(os.path.dirname(path)):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), os.path.dirname(path))
+    _write_json(path, task_data)
+    # Re-read to return the canonical on-disk representation
+    return get_task(task_id, base_path=base_path)
 
 
-def create_task(
-    task_id: int,
-    title: str,
-    action: str,
-    *,
-    features: Optional[List[Feature]] = None,
-    status: str = "-",
-    plan: str = "",
-    acceptance: Optional[list] = None,
-    base_path: str = "tasks",
-) -> Task:
-    """Create a new task at tasks/{task_id}/task.json.
+def create_task(task_data: Task, base_path: str = "tasks") -> Task:
+    """Create a new task directory and task.json from the given task_data.
 
-    If the file already exists, it will be overwritten.
-
-    Args:
-        task_id: Numeric task ID.
-        title: Task title.
-        action: High-level action/goal.
-        features: Optional list of Feature dicts.
-        status: Task status flag ("-", "~", "+", etc.).
-        plan: Optional human-readable plan string.
-        acceptance: Optional acceptance structure (list or nested dicts).
-        base_path: Root folder for tasks.
-    Returns:
-        The created Task object.
+    The task id is taken from task_data["id"]. It can be a string or int-like; it
+    will be used for the folder name as-is.
     """
-    _ensure_task_dir(task_id, base_path)
-    task: Task = cast(Task, {
-        "id": task_id,
-        "status": status,
-        "title": title,
-        "action": action,
-        "plan": plan,
-        "acceptance": acceptance or [],
-        "features": features or [],
-    })
-    _write_json(_task_path(task_id, base_path), cast(dict, task))
-    return task
-
-
-def get_feature(task: Task, feature_number: int) -> Tuple[int, Feature]:
-    """Retrieve a feature by its ordinal number (e.g., 4 for feature '13.4').
-
-    Args:
-        task: Task object.
-        feature_number: Ordinal feature number within the task.
-    Returns:
-        (index, Feature) where index is the position in the features list.
-    Raises:
-        IndexError: if the feature cannot be found.
-    """
-    features = cast(List[Feature], task.get("features", []))
-    # Match by suffix number or by positional index if ids are consistent
-    for i, feat in enumerate(features):
-        fid = str(feat.get("id", ""))
-        # Support ids like "13.4" or just "4"
-        if fid.endswith(f".{feature_number}") or fid == str(feature_number):
-            return i, cast(Feature, feat)
-    # Fallback: treat feature_number as 1-based index
-    idx = feature_number - 1
-    if 0 <= idx < len(features):
-        return idx, cast(Feature, features[idx])
-    raise IndexError(f"Feature {feature_number} not found in task {task.get('id')}")
-
-
-def update_feature(task: Task, feature_number: int, new_feature: Feature) -> Task:
-    """Replace a feature in the task by feature number and return the updated task."""
-    idx, _ = get_feature(task, feature_number)
-    features = cast(List[Feature], task.get("features", []))
-    features[idx] = new_feature
-    task["features"] = features
-    return task
-
-
-def update_task_status(task_id: int, status: str, *, base_path: str = "tasks") -> Task:
-    """Update a task's status and persist the change.
-
-    Args:
-        task_id: Task ID.
-        status: New status symbol.
-        base_path: Root folder for tasks.
-    Returns:
-        The updated Task object.
-    Raises:
-        FileNotFoundError: if the task does not exist.
-    """
-    task = get_task(task_id, base_path)
-    if task is None:
-        raise FileNotFoundError(f"Task {task_id} not found")
-    task["status"] = status
-    update_task(task_id, task, base_path)
-    return task
-
-
-def update_feature_status(task_id: int, feature_number: int, status: str, *, base_path: str = "tasks") -> Task:
-    """Update the status of a specific feature and persist the change.
-
-    Args:
-        task_id: Task ID.
-        feature_number: Ordinal number within the task (e.g., 4 for '13.4').
-        status: New status symbol.
-        base_path: Root folder for tasks.
-    Returns:
-        The updated Task object.
-    Raises:
-        FileNotFoundError: if the task does not exist.
-        IndexError: if the feature cannot be found.
-    """
-    task = get_task(task_id, base_path)
-    if task is None:
-        raise FileNotFoundError(f"Task {task_id} not found")
-    idx, feat = get_feature(task, feature_number)
-    feat = cast(Feature, {**feat, "status": status})
-    task = update_feature(task, feature_number, feat)
-    update_task(task_id, task, base_path)
-    return task
-
-
-def ask_agent_question(task_id: int, question_text: str, *, feature_number: Optional[int] = None, base_path: str = "tasks") -> Task:
-    """Set or update the agent_question field on a task or a specific feature.
-
-    This function is intended to replace prior ad-hoc ask_question tooling that
-    required direct text editing. It ensures questions are encoded in JSON.
-
-    Args:
-        task_id: Task ID.
-        question_text: The question to persist.
-        feature_number: If provided, set the question on that feature; otherwise on the task.
-        base_path: Root folder for tasks.
-    Returns:
-        The updated Task object with the question persisted.
-    Raises:
-        FileNotFoundError: if the task or feature is missing.
-    """
-    task = get_task(task_id, base_path)
-    if task is None:
-        raise FileNotFoundError(f"Task {task_id} not found")
-
-    if feature_number is None:
-        task["agent_question"] = question_text
+    task_id_raw = task_data.get("id")
+    if task_id_raw is None:
+        raise ValueError("task_data must include an 'id' field")
+    task_id_str = str(task_id_raw)
+    # We still accept an int 'task_id' arg in other functions; here we derive folder from task_data
+    path = _task_path(int(task_id_str) if task_id_str.isdigit() else task_id_str, base_path)  # type: ignore[arg-type]
+    if os.path.exists(path):
+        raise FileExistsError(errno.EEXIST, os.strerror(errno.EEXIST), path)
+    _write_json(path, task_data)
+    # Return what was written
+    if task_id_str.isdigit():
+        return get_task(int(task_id_str), base_path=base_path)
     else:
-        idx, feat = get_feature(task, feature_number)
-        feat = cast(Feature, {**feat, "agent_question": question_text})
-        task = update_feature(task, feature_number, feat)
+        # Non-numeric id fallback: read directly
+        return _read_json(path)  # type: ignore[return-value]
 
-    update_task(task_id, task, base_path)
-    return task
+
+def update_task_status(task_id: int, status: Status, base_path: str = "tasks") -> Task:
+    """Update the top-level status field for a task and persist the change."""
+    task = get_task(task_id, base_path=base_path)
+    task["status"] = status  # type: ignore[index]
+    return update_task(task_id, task, base_path=base_path)
+
+
+def update_feature_status(task_id: int, feature_id: int, status: Status, base_path: str = "tasks") -> Feature:
+    """Update status of a specific feature (by numeric feature_id) within a task.
+
+    Returns the updated Feature object.
+    """
+    task = get_task(task_id, base_path=base_path)
+    features = task.get("features", [])  # type: ignore[assignment]
+    feature_key = f"{task_id}.{feature_id}"
+    target_index: Optional[int] = None
+    for i, feat in enumerate(features):
+        if isinstance(feat, dict) and feat.get("id") == feature_key:
+            target_index = i
+            break
+    if target_index is None:
+        # Try a fallback: match by suffix after '.' in case of string vs int id mismatches
+        for i, feat in enumerate(features):
+            fid = str(feat.get("id", ""))
+            if fid.split(".")[-1] == str(feature_id):
+                target_index = i
+                break
+    if target_index is None:
+        raise KeyError(f"Feature {feature_key} not found in task {task_id}")
+
+    features[target_index]["status"] = status  # type: ignore[index]
+    update_task(task_id, task, base_path=base_path)
+    return features[target_index]  # type: ignore[return-value]
+
+
+def ask_agent_question(task_id: int, feature_id: Optional[int], question: str, base_path: str = "tasks") -> Task:
+    """Edit the task's or feature's `agent_question` field.
+
+    If feature_id is None, set task-level agent_question; otherwise set it on the
+    specified feature. This function supersedes older ask_question tooling.
+    """
+    task = get_task(task_id, base_path=base_path)
+    if feature_id is None:
+        task["agent_question"] = question  # type: ignore[index]
+    else:
+        features = task.get("features", [])  # type: ignore[assignment]
+        feature_key = f"{task_id}.{feature_id}"
+        target: Optional[Dict[str, Any]] = None
+        for feat in features:
+            if isinstance(feat, dict) and feat.get("id") == feature_key:
+                target = feat
+                break
+        if target is None:
+            # Fallback: match by numeric suffix
+            for feat in features:
+                fid = str(feat.get("id", ""))
+                if fid.split(".")[-1] == str(feature_id):
+                    target = feat
+                    break
+        if target is None:
+            raise KeyError(f"Feature {feature_key} not found in task {task_id}")
+        target["agent_question"] = question
+    return update_task(task_id, task, base_path=base_path)
