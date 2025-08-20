@@ -1,39 +1,44 @@
-import os
 import sys
-import ast
+import os
+import importlib.util
 
 def run():
-    path = "docs/tasks/task_format.py"
-    if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
+    # Acceptance Criterion 1: `docs/tasks/task_format.py` exists.
+    file_path = "docs/tasks/task_format.py"
+    if not os.path.exists(file_path):
+        print(f"FAIL: {file_path} does not exist.")
         sys.exit(1)
 
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-
+    # Acceptance Criterion 2: The file defines Python TypedDicts for `Task` and `Feature`.
     try:
-        tree = ast.parse(content)
-    except SyntaxError as e:
-        print(f"FAIL: Could not parse {path}: {e}")
+        spec = importlib.util.spec_from_file_location("task_format", file_path)
+        task_format = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(task_format)
+    except Exception as e:
+        print(f"FAIL: Could not import {file_path}. Error: {e}")
         sys.exit(1)
 
-    class_defs = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
-    
-    required_classes = {"Task", "Feature"}
-    if not required_classes.issubset(class_defs):
-        print(f"FAIL: Missing TypedDicts. Found: {class_defs}, Required: {required_classes}")
+    if not hasattr(task_format, "Task") or not hasattr(task_format, "Feature"):
+        print("FAIL: `Task` or `Feature` TypedDict not found in module.")
         sys.exit(1)
 
-    # Basic check for key fields
-    if 'class Task(TypedDict):' not in content.replace(" ", ""):
-         print(f"FAIL: 'Task' does not appear to be a TypedDict.")
-         sys.exit(1)
+    # Acceptance Criterion 3: The schema covers all required and optional fields.
+    Task = task_format.Task
+    Feature = task_format.Feature
 
-    if 'class Feature(TypedDict):' not in content.replace(" ", ""):
-         print(f"FAIL: 'Feature' does not appear to be a TypedDict.")
-         sys.exit(1)
+    required_task_fields = {'id', 'status', 'title', 'action', 'plan', 'features'}
+    if not required_task_fields.issubset(Task.__annotations__.keys()):
+        missing = required_task_fields - Task.__annotations__.keys()
+        print(f"FAIL: Task TypedDict is missing required fields: {missing}")
+        sys.exit(1)
+        
+    required_feature_fields = {'id', 'status', 'title', 'action', 'plan', 'context', 'acceptance'}
+    if not required_feature_fields.issubset(Feature.__annotations__.keys()):
+        missing = required_feature_fields - Feature.__annotations__.keys()
+        print(f"FAIL: Feature TypedDict is missing required fields: {missing}")
+        sys.exit(1)
 
-    print("PASS: docs/tasks/task_format.py exists and defines Task and Feature TypedDicts.")
+    print("PASS: docs/tasks/task_format.py defines the required Task and Feature TypedDicts.")
     sys.exit(0)
 
 if __name__ == "__main__":
