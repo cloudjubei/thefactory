@@ -1,0 +1,20 @@
+{
+  "id": 1303003,
+  "title": "TEST: Utility Task (updated)",
+  "status": "+",
+  "action": "Test the task utilities for JSON format.",
+  "plan": "Test-only task plan.",
+  "features": [
+    {
+      "id": "1303003.1",
+      "status": "~",
+      "title": "Test Feature",
+      "action": "Test feature status and question updates.",
+      "plan": "Test-only feature plan.",
+      "context": [],
+      "acceptance": [],
+      "agent_question": "Is this feature clear?"
+    }
+  ],
+  "agent_question": "Overall question at task level"
+}
