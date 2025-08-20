@@ -1,12 +1,12 @@
 {
-  "id": 6,
+  "id": 2,
   "status": "-",
   "title": "Define Core Agent Terminology and Principles",
   "action": "Create the specification that defines the agent's high-level principles and establishes the key terms \"Orchestrator\" and \"Agent\". The agent uses a tool-based architecture.",
 
   "features": [
     {
-      "id": "6.1",
+      "id": "2.1",
       "status": "-",
       "title": "Tools guide",
       "action": "Specify the JSON contract, tools, and execution modes",
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "id": "6.2",
+      "id": "2.2",
       "status": "-",
       "title": "principles guide",
       "action": "Define Agent vs Orchestrator and core principles.",
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "id": "6.3",
+      "id": "2.3",
       "status": "-",
       "title": "Agent personas",
       "action": "Create 4 personas that will serve different purposes:\n   - Manager: An agent that looks at the task description and identifies any missing specification or context. They must identify all necessary information to be in place for the other agents to proceed with their work. They are responsible for seeing if the work has been done, or whether it couldn't due to bad/missing spec. This agent is the one that can edit the task description.\n   - Planner: An agent that looks at the task description and creates a plan for completing a task following the given specifications. This agent is the one that can edit the plan description.\n   - Tester: An agent that looks at the task description, and then for each feature creates the most appropriate acceptance criteria. Based on that criteria the agent creates a test case for each feature. This agent is the one that can edit the tests.\n   - Developer: An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria.",
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "id": "6.4",
+      "id": "2.4",
       "status": "-",
       "title": "Orchestrator script",
       "action": "Implement the local orchestrator script and setup, fully compliant with AGENT_PRINCIPLES and TOOL_ARCHITECTURE, including CLI options to run specific tasks/features and supporting local setup.",
@@ -55,10 +55,10 @@
         "Create a tool for moving a task to a different position in the list of tasks"
 
       ],
-      "dependencies": ["6.1", "6.2", "6.3"]
+      "dependencies": ["2.1", "2.2", "2.3"]
     },
     {
-      "id": "6.5",
+      "id": "2.5",
       "status": "-",
       "title": "Dependency specification",
       "action": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`",
@@ -66,10 +66,10 @@
       "acceptance": [
         "`requirements.txt` exists "
       ],
-      "dependencies": ["6.4"]
+      "dependencies": ["2.4"]
     },
     {
-      "id": "6.6",
+      "id": "2.6",
       "status": "-",
       "title": "Environment variables template",
       "action": "Provide `.env.example` containing placeholders for required API keys and settings.",
@@ -77,10 +77,10 @@
       "acceptance": [
         "`.env.example` exists and documents each variable."
       ],
-      "dependencies": ["6.4"]
+      "dependencies": ["2.4"]
     },
     {
-      "id": "6.7",
+      "id": "2.7",
       "status": "-",
       "title": "Local setup guide",
       "action": "Author `docs/LOCAL_SETUP.md` with setup and execution instructions.",
@@ -88,7 +88,7 @@
       "acceptance": [
         "`docs/LOCAL_SETUP.md` exists and is accurate."
       ],
-      "dependencies": ["6.4", "6.5", "6.6"]
+      "dependencies": ["2.4", "2.5", "2.6"]
     }
   ]
 }
