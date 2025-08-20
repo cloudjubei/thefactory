@@ -1,39 +1,40 @@
-import os
 import sys
+import os
 import json
+import importlib.util
 
 def run():
-    path = "docs/tasks/task_example.json"
-    if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
+    # Acceptance Criterion 1: `docs/tasks/task_example.json` exists.
+    file_path = "docs/tasks/task_example.json"
+    if not os.path.exists(file_path):
+        print(f"FAIL: {file_path} does not exist.")
         sys.exit(1)
 
+    # Acceptance Criterion 2: The file contains a valid JSON object.
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
     except json.JSONDecodeError as e:
-        print(f"FAIL: {path} is not a valid JSON file: {e}")
+        print(f"FAIL: {file_path} is not a valid JSON file. Error: {e}")
         sys.exit(1)
+
+    # Acceptance Criterion 3: The JSON object structure conforms to the `Task` schema.
+    try:
+        spec = importlib.util.spec_from_file_location("task_format", "docs/tasks/task_format.py")
+        task_format = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(task_format)
+        Task = task_format.Task
     except Exception as e:
-        print(f"FAIL: Could not read {path}: {e}")
+        print(f"FAIL: Could not import Task schema from docs/tasks/task_format.py. Error: {e}")
         sys.exit(1)
 
-    required_task_keys = ["id", "status", "title", "action", "plan", "features"]
-    if not all(key in data for key in required_task_keys):
-        print(f"FAIL: Missing required top-level keys in {path}. Required: {required_task_keys}")
-        sys.exit(1)
-    
-    if not isinstance(data.get("features"), list) or not data["features"]:
-        print(f"FAIL: 'features' key in {path} is not a non-empty list.")
+    required_task_fields = set(Task.__annotations__.keys()) - set(getattr(task_format, 'NotRequired', {}).__args__)
+    if not required_task_fields.issubset(data.keys()):
+        missing = required_task_fields - data.keys()
+        print(f"FAIL: {file_path} is missing required Task fields: {missing}")
         sys.exit(1)
 
-    first_feature = data["features"][0]
-    required_feature_keys = ["id", "status", "title", "action", "plan", "acceptance"]
-    if not all(key in first_feature for key in required_feature_keys):
-        print(f"FAIL: Missing required feature keys in {path}. Required: {required_feature_keys}")
-        sys.exit(1)
-
-    print(f"PASS: {path} exists, is valid JSON, and conforms to the basic Task schema.")
+    print("PASS: docs/tasks/task_example.json exists, is valid JSON, and conforms to the basic Task schema.")
     sys.exit(0)
 
 if __name__ == "__main__":
