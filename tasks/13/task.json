@@ -151,13 +151,13 @@
     },
     {
       "id": "13.9",
-      "status": "+",
-      "title": "Update Docs and Tooling for Plan-in-JSON",
-      "action": "Update documentation and scripts to align with the plan-in-JSON format. This includes updating `PLAN_SPECIFICATION.md` and `FILE_ORGANISATION.md`. Also, add a new helper function to `task_utils.py` for updating feature status directly in the `task.json` file, and expose it in the orchestrator.",
+      "status": "-",
+      "title": "The plan field should be updated",
+      "action": "The plan field for both tasks and features needs to be in a LLM friendly style and Markdown format.",
       "acceptance": [
-        "`docs/PLAN_SPECIFICATION.md` is updated to describe the `plan` field in `task.json`.",
-        "`docs/FILE_ORGANISATION.md` is updated to reflect that `plan.md` is deprecated.",
-        "A new function, e.g., `update_feature_status(task_id, feature_id, new_status)`, exists in `scripts/tools/task_utils.py` and is available to the agent."
+        "each task and feature has a plan field filled in",
+        "each plan field is in Markdown format",
+        "each plan field is in a LLM friendly style, meaning it should be clear, concise, and structured for easy understanding by an AI agent - they should see the plan and be able to go step by step through it"
       ],
       "dependencies": [
         "13.8"
@@ -166,6 +166,20 @@
     },
     {
       "id": "13.10",
+      "status": "-",
+      "title": "ask_question should be updated",
+      "action": "The tool call should update a task or feature's status and agent_question fields.",
+      "acceptance": [
+        "The tool `ask_question` should be updated to allow the agent to set a task or feature's status and `agent_question` field.",
+        "any documentation relating to it should be updated"
+      ],
+      "dependencies": [
+        "13.9"
+      ],
+      "plan": ""
+    },
+    {
+      "id": "13.11",
       "status": "-",
       "title": "Cleanup",
       "action": "This task definition file (`tasks/13/task.json`) will be removed as the final step of its own completion, closing the loop on the migration.",
@@ -177,12 +191,12 @@
         "Task 1 was all about tasks - it needs be updated to reflect the new JSON-based format - essentially being migrated with this task. After which this whole task is removed."
       ],
       "dependencies": [
-        "13.9"
+        "13.10"
       ],
       "plan": "Final cleanup of this migration task itself. The developer will review all features in this task, ensure completed ones are marked `+`, remove any now-redundant features, and most importantly, update Task 1 to reflect the new JSON-based task management system. After Task 1 is updated, this Task 13 definition can be removed."
     },
     {
-      "id": "13.11",
+      "id": "13.12",
       "status": "-",
       "title": "Final Migration and Cleanup",
       "action": "Task 1 requires updating",
@@ -190,7 +204,7 @@
         "Task 1 was all about tasks - it needs be updated to reflect the new JSON-based format - essentially being migrated with this task."
       ],
       "dependencies": [
-        "13.10"
+        "13.11"
       ],
       "plan": "This feature is a final check and transfer of ownership. The developer must ensure that Task 1, which defines the project's task management process, is fully updated to reflect the new JSON format. All relevant concepts from Task 13 (like JSON schema, tooling, etc.) should be integrated into Task 1. Once Task 1 is the new source of truth for the task system, this entire Task 13 and its directory can be deleted."
     }
