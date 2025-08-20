@@ -88,37 +88,23 @@
     },
     {
       "id": "13.6",
-      "status": "+",
-      "title": "The plan field should be updated",
-      "action": "The plan field for both tasks and features needs to be in a LLM friendly style and Markdown format.",
-      "acceptance": [
-        "each task and feature has a plan field filled in",
-        "each plan field is in Markdown format",
-        "each plan field is in a LLM friendly style, meaning it should be clear, concise, and structured for easy understanding by an AI agent - they should see the plan and be able to go step by step through it"
-      ],
-      "dependencies": [
-        "13.5"
-      ],
-      "plan": "1. Retrieve `tasks/13/task.json`.\n2. Add a `plan` field to the root Task object, outlining the high-level steps of the task.\n3. For every Feature object in the task, add or update its `plan` field with a concise, step-by-step guide for an LLM to follow.\n4. Write the updated content back to `tasks/13/task.json`."
-    },
-    {
-      "id": "13.7",
       "status": "-",
       "title": "Cleanup",
       "action": "Handle any leftover missing functionality",
       "acceptance": [
         "all tasks that are complete have their status set to `+`",
+        "all tasks' features have their plan field populated with LLM-friendly text",
         "all tasks folders only have the tests folder and a `task.json` file",
         "any other feature in this task that was about cleanup or deprecation is removed",
         "any other feature that no longer applied should be refined or removed"
       ],
       "dependencies": [
-        "13.6"
+        "13.5"
       ],
-      "plan": "1. Scan all directories under `tasks/`.\n2. For each completed task, verify its status is `+` in `task.json` and update if necessary.\n3. Remove any extraneous files from task directories, preserving only `task.json` and the `tests/` subdirectory.\n4. Review the features within this task (Task 13) and remove any that are now redundant."
+      "plan": "1. Scan all directories under `tasks/`.\n2. For each completed task, verify its status is `+` in `task.json` and update if necessary.\n3. For each feature in a task, write an LLM-friendly Markup message detailing the plan for that feature.\n4. Remove any extraneous files from task directories, preserving only `task.json` and the `tests/` subdirectory.\n5. Review the features within this task (Task 13) and remove any that are now redundant."
     },
     {
-      "id": "13.8",
+      "id": "13.7",
       "status": "-",
       "title": "Migrate to task 1",
       "action": "Task 1 is the task that defines all information surrounding tasks, thus it is the one that should have all the features and definitions that are currently described here",
