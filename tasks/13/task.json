@@ -3,6 +3,7 @@
   "status": "-",
   "title": "JSON-based tasks format",
   "action": "Define and implement a new JSON-based format for tasks to replace `tasks/TASKS.md`. This involves defining the schema, creating necessary tooling for interaction, migrating existing tasks, and finally deprecating the old format.",
+  "plan": "1. Define the new task schema as Python TypedDicts in `docs/tasks/task_format.py`.\n2. Create an example JSON file (`docs/tasks/task_example.json`) to demonstrate the new format.\n3. Develop utility functions in `scripts/tools/task_utils.py` for programmatic interaction with task files.\n4. Update the task authoring guidance in `docs/tasks/TASKS_GUIDANCE.md` to reflect the new JSON-based workflow.\n5. Integrate the new task utilities into the main orchestrator (`run_local_agent.py`).\n6. Populate the `plan` field for this task and all its features to be LLM-friendly.\n7. Perform cleanup of task files and statuses.\n8. Consolidate task-related definitions into Task 1.",
   "features": [
     {
       "id": "13.1",
@@ -14,7 +15,8 @@
         "The file defines Python types for `Task`, `Feature`, and other relevant data structures.",
         "The types cover all fields currently used in `TASKS.md` and `plan.md` files."
       ],
-      "output": "`docs/tasks/task_format.py`"
+      "output": "`docs/tasks/task_format.py`",
+      "plan": "1. Create a new file at `docs/tasks/task_format.py`.\n2. Define a `TypedDict` named `Feature` with all required and optional fields.\n3. Define a `TypedDict` named `Task` that includes a list of `Feature` objects.\n4. Ensure type hints from Python's `typing` module are used correctly."
     },
     {
       "id": "13.2",
@@ -28,7 +30,8 @@
       "dependencies": [
         "13.1"
       ],
-      "output": "`docs/tasks/task_example.json`"
+      "output": "`docs/tasks/task_example.json`",
+      "plan": "1. Create a new file at `docs/tasks/task_example.json`.\n2. Construct a valid JSON object representing a sample task.\n3. Ensure the structure and fields of the JSON object match the `Task` and `Feature` TypedDicts defined in `docs/tasks/task_format.py`."
     },
     {
       "id": "13.3",
@@ -48,7 +51,8 @@
       "dependencies": [
         "13.1",
         "13.2"
-      ]
+      ],
+      "plan": "1. Create the file `scripts/tools/task_utils.py`.\n2. Import the `Task`, `Feature`, and `Status` types from `docs.tasks.task_format`.\n3. Implement `get_task` to read and parse `tasks/{task_id}/task.json`.\n4. Implement `update_task` to serialize and write a Task object to its corresponding JSON file.\n5. Implement `create_task` to handle new task creation.\n6. Implement the status update and question functions, ensuring they read, modify, and write the task file atomically."
     },
     {
       "id": "13.4",
@@ -64,7 +68,8 @@
       ],
       "dependencies": [
         "13.3"
-      ]
+      ],
+      "plan": "1. Read the content of `docs/tasks/TASKS_GUIDANCE.md`.\n2. Remove any outdated schema descriptions.\n3. Add a clear reference to `docs/tasks/task_format.py` as the canonical schema source.\n4. Add a section explaining how to use `scripts/tools/task_utils.py` for programmatic access.\n5. Include a reference to `docs/tasks/task_example.json` as a practical example."
     },
     {
       "id": "13.5",
@@ -78,11 +83,12 @@
       "dependencies": [
         "13.4"
       ],
-      "output": "Modified `scripts/run_local_agent.py`"
+      "output": "Modified `scripts/run_local_agent.py`",
+      "plan": "1. Open `scripts/run_local_agent.py` for editing.\n2. Add an import statement for `get_task` from `scripts.tools.task_utils`.\n3. In the `_gather_context` method, replace the logic for reading `TASKS.md` with a call to `get_task(self.task_id)`.\n4. Ensure the returned task data is correctly processed and added to the context."
     },
     {
       "id": "13.6",
-      "status": "-",
+      "status": "+",
       "title": "The plan field should be updated",
       "action": "The plan field for both tasks and features needs to be in a LLM friendly style and Markdown format.",
       "acceptance": [
@@ -93,7 +99,7 @@
       "dependencies": [
         "13.5"
       ],
-      "plan": ""
+      "plan": "1. Retrieve `tasks/13/task.json`.\n2. Add a `plan` field to the root Task object, outlining the high-level steps of the task.\n3. For every Feature object in the task, add or update its `plan` field with a concise, step-by-step guide for an LLM to follow.\n4. Write the updated content back to `tasks/13/task.json`."
     },
     {
       "id": "13.7",
@@ -108,7 +114,8 @@
       ],
       "dependencies": [
         "13.6"
-      ]
+      ],
+      "plan": "1. Scan all directories under `tasks/`.\n2. For each completed task, verify its status is `+` in `task.json` and update if necessary.\n3. Remove any extraneous files from task directories, preserving only `task.json` and the `tests/` subdirectory.\n4. Review the features within this task (Task 13) and remove any that are now redundant."
     },
     {
       "id": "13.8",
@@ -121,7 +128,8 @@
       ],
       "dependencies": [
         "13.7"
-      ]
+      ],
+      "plan": "1. Retrieve the contents of `tasks/1/task.json` and `tasks/13/task.json`.\n2. Identify the core features and definitions from Task 13 that describe the task management system.\n3. Append these features to the `features` list in `tasks/1/task.json`, re-numbering their IDs as needed.\n4. Update the `action` and `plan` of Task 1 to encompass this new scope.\n5. Mark Task 13 as complete or deferred, leaving it as a record of the migration process."
     }
   ]
 }
