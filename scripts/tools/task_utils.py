@@ -1,100 +1,41 @@
-import os
 import json
-from typing import Dict, Any, Literal
+import os
+from typing import TypedDict, List, Optional
 
-Status = Literal["+", "~", "-", "?", "/", "="]
+class Feature(TypedDict):
+    id: str
+    status: str
+    title: str
+    action: str
+    acceptance: List[str]
+    dependencies: Optional[List[str]]
+    output: Optional[str]
+    plan: Optional[str]
 
-def get_task(task_id: int, base_path: str = "tasks") -> Dict[str, Any] | None:
+class AcceptancePhase(TypedDict):
+    phase: str
+    criteria: List[str]
+
+class Task(TypedDict):
+    id: int
+    status: str
+    title: str
+    action: str
+    plan: str
+    acceptance: List[AcceptancePhase]
+    features: List[Feature]
+
+def get_task(task_id: int, base_path: str = 'tasks') -> Optional[Task]:
     """
-    Reads a task from its JSON file.
-
-    Args:
-        task_id: The ID of the task to read.
-        base_path: The base directory where tasks are stored.
-
-    Returns:
-        A dictionary representing the task, or None if not found.
+    Reads a task from its JSON file. This is the single source of truth.
+    It does not read or merge plan.md files.
     """
-    task_file = os.path.join(base_path, str(task_id), "task.json")
+    task_file = os.path.join(base_path, str(task_id), 'task.json')
     if not os.path.exists(task_file):
         return None
     try:
-        with open(task_file, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (IOError, json.JSONDecodeError):
-        return None
-
-def update_task(task_id: int, task_data: Dict[str, Any], base_path: str = "tasks") -> bool:
-    """
-    Updates an existing task's JSON file.
-
-    Args:
-        task_id: The ID of the task to update.
-        task_data: A dictionary containing the updated task data.
-        base_path: The base directory where tasks are stored.
-
-    Returns:
-        True if the update was successful, False otherwise.
-    """
-    task_dir = os.path.join(base_path, str(task_id))
-    task_file = os.path.join(task_dir, "task.json")
-    try:
-        os.makedirs(task_dir, exist_ok=True)
-        with open(task_file, "w", encoding="utf-8") as f:
-            json.dump(task_data, f, indent=2)
-        return True
-    except IOError:
-        return False
-
-def create_task(task_data: Dict[str, Any], base_path: str = "tasks") -> Dict[str, Any] | None:
-    """
-    Creates a new task JSON file.
-
-    Args:
-        task_data: A dictionary containing the new task's data. Must include an 'id'.
-        base_path: The base directory where tasks are stored.
-
-    Returns:
-        The created task data if successful, None otherwise.
-    """
-    task_id = task_data.get("id")
-    if not task_id:
-        return None
-    
-    task_dir = os.path.join(base_path, str(task_id))
-    if os.path.exists(os.path.join(task_dir, "task.json")):
-        return None # Task already exists
-
-    if update_task(task_id, task_data, base_path):
+        with open(task_file, 'r', encoding='utf-8') as f:
+            task_data: Task = json.load(f)
         return task_data
-    return None
-
-def update_feature_status(task_id: int, feature_id: str, new_status: Status, base_path: str = "tasks") -> bool:
-    """
-    Updates the status of a specific feature within a task's JSON file.
-
-    Args:
-        task_id: The ID of the task.
-        feature_id: The ID of the feature to update (e.g., "13.11").
-        new_status: The new status to set for the feature.
-        base_path: The base directory where tasks are stored.
-
-    Returns:
-        True if the update was successful, False otherwise.
-    """
-    task_data = get_task(task_id, base_path)
-    if not task_data:
-        return False
-
-    feature_found = False
-    if "features" in task_data:
-        for feature in task_data["features"]:
-            if feature.get("id") == feature_id:
-                feature["status"] = new_status
-                feature_found = True
-                break
-    
-    if not feature_found:
-        return False
-
-    return update_task(task_id, task_data, base_path)
+    except (json.JSONDecodeError, IOError):
+        return None
