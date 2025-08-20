@@ -266,25 +266,31 @@ class Agent:
         if persona == 'manager':
             files = [
                 'docs/tasks/TASKS_GUIDANCE.md',
+                'docs/tasks/task_example.json',
+                'docs/tasks/task_format.py',
                 'docs/AGENT_PRINCIPLES.md',
                 'docs/TOOL_ARCHITECTURE.md',
             ]
         elif persona == 'planner':
             files = [
-                'docs/PLAN_SPECIFICATION.md',
-                'docs/FEATURE_FORMAT.md',
                 'docs/tasks/TASKS_GUIDANCE.md',
+                'docs/tasks/task_example.json',
+                'docs/tasks/task_format.py',
+                'docs/PLAN_SPECIFICATION.md',
                 'docs/TOOL_ARCHITECTURE.md',
             ]
         elif persona == 'tester':
             files = [
+                'docs/tasks/TASKS_GUIDANCE.md',
                 'docs/TESTING.md',
                 'docs/PLAN_SPECIFICATION.md',
                 'docs/TOOL_ARCHITECTURE.md',
             ]
         elif persona == 'developer':
             files = [
-                'docs/AGENT_EXECUTION_CHECKLIST.md',
+                'docs/tasks/TASKS_GUIDANCE.md',
+                'docs/tasks/task_example.json',
+                'docs/tasks/task_format.py',
                 'docs/PLAN_SPECIFICATION.md',
                 'docs/TESTING.md',
                 'docs/TOOL_ARCHITECTURE.md',
@@ -309,6 +315,8 @@ class Agent:
         # Always include the orchestrator file reference for tool contract visibility
         if 'scripts/run_local_agent.py' not in files:
             files.append('scripts/run_local_agent.py')
+
+        print(f"Context for agent: {files}")
 
         context = {}
         # The sole source of truth for tasks is now the task.json file.
