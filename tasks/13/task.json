@@ -68,7 +68,7 @@
     },
     {
       "id": "13.5",
-      "status": "-",
+      "status": "+",
       "title": "Integrate Tooling into Orchestrator",
       "action": "Update the orchestrator (`run_local_agent.py`) to use `task_utils.py` for task operations.",
       "acceptance": [
