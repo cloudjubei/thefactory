@@ -15,7 +15,7 @@ from scripts.tools.ask_question import ask_question_tool
 from scripts.tools.finish import finish_tool
 from scripts.tools.finish_feature import finish_feature_tool
 from scripts.tools.run_tests import run_tests_tool
-from scripts.tools.task_utils import get_task
+from scripts.tools.task_utils import get_task, update_feature_status as update_feature_status_tool
 
 class AgentTools:
     def __init__(self, repo_path: str, git_manager: GitManager):
@@ -48,6 +48,12 @@ class AgentTools:
 
     def run_tests(self):
         return run_tests_tool(self.repo_path)
+
+    def update_feature_status(self, task_id: int, feature_number: int, new_status: str):
+        try:
+            return json.dumps(update_feature_status_tool(task_id=task_id, feature_number=feature_number, new_status=new_status))
+        except Exception as e:
+            return json.dumps({"ok": False, "error": f"Failed to execute update_feature_status tool: {e}"})
 
 class UnifiedEngine:
     def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None, persona: str = None) -> list:
@@ -96,6 +102,7 @@ You have access to the following SAFE tools:
 - `rename_files(operations: list, overwrite: bool, dry_run: bool)`
 - `run_tests()`
 - `finish_feature(task_id, feature_id, title, message)`
+- `update_feature_status(task_id: int, feature_number: int, new_status: str)`
 - `submit_for_review(task_id, task_title)`
 - `ask_question(question_text)`
 - `finish(reason)`

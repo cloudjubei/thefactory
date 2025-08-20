@@ -1,85 +1,37 @@
 # File Organisation Specification
 
-This document defines how files and directories are structured, named, and evolved in this repository to support specification-driven, tool-using agent workflows.
+## 1. Purpose
+This document outlines the standard file and directory structure for the repository. A consistent structure is essential for locating files, understanding the project's architecture, and automating processes.
 
-## Top-Level Directory Layout
+## 2. Top-Level Directory Structure
 
-A concise overview of the repository's root structure and the purpose of each directory.
+- `docs/`: Contains all project documentation, including specifications, guides, and architectural diagrams.
 
-- docs/
-  - Project-wide specifications, guides, and reference documents.
-  - Examples: PLAN_SPECIFICATION.md, TESTING.md, TOOL_ARCHITECTURE.md, AGENT_EXECUTION_CHECKLIST.md.
-- tasks/
-  - Task-scoped definitions and tests. Each task has its own folder: `tasks/{task_id}/`.
-  - Inside each task folder:
-    - `task.json` — the canonical definition for the task, its plan, and its features.
-    - `tests/` — tests validating the features of this task.
-- scripts/
-  - Orchestrator, tools, and execution helpers for the agent runtime.
-  - Example: scripts/run_local_agent.py, scripts/tools/*.
-- projects/ (optional, may not exist yet)
-  - Holds child projects/submodules if/when introduced as per CHILD_PROJECTS_SPECIFICATION.
-- .github/ (optional)
-  - CI/CD workflows and repository automation.
-- Other top-level files
-  - README.md, LICENSE, .gitignore, environment/config files as needed.
+- `scripts/`: Holds automation and utility scripts. This includes the agent orchestrator, testing tools, and any other scripts needed for development and execution.
 
-Example tree (illustrative):
+- `tasks/`: The central location for all task-related files. This directory is the primary workspace for the AI agent.
 
-```
-/ (repo root)
-├── docs/
-│   ├── PLAN_SPECIFICATION.md
-│   ├── TESTING.md
-│   └── TOOL_ARCHITECTURE.md
-├── tasks/
-│   └── 3/
-│       ├── task.json
-│       └── tests/
-│           └── test_3_2.py
-├── scripts/
-│   ├── run_local_agent.py
-│   └── tools/
-│       └── ...
-└── .gitignore
-```
+- `.github/`: Contains GitHub-specific files, primarily for CI/CD workflows.
 
-## File Naming Conventions
+## 3. `docs/` Directory
+This directory houses all specification documents that define the agent's behavior and the project's standards.
+- `SPEC.md`: The main specification document.
+- `AGENT_PRINCIPLES.md`: Core principles guiding the agent's operation.
+- `PLAN_SPECIFICATION.md`: Defines the structure and requirements for an agent's plan.
+- `FEATURE_FORMAT.md`: Details the format for defining features within a plan.
+- `FILE_ORGANISATION.md`: This file.
+- `TESTING.md`: Specification for writing and running tests.
+- `TOOL_ARCHITECTURE.md`: Describes the available tools and the agent's interaction with them.
 
-Consistent naming improves discoverability and automates tooling.
+## 4. `scripts/` Directory
+This directory contains all executable scripts.
+- `run_local_agent.py`: The main orchestrator for running the agent locally.
+- `run_tests.py`: The test runner script invoked by the `run_tests` tool.
+- `tools/`: A subdirectory for individual tool implementations (e.g., `submit_for_review.py`).
 
-- Markdown specifications (docs/)
-  - Use UPPER_SNAKE_CASE with .md extension for primary specs and guides.
-  - Examples: PLAN_SPECIFICATION.md, TESTING.md, TOOL_ARCHITECTURE.md.
-- Task definitions and tests (`tasks/{task_id}/`)
-  - Task definition filename: `task.json`.
-  - Test filenames: `test_{task_id}_{feature_number}.py` (e.g., test_3_2.py).
-  - Tests reside under `tasks/{task_id}/tests/`.
-- Python scripts and modules (scripts/ and subdirs)
-  - Use snake_case.py for modules (e.g., run_local_agent.py, write_file.py).
-  - Packages use snake_case directories; tools live under scripts/tools/.
-- General rules
-  - Prefer ASCII, lowercase (except docs’ spec files, which are uppercase), hyphens or underscores for separators.
-  - Be explicit and descriptive; avoid abbreviations unless well-established.
-  - One logical entity per file (e.g., one task definition per `task.json`).
+## 5. `tasks/` Directory
+This is the most critical directory for the agent's day-to-day work.
 
-## Evolution Guidance
+- `tasks/{task_id}/task.json`: A JSON file that serves as the single source of truth for a task's definition, including its plan, acceptance criteria, and features.
 
-How to evolve the structure safely as the project grows.
-
-- Plan changes
-  - Reflect structural updates in relevant docs (e.g., this file) and task definitions.
-  - When introducing new directories (e.g., projects/), document purpose and conventions.
-- Safe refactors
-  - Use repository tooling (e.g., rename_files) to move/rename files atomically.
-  - Update references in specs and tests in the same change.
-- Testing and verification
-  - Add or update tests under `tasks/{task_id}/tests/` that assert new or changed conventions.
-  - Run the test suite (run_tests) to ensure no regressions.
-- Versioning and traceability
-  - Make small, incremental changes; one feature per commit using finish_feature.
-  - Clearly describe rationale and impact in commit messages and notes.
-- Backwards compatibility
-  - When breaking changes are necessary, provide migration notes and update affected tasks/features accordingly.
-
-This specification should be revisited as repository needs evolve. Keep conventions simple, explicit, and enforceable via tests.
+- `tasks/{task_id}/tests/`: A directory containing all tests for the corresponding task. Each test file should be named `test_{feature_id}.py`.

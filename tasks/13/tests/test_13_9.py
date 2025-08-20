@@ -1,54 +1,77 @@
 import os
 import sys
-import re
+import json
+import tempfile
+import shutil
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
+try:
+    from scripts.tools import task_utils
+except ImportError:
+    print("FAIL: Could not import task_utils.")
+    sys.exit(1)
 
 def run():
-    print("Running test for Feature 13.9: Update Docs and Tooling for Plan-in-JSON")
-    errors = []
+    print("--- Running Test for Feature 13.9: Update Docs and Tooling for Plan-in-JSON ---")
+    
+    # 1. Verify documentation changes
+    with open('docs/PLAN_SPECIFICATION.md', 'r') as f:
+        content = f.read()
+        if '`plan.md`' in content or '`plan` field of the corresponding `tasks/{task_id}/task.json` file' not in content:
+            print("FAIL: docs/PLAN_SPECIFICATION.md not updated correctly.")
+            sys.exit(1)
+    print("PASS: docs/PLAN_SPECIFICATION.md updated.")
 
-    # AC 1: `docs/PLAN_SPECIFICATION.md` is updated
-    plan_spec_path = 'docs/PLAN_SPECIFICATION.md'
-    if not os.path.exists(plan_spec_path):
-        errors.append(f"FAIL: {plan_spec_path} not found.")
-    else:
-        with open(plan_spec_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if '`plan` field' not in content or '`task.json`' not in content:
-                errors.append(f"FAIL: {plan_spec_path} does not seem to be updated to describe the `plan` field in `task.json`.")
+    with open('docs/FILE_ORGANISATION.md', 'r') as f:
+        content = f.read()
+        if 'plan.md' in content:
+            print("FAIL: docs/FILE_ORGANISATION.md still references plan.md.")
+            sys.exit(1)
+    print("PASS: docs/FILE_ORGANISATION.md updated.")
 
-    # AC 2: `docs/FILE_ORGANISATION.md` is updated
-    file_org_path = 'docs/FILE_ORGANISATION.md'
-    if os.path.exists(file_org_path):
-        with open(file_org_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if 'plan.md' in content and 'deprecated' not in content.lower():
-                 errors.append(f"FAIL: {file_org_path} does not seem to reflect that `plan.md` is deprecated.")
+    # 2. Verify tooling changes
+    temp_dir = tempfile.mkdtemp()
+    try:
+        # Setup dummy task
+        task_id = 999
+        task_data = {
+            "id": 999,
+            "status": "-",
+            "features": [
+                {"id": "999.1", "status": "-", "title": "Feature 1"}
+            ]
+        }
+        task_utils.create_task(task_data, base_path=temp_dir)
 
-    # AC 3: New function in task_utils.py and exposed in orchestrator
-    task_utils_path = 'scripts/tools/task_utils.py'
-    if not os.path.exists(task_utils_path):
-        errors.append(f"FAIL: {task_utils_path} not found.")
-    else:
-        with open(task_utils_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if not re.search(r"def\s+update_feature_status\s*\(", content):
-                errors.append(f"FAIL: Expected function `update_feature_status` not found in {task_utils_path}.")
+        # Test update_feature_status
+        result = task_utils.update_feature_status(task_id, 1, '+', base_path=temp_dir)
+        if not result.get('ok'):
+            print(f"FAIL: update_feature_status failed: {result.get('error')}")
+            sys.exit(1)
+        
+        # Verify the change
+        updated_task = task_utils.get_task(task_id, base_path=temp_dir)
+        if not updated_task or updated_task['features'][0]['status'] != '+':
+            print("FAIL: task.json was not updated correctly by update_feature_status.")
+            sys.exit(1)
+        print("PASS: task_utils.update_feature_status works correctly.")
 
-    agent_script_path = 'scripts/run_local_agent.py'
-    if not os.path.exists(agent_script_path):
-        errors.append(f"FAIL: {agent_script_path} not found.")
-    else:
-        with open(agent_script_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if 'def update_feature_status' not in content and 'update_feature_status_tool' not in content:
-                 errors.append(f"FAIL: `update_feature_status` is not exposed as a tool in {agent_script_path}.")
+    finally:
+        shutil.rmtree(temp_dir)
 
-    if errors:
-        for error in errors:
-            print(error)
-        sys.exit(1)
+    # 3. Verify orchestrator exposure
+    with open('scripts/run_local_agent.py', 'r') as f:
+        content = f.read()
+        if 'def update_feature_status(self' not in content:
+            print("FAIL: update_feature_status not found in AgentTools class in run_local_agent.py")
+            sys.exit(1)
+        if '`update_feature_status(task_id: int, feature_number: int, new_status: str)`' not in content:
+             print("FAIL: update_feature_status not listed in system prompt in run_local_agent.py")
+             sys.exit(1)
 
-    print("PASS: Feature 13.9 test checks passed.")
+    print("PASS: update_feature_status is exposed as a tool in run_local_agent.py.")
+
+    print("\n--- All tests for feature 13.9 passed! ---")
     sys.exit(0)
 
 if __name__ == "__main__":
