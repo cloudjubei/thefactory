@@ -1,100 +1,114 @@
 import os
 import json
-from typing import Dict, Any, Literal
+from typing import Any, TypedDict, Optional
 
-Status = Literal["+", "~", "-", "?", "/", "="]
+# Base directory for tasks
+TASKS_BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'tasks')
 
-def get_task(task_id: int, base_path: str = "tasks") -> Dict[str, Any] | None:
-    """
-    Reads a task from its JSON file.
+class TaskNotFoundError(Exception):
+    pass
 
-    Args:
-        task_id: The ID of the task to read.
-        base_path: The base directory where tasks are stored.
+class FeatureNotFoundError(Exception):
+    pass
 
-    Returns:
-        A dictionary representing the task, or None if not found.
-    """
-    task_file = os.path.join(base_path, str(task_id), "task.json")
-    if not os.path.exists(task_file):
+
+def _task_path(task_id: int, base_path: Optional[str] = None) -> str:
+    base = base_path or TASKS_BASE_DIR
+    return os.path.join(base, str(task_id), 'task.json')
+
+
+def get_task(task_id: int, base_path: Optional[str] = None) -> Optional[dict]:
+    """Read a task JSON file and return its data or None if not found."""
+    path = _task_path(task_id, base_path)
+    if not os.path.exists(path):
         return None
-    try:
-        with open(task_file, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (IOError, json.JSONDecodeError):
-        return None
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
-def update_task(task_id: int, task_data: Dict[str, Any], base_path: str = "tasks") -> bool:
+
+def save_task(task_id: int, task_data: dict, base_path: Optional[str] = None) -> None:
+    """Persist a task JSON file atomically."""
+    path = _task_path(task_id, base_path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp_path = path + '.tmp'
+    with open(tmp_path, 'w', encoding='utf-8') as f:
+        json.dump(task_data, f, indent=2, ensure_ascii=False)
+        f.write('\n')
+    os.replace(tmp_path, path)
+
+
+def update_feature_status(task_id: int, feature_number: int, new_status: str, reason: str = "", base_path: Optional[str] = None) -> str:
     """
-    Updates an existing task's JSON file.
+    Update the status of a specific feature within tasks/{task_id}/task.json.
 
     Args:
-        task_id: The ID of the task to update.
-        task_data: A dictionary containing the updated task data.
-        base_path: The base directory where tasks are stored.
+        task_id: The numeric ID of the task (e.g., 13).
+        feature_number: The feature index (e.g., for 13.9 pass 9).
+        new_status: One of '+', '~', '-', '?', '/', '='.
+        reason: Optional note explaining the status change.
+        base_path: Optional override base tasks path (used by orchestrator/tests).
 
     Returns:
-        True if the update was successful, False otherwise.
+        A JSON string with keys: ok (bool), message (str), previous_status (str).
     """
-    task_dir = os.path.join(base_path, str(task_id))
-    task_file = os.path.join(task_dir, "task.json")
-    try:
-        os.makedirs(task_dir, exist_ok=True)
-        with open(task_file, "w", encoding="utf-8") as f:
-            json.dump(task_data, f, indent=2)
-        return True
-    except IOError:
-        return False
+    allowed = ['+', '~', '-', '?', '/', '=']
+    if new_status not in allowed:
+        return json.dumps({
+            'ok': False,
+            'message': f"Invalid status '{new_status}'. Allowed: {allowed}",
+            'previous_status': ''
+        })
 
-def create_task(task_data: Dict[str, Any], base_path: str = "tasks") -> Dict[str, Any] | None:
-    """
-    Creates a new task JSON file.
+    task = get_task(task_id, base_path=base_path)
+    if task is None:
+        return json.dumps({'ok': False, 'message': f'Task {task_id} not found.', 'previous_status': ''})
 
-    Args:
-        task_data: A dictionary containing the new task's data. Must include an 'id'.
-        base_path: The base directory where tasks are stored.
+    features = task.get('features') or []
+    idx = None
+    for i, feat in enumerate(features):
+        # Feature IDs may be strings like '13.9' or numbers
+        fid = str(feat.get('id'))
+        if fid.endswith(f'.{feature_number}') or fid == f"{task_id}.{feature_number}":
+            idx = i
+            break
+    if idx is None:
+        return json.dumps({'ok': False, 'message': f'Feature {task_id}.{feature_number} not found.', 'previous_status': ''})
 
-    Returns:
-        The created task data if successful, None otherwise.
-    """
-    task_id = task_data.get("id")
-    if not task_id:
-        return None
-    
-    task_dir = os.path.join(base_path, str(task_id))
-    if os.path.exists(os.path.join(task_dir, "task.json")):
-        return None # Task already exists
+    prev = features[idx].get('status', '')
+    features[idx]['status'] = new_status
+    if reason:
+        # record lightweight audit trail in feature object
+        notes = features[idx].get('notes')
+        audit_line = f"Status changed to '{new_status}'"
+        if reason:
+            audit_line += f": {reason}"
+        if notes:
+            features[idx]['notes'] = f"{notes}\n{audit_line}"
+        else:
+            features[idx]['notes'] = audit_line
 
-    if update_task(task_id, task_data, base_path):
-        return task_data
-    return None
+    # Persist
+    task['features'] = features
+    save_task(task_id, task, base_path=base_path)
 
-def update_feature_status(task_id: int, feature_id: str, new_status: Status, base_path: str = "tasks") -> bool:
-    """
-    Updates the status of a specific feature within a task's JSON file.
+    return json.dumps({'ok': True, 'message': 'Feature status updated.', 'previous_status': prev})
 
-    Args:
-        task_id: The ID of the task.
-        feature_id: The ID of the feature to update (e.g., "13.11").
-        new_status: The new status to set for the feature.
-        base_path: The base directory where tasks are stored.
 
-    Returns:
-        True if the update was successful, False otherwise.
-    """
-    task_data = get_task(task_id, base_path)
-    if not task_data:
-        return False
+def create_task(task_data: dict, base_path: Optional[str] = None) -> str:
+    """Create a new task with the provided data structure."""
+    task_id = task_data.get('id')
+    if task_id is None:
+        return json.dumps({'ok': False, 'message': 'Task data missing id.'})
+    path = _task_path(task_id, base_path)
+    if os.path.exists(path):
+        return json.dumps({'ok': False, 'message': f'Task {task_id} already exists.'})
+    save_task(task_id, task_data, base_path=base_path)
+    return json.dumps({'ok': True, 'message': f'Task {task_id} created.'})
 
-    feature_found = False
-    if "features" in task_data:
-        for feature in task_data["features"]:
-            if feature.get("id") == feature_id:
-                feature["status"] = new_status
-                feature_found = True
-                break
-    
-    if not feature_found:
-        return False
 
-    return update_task(task_id, task_data, base_path)
+def update_task(task_id: int, task_data: dict, base_path: Optional[str] = None) -> str:
+    """Overwrite the entire task definition with provided data."""
+    if get_task(task_id, base_path=base_path) is None:
+        return json.dumps({'ok': False, 'message': f'Task {task_id} not found.'})
+    save_task(task_id, task_data, base_path=base_path)
+    return json.dumps({'ok': True, 'message': f'Task {task_id} updated.'})

@@ -1,55 +1,67 @@
-import os
-import sys
-import re
+import os, sys, json, re
 
-def run():
-    print("Running test for Feature 13.9: Update Docs and Tooling for Plan-in-JSON")
-    errors = []
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
-    # AC 1: `docs/PLAN_SPECIFICATION.md` is updated
-    plan_spec_path = 'docs/PLAN_SPECIFICATION.md'
-    if not os.path.exists(plan_spec_path):
-        errors.append(f"FAIL: {plan_spec_path} not found.")
-    else:
-        with open(plan_spec_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if '`plan` field' not in content or '`task.json`' not in content:
-                errors.append(f"FAIL: {plan_spec_path} does not seem to be updated to describe the `plan` field in `task.json`.")
 
-    # AC 2: `docs/FILE_ORGANISATION.md` is updated
-    file_org_path = 'docs/FILE_ORGANISATION.md'
-    if os.path.exists(file_org_path):
-        with open(file_org_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if 'plan.md' in content and 'deprecated' not in content.lower():
-                 errors.append(f"FAIL: {file_org_path} does not seem to reflect that `plan.md` is deprecated.")
+def read(path):
+    with open(path, 'r', encoding='utf-8') as f:
+        return f.read()
 
-    # AC 3: New function in task_utils.py and exposed in orchestrator
-    task_utils_path = 'scripts/tools/task_utils.py'
-    if not os.path.exists(task_utils_path):
-        errors.append(f"FAIL: {task_utils_path} not found.")
-    else:
-        with open(task_utils_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if not re.search(r"def\s+update_feature_status\s*\(", content):
-                errors.append(f"FAIL: Expected function `update_feature_status` not found in {task_utils_path}.")
 
-    agent_script_path = 'scripts/run_local_agent.py'
-    if not os.path.exists(agent_script_path):
-        errors.append(f"FAIL: {agent_script_path} not found.")
-    else:
-        with open(agent_script_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if 'def update_feature_status' not in content and 'update_feature_status_tool' not in content:
-                 errors.append(f"FAIL: `update_feature_status` is not exposed as a tool in {agent_script_path}.")
+def fail(msg):
+    print(f"FAIL: {msg}")
+    sys.exit(1)
 
-    if errors:
-        for error in errors:
-            print(error)
-        sys.exit(1)
 
-    print("PASS: Feature 13.9 test checks passed.")
+def ok(msg):
+    print(f"PASS: {msg}")
     sys.exit(0)
 
-if __name__ == "__main__":
-    run()
+
+def main():
+    # 1) Tooling: update_feature_status exists and orchestrator exposes it
+    tu_path = os.path.join(ROOT, 'scripts', 'tools', 'task_utils.py')
+    if not os.path.exists(tu_path):
+        fail('scripts/tools/task_utils.py does not exist')
+    tu = read(tu_path)
+    if 'def update_feature_status' not in tu:
+        fail('update_feature_status function missing in task_utils.py')
+
+    rla_path = os.path.join(ROOT, 'scripts', 'run_local_agent.py')
+    if not os.path.exists(rla_path):
+        fail('scripts/run_local_agent.py missing')
+    rla = read(rla_path)
+    if 'def update_feature_status(self, task_id' not in rla:
+        fail('AgentTools.update_feature_status not exposed in run_local_agent.py')
+
+    # 2) Docs updated: PLAN_SPECIFICATION.md mentions LLM-friendly Markdown
+    plan_spec_path = os.path.join(ROOT, 'docs', 'PLAN_SPECIFICATION.md')
+    ps = read(plan_spec_path)
+    if 'LLM-Friendly' not in ps and 'LLM friendly' not in ps:
+        fail('PLAN_SPECIFICATION.md must mention LLM-friendly plans')
+    if 'Markdown' not in ps:
+        fail('PLAN_SPECIFICATION.md must state plans are in Markdown')
+
+    # 3) FEATURE_FORMAT.md requires plan field and LLM-friendly Markdown
+    ff_path = os.path.join(ROOT, 'docs', 'FEATURE_FORMAT.md')
+    if not os.path.exists(ff_path):
+        fail('docs/FEATURE_FORMAT.md missing')
+    ff = read(ff_path)
+    if 'plan' not in ff or 'LLM' not in ff or 'Markdown' not in ff:
+        fail('FEATURE_FORMAT.md must document plan field and LLM-friendly Markdown requirements')
+
+    # 4) FILE_ORGANISATION.md: no plan.md, reference embedded plans
+    fo_path = os.path.join(ROOT, 'docs', 'FILE_ORGANISATION.md')
+    if not os.path.exists(fo_path):
+        fail('docs/FILE_ORGANISATION.md missing')
+    fo = read(fo_path)
+    if 'plan.md' in fo:
+        fail('FILE_ORGANISATION.md should not reference plan.md')
+    if 'task.json' not in fo or 'plans' not in fo:
+        fail('FILE_ORGANISATION.md should state plans are embedded in task.json')
+
+    ok('Feature 13.9: tooling and docs updated for LLM-friendly Markdown plans, and update_feature_status tool exposed.')
+
+
+if __name__ == '__main__':
+    main()

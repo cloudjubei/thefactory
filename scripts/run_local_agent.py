@@ -15,10 +15,9 @@ from scripts.tools.ask_question import ask_question_tool
 from scripts.tools.finish import finish_tool
 from scripts.tools.finish_feature import finish_feature_tool
 from scripts.tools.run_tests import run_tests_tool
-from scripts.tools.task_utils import get_task
+from scripts.tools.task_utils import get_task, update_feature_status
 
-class AgentTools:
-    def __init__(self, repo_path: str, git_manager: GitManager):
+class AgentTools:\n    def __init__(self, repo_path: str, git_manager: GitManager):
         self.repo_path = repo_path
         self.git_manager = git_manager
 
@@ -48,6 +47,12 @@ class AgentTools:
 
     def run_tests(self):
         return run_tests_tool(self.repo_path)
+
+    def update_feature_status(self, task_id: int, feature_number: int, new_status: str, reason: str = ""):
+        """Expose update_feature_status as an agent tool."""
+        # Ensure the function uses the working repo tasks base path
+        tasks_base = os.path.join(self.repo_path, 'tasks')
+        return update_feature_status(task_id=task_id, feature_number=feature_number, new_status=new_status, reason=reason, base_path=tasks_base)
 
 class UnifiedEngine:
     def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None, persona: str = None) -> list:
