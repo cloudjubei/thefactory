@@ -82,7 +82,7 @@
     },
     {
       "id": "1.6",
-      "status": "-",
+      "status": "+",
       "title": "Testing",
       "action": "Establish the canonical, project-wide testing specification and integrate testing requirements into the planning specification so every feature is verifiable by deterministic tests.",
       "plan": "1. Create the file `docs/TESTING.md`. 2. Define the project's testing philosophy, scope, and structure. 3. Specify file locations (`tasks/{id}/tests/`) and naming conventions (`test_{task_id}_{feature_id}.py`). 4. Document testing tools (`run_tests`) and the development workflow.",

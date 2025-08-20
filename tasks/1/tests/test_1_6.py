@@ -1,29 +1,33 @@
-import os
 import sys
+import os
 
 def run():
-    path = "docs/TESTING.md"
-    if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
+    file_path = "docs/TESTING.md"
+    if not os.path.exists(file_path):
+        print(f"FAIL: {file_path} does not exist.")
         sys.exit(1)
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    required_content = [
+    # Acceptance Criterion: Check for key sections/topics
+    required_topics = [
+        "Purpose and Scope",
         "Test Locations and Naming Conventions",
-        "tasks/{task_id}/tests/",
-        "test_{task_id}_{feature_number}.py",
-        "run_tests"
+        "Test Structure and Utilities",
+        "Writing Acceptance Tests",
+        "Running Tests",
+        "Tool Usage",
+        "finish_feature"
     ]
 
-    missing = [item for item in required_content if item not in content]
+    missing = [topic for topic in required_topics if topic not in content]
 
     if missing:
-        print(f"FAIL: Missing key content in {path}: {', '.join(missing)}")
+        print(f"FAIL: Missing topics in {file_path}: {', '.join(missing)}")
         sys.exit(1)
 
-    print(f"PASS: {path} exists and describes the testing specification as required.")
+    print(f"PASS: {file_path} exists and describes the testing specification as required.")
     sys.exit(0)
 
 if __name__ == "__main__":
