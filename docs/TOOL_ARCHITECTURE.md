@@ -102,7 +102,7 @@ The orchestrator will make the following Python functions available as tools to 
 ## 6. Mandatory Task Completion Workflow
 To be considered complete, any plan that successfully addresses a task MUST conclude with the following sequence of tool calls. This is the agent's "definition of done."
 
-1.  `write_file`: All file modifications, including updating the relevant task's status in `TASKS.md`.
+1.  `write_file`: All file modifications, including updating the relevant task's status in `tasks/{task_id}/task.json`.
 2.  `submit_for_review`: To package and submit all changes for human review.
 3.  `finish`: To signal the successful completion of the work cycle.
 

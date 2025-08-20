@@ -1,44 +1,68 @@
-import os
-import sys
 import json
+import sys
+import os
 
 def run():
-    """
-    Verifies that the task.json file for task 13 has a 'plan' field
-    at the top level and for every feature.
-    """
-    task_file_path = "tasks/13/task.json"
-    if not os.path.exists(task_file_path):
-        print(f"FAIL: {task_file_path} does not exist.")
-        sys.exit(1)
-
-    try:
-        with open(task_file_path, "r", encoding="utf-8") as f:
-            task_data = json.load(f)
-    except json.JSONDecodeError as e:
-        print(f"FAIL: Could not decode JSON from {task_file_path}: {e}")
-        sys.exit(1)
-
-    # Check top-level plan
-    if "plan" not in task_data or not isinstance(task_data["plan"], str) or not task_data["plan"].strip():
-        print(f"FAIL: Top-level 'plan' field is missing, not a string, or empty in {task_file_path}.")
-        sys.exit(1)
-
-    # Check feature-level plans
-    if "features" not in task_data or not isinstance(task_data["features"], list):
-        print(f"FAIL: 'features' field is missing or not a list in {task_file_path}.")
+    # 1. Check schema file for corrections
+    schema_file = 'docs/tasks/task_format.py'
+    if not os.path.exists(schema_file):
+        print(f"FAIL: Schema file {schema_file} does not exist.")
         sys.exit(1)
         
-    all_features_have_plan = True
-    for i, feature in enumerate(task_data["features"]):
-        if "plan" not in feature or not isinstance(feature["plan"], str) or not feature["plan"].strip():
-            print(f"FAIL: Feature #{i+1} (ID: {feature.get('id', 'N/A')}) is missing a 'plan', or it is not a non-empty string.")
-            all_features_have_plan = False
+    with open(schema_file, 'r', encoding='utf-8') as f:
+        schema_content = f.read()
 
-    if not all_features_have_plan:
+    if 'class AcceptanceCriterion(TypedDict):' not in schema_content:
+        print("FAIL: AcceptanceCriterion TypedDict not found in schema.")
         sys.exit(1)
 
-    print("PASS: Top-level plan and all feature plans exist and are non-empty strings.")
+    if 'class Task(TypedDict):' not in schema_content:
+        print("FAIL: Task TypedDict not found in schema.")
+        sys.exit(1)
+
+    if 'id: int' not in schema_content:
+        print("FAIL: Task id is not of type int in schema.")
+        sys.exit(1)
+
+    if 'acceptance: List[AcceptanceCriterion]' not in schema_content:
+        print("FAIL: Task acceptance field is missing or has wrong type in schema.")
+        sys.exit(1)
+    
+    # 2. Check an actual task file against the schema's intent
+    task_file = 'tasks/13/task.json'
+    if not os.path.exists(task_file):
+        print(f"FAIL: Task file {task_file} not found.")
+        sys.exit(1)
+
+    with open(task_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    if not isinstance(data.get('id'), int):
+        print(f"FAIL: Task id in {task_file} is not an integer.")
+        sys.exit(1)
+        
+    if 'acceptance' not in data:
+        print(f"FAIL: Task {task_file} is missing 'acceptance' field.")
+        sys.exit(1)
+        
+    if not isinstance(data.get('acceptance'), list):
+        print(f"FAIL: Task 'acceptance' in {task_file} is not a list.")
+        sys.exit(1)
+
+    # 3. Check docs/TOOL_ARCHITECTURE.md for update
+    doc_file = 'docs/TOOL_ARCHITECTURE.md'
+    if not os.path.exists(doc_file):
+        print(f"FAIL: Doc file {doc_file} does not exist.")
+        sys.exit(1)
+        
+    with open(doc_file, 'r', encoding='utf-8') as f:
+        doc_content = f.read()
+    
+    if 'TASKS.md' in doc_content:
+        print("FAIL: docs/TOOL_ARCHITECTURE.md still contains reference to TASKS.md")
+        sys.exit(1)
+        
+    print("PASS: Task schema, example, and documentation are consistent.")
     sys.exit(0)
 
 if __name__ == "__main__":

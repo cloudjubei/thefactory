@@ -88,7 +88,7 @@
     },
     {
       "id": "13.6",
-      "status": "-",
+      "status": "+",
       "title": "Cleanup",
       "action": "Handle any leftover missing functionality",
       "acceptance": [

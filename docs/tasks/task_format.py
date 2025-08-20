@@ -5,10 +5,6 @@ try:
 except ImportError:
     from typing_extensions import NotRequired
 
-# Dummy definitions to satisfy a potentially flawed test
-# Feature.acceptance: str
-# Task.acceptance: str
-
 Status = Literal["+", "~", "-", "?", "/", "="]
 
 class Feature(TypedDict):
@@ -23,10 +19,15 @@ class Feature(TypedDict):
     rejection: NotRequired[str]
     agent_question: NotRequired[str]
 
+class AcceptanceCriterion(TypedDict):
+    phase: str
+    criteria: List[str]
+
 class Task(TypedDict):
-    id: str
+    id: int
     status: Status
     title: str
     action: str
     plan: str
+    acceptance: List[AcceptanceCriterion]
     features: List[Feature]
