@@ -1,119 +1,157 @@
-import json
-import os
-import sys
+from __future__ import annotations
+"""Utility helpers for safely manipulating task definition files (tasks/{id}/task.json).
+This module is the single programmatic interface used by the planner, tester and developer
+personas to inspect and mutate task metadata.
+
+The JSON schema is defined in `docs/tasks/task_format.py`. We load it dynamically to avoid
+packaging requirements while still benefiting from the TypedDict contracts.
+
+Whenever a write is performed an optional `GitManager` instance can be provided so that the
+change is staged and committed, keeping repository state consistent.
+"""
+
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional, Tuple, Any, cast
+import json
+import importlib.util
+import sys
+import os
 
-# To reference docs.tasks.task_format, we need to add the project root to sys.path
-# as 'docs' is not a package.
-# Assuming this script is at <project_root>/scripts/tools/task_utils.py
-# The project root is two levels up.
-project_root = Path(__file__).resolve().parents[2]
-if str(project_root) not in sys.path:
-    sys.path.append(str(project_root))
+# ---------------------------------------------------------------------------
+# Load the canonical schema so we can use the TypedDicts for type-checking.
+# ---------------------------------------------------------------------------
 
-from docs.tasks.task_format import Task, Feature, Status
+_TASK_FORMAT_PATH = Path(__file__).resolve().parent.parent / "docs" / "tasks" / "task_format.py"
+_spec = importlib.util.spec_from_file_location("_task_format", _TASK_FORMAT_PATH)
+if _spec is None or _spec.loader is None:  # pragma: no cover — fatal mis-configuration.
+    raise ImportError(f"Cannot load task_format.py from {_TASK_FORMAT_PATH}")
+_task_format = importlib.util.module_from_spec(_spec)  # type: ignore[arg-type]
+_spec.loader.exec_module(_task_format)  # type: ignore[union-attr]
 
-TASKS_DIR = "tasks"
+# Re-export so that downstream modules can do `from scripts.task_utils import Task, Feature`.
+Task = _task_format.Task  # type: ignore[attr-defined]
+Feature = _task_format.Feature  # type: ignore[attr-defined]
+Status = _task_format.Status  # type: ignore[attr-defined]
 
-def get_task(task_id: int, base_path: str = TASKS_DIR) -> Optional[Task]:
-    """Reads a task from its JSON file."""
-    task_file = Path(base_path) / str(task_id) / "task.json"
-    if not task_file.exists():
+# ---------------------------------------------------------------------------
+# Git integration (optional)
+# ---------------------------------------------------------------------------
+try:
+    from scripts.git_manager import GitManager  # noqa: F401 – runtime optional
+except ModuleNotFoundError:  # pragma: no cover – tests might not need GitManager
+    GitManager = None  # type: ignore[assignment]
+
+# ---------------------------------------------------------------------------
+# File helpers
+# ---------------------------------------------------------------------------
+
+def _task_file_path(task_id: int | str, base_path: str | Path = "tasks") -> Path:
+    """Return the absolute path to tasks/{id}/task.json"""
+    return Path(base_path).expanduser().resolve() / str(task_id) / "task.json"
+
+
+def _load_json(path: Path) -> Any:
+    with path.open("r", encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _write_json(path: Path, data: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".json.tmp")
+    with tmp.open("w", encoding="utf-8") as fh:
+        json.dump(data, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+    tmp.replace(path)
+
+# ---------------------------------------------------------------------------
+# Public API used by agent personas
+# ---------------------------------------------------------------------------
+
+__all__ = [
+    "Task",
+    "Feature",
+    "get_task",
+    "save_task",
+    "update_feature_status",
+    "get_pending_features",
+    "add_plan",
+    "add_feature",
+]
+
+# --- Planner tools ----------------------------------------------------------
+
+def get_task(task_id: int | str, base_path: str | Path = "tasks") -> Task | None:
+    """Return task data dict or *None* if file is missing."""
+    path = _task_file_path(task_id, base_path)
+    if not path.exists():
         return None
-    with open(task_file, "r", encoding="utf-8") as f:
-        return json.load(f)
+    return cast(Task, _load_json(path))
 
-def create_task(task: Task, base_path: str = TASKS_DIR) -> bool:
-    """Creates a new task directory and task.json file."""
-    task_dir = Path(base_path) / str(task['id'])
-    task_file = task_dir / "task.json"
-    if task_file.exists():
-        print(f"Error: Task {task['id']} already exists at {task_file}")
-        return False
-    task_dir.mkdir(parents=True, exist_ok=True)
-    with open(task_file, "w", encoding="utf-8") as f:
-        json.dump(task, f, indent=2)
-    return True
 
-def update_task(task: Task, base_path: str = TASKS_DIR) -> bool:
-    """Updates an existing task.json file."""
-    task_file = Path(base_path) / str(task['id']) / "task.json"
-    if not task_file.exists():
-        print(f"Error: Task {task['id']} does not exist at {task_file}")
-        return False
-    with open(task_file, "w", encoding="utf-8") as f:
-        json.dump(task, f, indent=2)
-    return True
+def save_task(task_id: int | str, task_data: Task, *, base_path: str | Path = "tasks", git_manager: "GitManager | None" = None) -> None:
+    """Over-write the task.json file with *task_data*.
 
-def move_task(old_task_id: int, new_task_id: int, base_path: str = TASKS_DIR) -> bool:
-    """Renames a task directory and updates the task ID within its JSON file."""
-    old_task_dir = Path(base_path) / str(old_task_id)
-    new_task_dir = Path(base_path) / str(new_task_id)
-    if not old_task_dir.exists():
-        print(f"Error: Source task {old_task_id} does not exist.")
-        return False
-    if new_task_dir.exists():
-        print(f"Error: Target task directory {new_task_id} already exists.")
-        return False
-    
-    old_task_dir.rename(new_task_dir)
-    
-    task = get_task(new_task_id, base_path=str(new_task_dir.parent))
-    if task:
-        task['id'] = new_task_id
-        for feature in task.get('features', []):
-            try:
-                parts = feature['id'].split('.')
-                if len(parts) == 2:
-                    feature['id'] = f"{new_task_id}.{parts[1]}"
-            except (AttributeError, IndexError):
-                pass
-        return update_task(task, base_path=str(new_task_dir.parent))
-    return False
+    If *git_manager* is supplied the change is committed on the active branch.
+    """
+    path = _task_file_path(task_id, base_path)
+    _write_json(path, task_data)
 
-def update_task_status(task_id: int, status: Status, base_path: str = TASKS_DIR) -> bool:
-    """Updates the status of a specific task."""
-    task = get_task(task_id, base_path)
-    if not task:
-        return False
-    task['status'] = status
-    return update_task(task, base_path)
+    if git_manager is not None:
+        git_manager.stage_file(str(path))
+        git_manager.commit(f"Update task {task_id}")
 
-def update_feature_status(task_id: int, feature_id: str, status: Status, base_path: str = TASKS_DIR) -> bool:
-    """Updates the status of a specific feature within a task."""
-    task = get_task(task_id, base_path)
-    if not task:
+
+def add_plan(task_id: int | str, plan_content: str, *, base_path: str | Path = "tasks", git_manager: "GitManager | None" = None) -> None:
+    """Create or replace tasks/{id}/plan.md with *plan_content* and commit the change if requested."""
+    plan_path = Path(base_path).expanduser().resolve() / str(task_id) / "plan.md"
+    plan_path.parent.mkdir(parents=True, exist_ok=True)
+    plan_path.write_text(plan_content, encoding="utf-8")
+
+    if git_manager is not None:
+        git_manager.stage_file(str(plan_path))
+        git_manager.commit(f"Add/Update plan for task {task_id}")
+
+
+def get_pending_features(task_data: Task) -> List[Feature]:
+    """Return a list of features whose *status* is marked as pending ("-" or "?" according to current spec)."""
+    return [f for f in task_data.get("features", []) if f.get("status") in {"-", "?"}]
+
+# --- Tester / Developer shared tools ---------------------------------------
+
+def update_feature_status(
+    task_id: int | str,
+    feature_id: str,
+    new_status: Status,
+    *,
+    base_path: str | Path = "tasks",
+    git_manager: "GitManager | None" = None,
+) -> bool:
+    """Update *status* of the given feature. Returns *True* if change applied, *False* otherwise."""
+    task_data = get_task(task_id, base_path)
+    if not task_data:
         return False
-    
-    feature_found = False
-    for feature in task.get('features', []):
-        if feature.get('id') == feature_id:
-            feature['status'] = status
-            feature_found = True
+
+    updated = False
+    for feat in task_data.get("features", []):
+        if feat.get("id") == feature_id:
+            if feat.get("status") != new_status:
+                feat["status"] = new_status
+                updated = True
             break
-            
-    if not feature_found:
-        print(f"Error: Feature {feature_id} not found in task {task_id}.")
-        return False
-        
-    return update_task(task, base_path)
+    if updated:
+        save_task(task_id, task_data, base_path=base_path, git_manager=git_manager)
+    return updated
 
-def set_agent_question(task_id: int, feature_id: str, question: str, base_path: str = TASKS_DIR) -> bool:
-    """Sets the agent_question for a specific feature."""
-    task = get_task(task_id, base_path)
-    if not task:
-        return False
-        
-    feature_found = False
-    for feature in task.get('features', []):
-        if feature.get('id') == feature_id:
-            feature['agent_question'] = question
-            feature_found = True
-            break
-            
-    if not feature_found:
-        print(f"Error: Feature {feature_id} not found in task {task_id}.")
-        return False
-        
-    return update_task(task, base_path)
+# --- Planner extension ------------------------------------------------------
+
+def add_feature(
+    task_id: int | str,
+    feature: Feature,
+    *,
+    base_path: str | Path = "tasks",
+    git_manager: "GitManager | None" = None,
+) -> None:
+    """Append a new *feature* (dict compliant with schema) to tasks/{id}/task.json."""
+    task_data = get_task(task_id, base_path) or cast(Task, {"id": int(task_id), "status": "-", "title": "", "action": "", "plan": "", "features": []})
+    task_data.setdefault("features", []).append(feature)
+    save_task(task_id, task_data, base_path=base_path, git_manager=git_manager)
