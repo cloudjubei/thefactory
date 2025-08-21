@@ -26,7 +26,7 @@
     },
     {
       "id": "2.2",
-      "status": "-",
+      "status": "+",
       "title": "Task Utility Tooling",
       "description": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
       "context": [
@@ -85,7 +85,7 @@
     },
     {
       "id": "2.4",
-      "status": "-",
+      "status": "+",
       "title": "Dependency specification",
       "description": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`, `scripts/git_manager.py, `scripts/task_utils.py",
       "plan": "Scan `scripts/run_local_agent.py` and list all non-standard library imports.\nScan `scripts/git_manager.py` and list all non-standard library imports.\nScan `scripts/task_utils.py` and list all non-standard library imports.\nCompile a single, unique list of all external dependencies identified in the previous steps.\nCreate a new file named `requirements.txt` in the project's root directory.\nAdd each unique dependency from the compiled list to `requirements.txt`, with each library on a new line.",
@@ -102,7 +102,7 @@
     },
     {
       "id": "2.5",
-      "status": "-",
+      "status": "+",
       "title": "Environment variables template",
       "description": "Provide `.env.example` containing placeholders for required API keys and settings.",
       "plan": "1. Create the `.env.example` file in the project root. 2. Add placeholder variables for API keys needed by `litellm` (e.g., `OPENAI_API_KEY=your_key_here`). 3. Include comments to explain each variable's purpose.",
