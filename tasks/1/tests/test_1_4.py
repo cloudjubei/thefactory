@@ -86,12 +86,12 @@ def test_update_statuses():
     task_updated = task_utils.update_task_status(TEST_TASK_ID, '+', base_path=str(TEMP_TASKS_DIR))
     assert task_updated, "update_task_status should return True."
     task = task_utils.get_task(TEST_TASK_ID, base_path=str(TEMP_TASKS_DIR))
-    assert task['status'] == '+', "Task status should be updated to '+'+"."
+    assert task['status'] == '+', "Task status should be updated to '+'"
     feature_id = f"{TEST_TASK_ID}.1"
     feature_updated = task_utils.update_feature_status(TEST_TASK_ID, feature_id, '~', base_path=str(TEMP_TASKS_DIR))
     assert feature_updated, "update_feature_status should return True."
     task = task_utils.get_task(TEST_TASK_ID, base_path=str(TEMP_TASKS_DIR))
-    assert task['features'][0]['status'] == '~', "Feature status should be updated to '~'."
+    assert task['features'][0]['status'] == '~', "Feature status should be updated to '~'"
     print("...PASSED")
 
 @run_test
