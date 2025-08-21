@@ -217,15 +217,27 @@ def create_task(task: Task) -> Task:
     save_task(task)
     return task
 
-def create_feature(task_id: int, feature: Feature):
-    """Adds a new feature to an existing task."""
+def create_feature(task_id: int, feature: Feature) -> Feature:
+    """Adds a new feature to an existing task. (For rare cases where a feature must be split)."""
     task = get_task(task_id)
-    
-    # Simple check for duplicate feature IDs
     existing_ids = {f["id"] for f in task["features"]}
     if feature["id"] in existing_ids:
         raise ValueError(f"Feature with ID {feature['id']} already exists in task {task_id}.")
-        
     task["features"].append(feature)
     save_task(task)
     return feature
+
+def update_feature_plan(task_id: int, feature_id: str, plan: str) -> Optional[Feature]:
+    """
+    Updates the 'plan' field of a specific feature. This is the primary tool for the Planner agent.
+    """
+    task = get_task(task_id)
+    updated_feature = None
+    for feature in task["features"]:
+        if feature["id"] == feature_id:
+            feature["plan"] = plan
+            updated_feature = feature
+            break
+    if updated_feature:
+        save_task(task)
+    return updated_feature

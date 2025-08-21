@@ -23,10 +23,7 @@ MAX_TURNS_PER_FEATURE = 10
 # --- Tool Mapping ---
 
 def get_available_tools(agent_type: str, git_manager: GitManager) -> Dict[str, Callable]:
-    """
-    Returns a dictionary of callable tool functions based on the agent persona.
-    """
-    # Base tools available to all agents
+    """Returns a dictionary of callable tool functions based on the agent persona."""
     base_tools = {
         "finish": task_utils.finish,
         "update_agent_question": task_utils.update_agent_question,
@@ -42,48 +39,67 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Dict[str, C
             "defer_feature": task_utils.defer_feature,
             "finish_feature": lambda **kwargs: task_utils.finish_feature(**kwargs, git_manager=git_manager),
         }
-    elif agent_type == 'tester':
-        agent_tools = {
-            "get_test": task_utils.get_test,
-            "update_acceptance_criteria": task_utils.update_acceptance_criteria,
-            "update_test": task_utils.update_test,
-            "delete_test": task_utils.delete_test,
-            "run_test": task_utils.run_test,
-        }
     elif agent_type == 'planner':
         agent_tools = {
-            "create_task": task_utils.create_task,
+            "update_feature_plan": task_utils.update_feature_plan,
             "create_feature": task_utils.create_feature,
-            "update_task": task_utils.update_task_status, # Note: Planner updates task status
-            "update_feature": lambda **kwargs: None, # Placeholder for a more complex update_feature tool
+        }
+    elif agent_type == 'tester':
+        agent_tools = {
+            "update_acceptance_criteria": task_utils.update_acceptance_criteria,
+            "update_test": task_utils.update_test,
+            "run_test": task_utils.run_test,
+            "get_test": task_utils.get_test,
+            "delete_test": task_utils.delete_test,
         }
     
     base_tools.update(agent_tools)
     return base_tools
 
 def construct_system_prompt(agent_type: str, task: Task, feature: Feature, context: str, available_tools: Dict) -> str:
-    prompt = f"""You are the '{agent_type}' agent. Your goal is to complete the single feature assigned to you.
+    """Constructs the detailed system prompt, now specialized for the agent type."""
+    
+    # Base information for all agents
+    prompt = f"""You are the '{agent_type}' agent.
 
 CURRENT TASK: {task['title']} (ID: {task['id']})
-
 ASSIGNED FEATURE: {feature['title']} (ID: {feature['id']})
 DESCRIPTION: {feature.get('action', 'No action specified.')}
-ACCEPTANCE CRITERIA:
-    """
-    for i, criterion in enumerate(feature.get('acceptance', []), 1):
-        prompt += f"{i}. {criterion}\n"
-            
-    prompt += f"""
+"""
+    # Acceptance criteria are relevant for developers and testers, but not planners who might be creating them.
+    if agent_type in ['developer', 'tester']:
+        prompt += "ACCEPTANCE CRITERIA:\n"
+        for i, criterion in enumerate(feature.get('acceptance', []), 1):
+            prompt += f"{i}. {criterion}\n"
+
+    # --- Agent-specific instructions ---
+    if agent_type == 'planner':
+        prompt += """
+Your **ONLY** job is to create a detailed, step-by-step implementation plan for the assigned feature.
+Analyze the feature and use the `update_feature_plan` tool to save your plan. Do not perform any other actions.
+"""
+    elif agent_type == 'tester':
+        prompt += """
+Your job is to write the acceptance criteria and a corresponding Python test for this feature.
+1. First, use the `update_acceptance_criteria` tool to define the success conditions.
+2. Second, use the `update_test` tool to write a test that verifies those criteria.
+"""
+    else: # Developer prompt
+        prompt += f"""
 The following context files have been provided:
 {context}
 
+Your job is to execute the feature's plan and meet all acceptance criteria.
+When you are finished and the tests pass, you MUST call 'finish_feature'.
+"""
+
+    prompt += f"""
 You must respond in JSON format with a "plan" and a list of "tool_calls".
-When you have successfully completed your work on the feature, you MUST call the appropriate finishing tool ('finish_feature' for developers).
 
 AVAILABLE TOOLS:
 {json.dumps(list(available_tools.keys()), indent=2)}
 
-Begin work on your assigned feature now.
+Begin now.
 """
     return prompt
 
