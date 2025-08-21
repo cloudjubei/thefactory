@@ -1,45 +1,34 @@
-import os
-import sys
+import os, sys
 
-def run_test():
-    """
-    Tests for Feature 1.5: File Organisation specification.
-    - Verifies that docs/FILE_ORGANISATION.md exists.
-    - Verifies that it contains the required sections.
-    """
-    file_path = "docs/FILE_ORGANISATION.md"
-    
-    # 1. Check if file exists
-    if not os.path.exists(file_path):
-        print(f"FAIL: {file_path} does not exist.")
+def run():
+    path = "docs/AGENT_PLANNER.md"
+    if not os.path.exists(path):
+        print(f"FAIL: {path} does not exist.")
         sys.exit(1)
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
 
-    # 2. Check for required sections
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
-    except Exception as e:
-        print(f"FAIL: Could not read {file_path}: {e}")
-        sys.exit(1)
-
-    required_headings = [
-        "# Top-Level Directory Layout",
-        "# File Naming Conventions",
-        "# Evolution Guidance",
-        "# Example Tree"
+    required_strings = [
+        "docs/tasks/task_format.py",
+        "docs/tasks/task_example.json",
+        "create_task(task:Task)->Task",
+        "create_feature(feature:Feature)->Feature",
+        "update_task(id:int,title:str,action:str,plan:str)->Task",
+        "update_feature(task_id:int,feature_id:str,title:str,action:str,context:[str],plan:str)->Feature",
+        "The document explains that creating a task with features that clearly describe the full scope of the task is mandatory - `create_task` tool is used for this",
+        "The document explains that creating features that are missing for the task to be complete is mandatory - `create_feature` tool is used for this",
+        "The document explains that the task requires a generic high level plan - `update_task` tool is used for this",
+        "The document explains that each feature requires a step-by-step plan that should make it easy to implement for an LLM - `update_feature` tool is used for this",
+        "The document explains that each feature requires gathering a minimal context that is required per feature - `update_feature` tool is used for this",
     ]
-    
-    missing_headings = []
-    for heading in required_headings:
-        if heading not in content:
-            missing_headings.append(heading)
 
-    if missing_headings:
-        print(f"FAIL: Missing sections in {file_path}: {', '.join(missing_headings)}")
+    missing = [s for s in required_strings if s not in content]
+    if missing:
+        print("FAIL: Missing required content: " + ", ".join(missing))
         sys.exit(1)
-        
-    print("PASS: docs/FILE_ORGANISATION.md exists and contains all required sections.")
+
+    print("PASS: AGENT_PLANNER.md meets the acceptance criteria for feature 1.5.")
     sys.exit(0)
 
 if __name__ == "__main__":
-    run_test()
+    run()

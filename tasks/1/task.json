@@ -62,7 +62,7 @@
     },
     {
       "id": "1.5",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Planner",
       "action": "Create a specification for the Planner task that describes how to create a task with features that clearly describe the full scope of the task, and how to create a plan for each feature. This document is meant to be directly passed to a planner agent and alongside `docs/AGENT_PERSONAS_PLANNER.md` serve as their starting point and guide.",
       "context": [
