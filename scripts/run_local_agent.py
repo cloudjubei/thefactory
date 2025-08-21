@@ -43,7 +43,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
     base_tools = {
         "get_context": (task_utils.get_context, "get_context(files: list[str]) -> list[str]"),
         "block_feature": (task_utils.block_feature, "block_feature(reason: str)"),
-        "finish_feature": (task_utils.finish_feature, "finish_feature()"),
+        "finish_feature": (lambda task_id, feature_id: task_utils.finish_feature(task_id, feature_id, agent_type, git_manager), "finish_feature()"),
     }
 
     agent_tools = {}

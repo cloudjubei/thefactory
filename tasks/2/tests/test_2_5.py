@@ -2,22 +2,22 @@ import os
 
 def test_env_example():
     file_path = '.env.example'
-    assert os.path.exists(file_path), ".env.example file does not exist"
+    assert os.path.exists(file_path), f"{file_path} does not exist in the project root."
 
     with open(file_path, 'r') as f:
         lines = f.readlines()
 
-    var_count = 0
+    var_lines = []
     for i, line in enumerate(lines):
         stripped = line.strip()
-        if stripped and '=' in stripped and not stripped.startswith('#'):
-            # Check preceding comment
-            assert i > 0, "First line cannot be a variable without preceding comment"
-            prev_stripped = lines[i-1].strip()
-            assert prev_stripped.startswith('#'), f"No comment before variable at line {i+1}"
-            # Check placeholder (empty value after =)
-            key, value = stripped.split('=', 1)
-            assert value.strip() == '', f"Variable '{key}' should have empty placeholder value"
-            var_count += 1
+        if stripped and not stripped.startswith('#'):
+            parts = stripped.split('=', 1)
+            if len(parts) != 2 or parts[1].strip() != '':
+                assert False, f"Line {i+1}: '{line.strip()}' is not a proper placeholder (should be VAR= with empty value)"
+            var_lines.append(i)
 
-    assert var_count >= 1, "At least one documented variable required"
+    assert len(var_lines) >= 1, "At least one environment variable required"
+
+    for var_idx in var_lines:
+        if var_idx == 0 or not lines[var_idx - 1].strip().startswith('#'):
+            assert False, f"Environment variable at line {var_idx+1} is not preceded immediately by a comment."
