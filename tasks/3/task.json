@@ -1,6 +1,6 @@
 {
   "id": 3,
-  "status": "-",
+  "status": "~",
   "title": "New child projects structure",
   "action": "Need helper functions to start a child project, to create all of its starting files and link it back to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. This project will only oversee their specification correctness.",
   "plan": "1. Create the specification document for child projects. 2. Create the `projects` directory and update `.gitignore`. 3. Define boilerplate files for child projects. 4. Implement a script to automate child project creation and registration as a submodule.",
@@ -8,7 +8,7 @@
     {
       "id": "3.1",
       "title": "Create Child Projects Specification Document",
-      "status": "-",
+      "status": "+",
       "action": "Create the `docs/CHILD_PROJECTS_SPECIFICATION.md` file to define the structure, purpose, and management of child projects linked to this main project.",
       "plan": "1. Create a new file at `docs/CHILD_PROJECTS_SPECIFICATION.md`. 2. Add content explaining that child projects are managed as Git submodules within the `projects/` directory. 3. Detail the expected repository structure for a child project and how it links back to this parent project.",
       "context": [],
