@@ -36,7 +36,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Dict[str, C
             "write_file": task_utils.write_file,
             "run_test": task_utils.run_test,
             "update_feature_status": task_utils.update_feature_status,
-            "defer_feature": task_utils.defer_feature,
+            "block_feature": task_utils.block_feature,
             "finish_feature": lambda **kwargs: task_utils.finish_feature(**kwargs, git_manager=git_manager),
         }
     elif agent_type == 'planner':
@@ -124,6 +124,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
             messages.append(assistant_message)
             
             response_json = json.loads(assistant_message.content)
+            print(f"RAW RESPONSE: {response_json}")
             plan = response_json.get("action_plan", "No plan provided.")
             tool_calls = response_json.get("tool_calls", [])
             print(f"Agent Plan: {plan}")
@@ -145,7 +146,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
                 else:
                     tool_outputs.append(f"Error: Tool '{tool_name}' not found.")
 
-                if tool_name in ['finish_feature', 'defer_feature']:
+                if tool_name in ['finish_feature', 'block_feature']:
                     print(f"Agent called '{tool_name}'. Concluding work on this feature.")
                     return True
                 if tool_name == 'finish':
@@ -156,11 +157,11 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
 
         except Exception as e:
             print(f"An error occurred in agent loop: {e}")
-            task_utils.defer_feature(task['id'], feature['id'], f"Agent loop failed: {e}")
+            task_utils.block_feature(task['id'], feature['id'], f"Agent loop failed: {e}")
             return True
             
     print(f"Max turns reached for feature {feature['id']}. Deferring.")
-    task_utils.defer_feature(task['id'], feature['id'], "Max conversation turns reached.")
+    task_utils.block_feature(task['id'], feature['id'], "Max conversation turns reached.")
     return True
 
 

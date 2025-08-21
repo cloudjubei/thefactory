@@ -37,8 +37,12 @@ The following tree is graphical and illustrative of a typical repository layout:
 repo_root/
 ├─ docs/
 │  ├─ FILE_ORGANISATION.md
-│  ├─ TESTING.md
+│  ├─ AGENT_DEVELOPER.md
+│  ├─ AGENT_PLANNER.md
+│  ├─ AGENT_TESTER.md
+│  ├─ LOCAL_SETUP.md
 │  ├─ AGENT_COMMUNICATION_PROTOCOL.md
+│  ├─ agent_protocol_format.json
 │  └─ tasks/
 │     ├─ task_format.py
 │     └─ task_example.json

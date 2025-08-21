@@ -84,20 +84,20 @@ def update_feature_status(task_id: int, feature_id: str, status: Status) -> Opti
         save_task(task)
     return updated_feature
 
-def defer_feature(task_id: int, feature_id: str, reason: str) -> Optional[Feature]:
-    """Sets a feature's status to '=' (Deferred) when it's blocked."""
+def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Feature]:
+    """Sets a feature's status to '?' Blocked when it's blocked."""
     # ... (implementation from previous message is correct)
     task = get_task(task_id)
     deferred_feature = None
     for feature in task["features"]:
         if feature["id"] == feature_id:
-            feature["status"] = "="
-            feature["rejection"] = f"Deferred: {reason}"
+            feature["status"] = "?"
+            feature["rejection"] = f"Blocked: {reason}"
             deferred_feature = feature
             break
     if deferred_feature:
         save_task(task)
-    print(f"Feature {feature_id} deferred. Reason: {reason}")
+    print(f"Feature {feature_id} blocked. Reason: {reason}")
     return deferred_feature
 
 def finish_feature(task_id: int, feature_id: str, git_manager: GitManager):
