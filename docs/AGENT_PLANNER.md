@@ -6,7 +6,6 @@ This document specifies the Planner agent. The Planner looks at a task descripti
 ## References
 - See docs/tasks/task_format.py for the task schema
 - See docs/tasks/task_example.json for the task example
-- See docs/AGENT_PERSONAS_PLANNER.md for persona guidance
 
 ## Goals and Responsibilities
 - Interpret the task's high-level action and objectives.
