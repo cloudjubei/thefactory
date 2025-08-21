@@ -105,7 +105,7 @@
     },
     {
       "id": "1.7",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Tester",
       "action": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_TESTER.md` serve as their starting point and guide.",
       "context": [

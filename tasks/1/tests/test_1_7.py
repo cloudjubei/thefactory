@@ -1,34 +1,35 @@
 import os
-import sys
 
-def run():
-    file_path = "docs/TOOL_ARCHITECTURE.md"
-    print(f"--- Running Test for Feature 1.7: Tools Guide ---")
 
-    if not os.path.exists(file_path):
-        print(f"FAIL: File '{file_path}' does not exist.")
-        sys.exit(1)
-        
-    with open(file_path, "r", encoding="utf-8") as f:
+def test_agent_tester_doc_exists_and_has_required_content():
+    path = os.path.join('docs', 'AGENT_TESTER.md')
+    assert os.path.isfile(path), 'docs/AGENT_TESTER.md must exist'
+    with open(path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    required_sections = [
-        "Core Principle",
-        "Agent-Orchestrator Contract",
-        "JSON Response Schema",
-        "Available Tools",
-        "Execution Modes",
-        "Mandatory Task Completion Workflow"
+    # Must reference core guidance and protocol docs
+    assert 'docs/TESTING.md' in content, 'Must reference docs/TESTING.md'
+    assert 'docs/AGENT_COMMUNICATION_PROTOCOL.md' in content, 'Must reference docs/AGENT_COMMUNICATION_PROTOCOL.md'
+    assert 'docs/agent_protocol_format.json' in content, 'Must reference docs/agent_protocol_format.json'
+
+    # Must have a Tools section and list all required tools
+    assert 'Tools' in content, 'Must contain a Tools section'
+    required_tools = [
+        'get_test(',
+        'update_acceptance_criteria(',
+        'update_test(',
+        'delete_test(',
+        'run_test(',
+        'update_task_status(',
+        'update_feature_status(',
+        'update_agent_question('
     ]
+    for tool in required_tools:
+        assert tool in content, f'Missing tool specification: {tool}'
 
-    missing_sections = [s for s in required_sections if s not in content]
-
-    if missing_sections:
-        print(f"FAIL: Missing sections in '{file_path}': {', '.join(missing_sections)}")
-        sys.exit(1)
-
-    print(f"PASS: '{file_path}' exists and seems to have the required sections.")
-    sys.exit(0)
-
-if __name__ == "__main__":
-    run()
+    # Must explain key expectations per acceptance criteria
+    assert 'rigorous and atomic acceptance criteria' in content, 'Must explain rigorous and atomic acceptance criteria'
+    assert 'context' in content and 'get_test' in content, 'Must explain gathering minimal context with get_test'
+    assert 'run_test' in content and 'execute' in content, 'Must explain that the tester can run tests using run_test'
+    assert 'update_task_status' in content and 'update_feature_status' in content and 'not finished' in content, 'Must explain status updates when work is not finished'
+    assert 'update_agent_question' in content and 'unresolved' in content, 'Must explain how to raise unresolved issues via update_agent_question'
