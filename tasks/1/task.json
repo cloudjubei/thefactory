@@ -54,7 +54,7 @@
     },
     {
       "id": "1.4",
-      "status": "+",
+      "status": "-",
       "title": "Task Utility Tooling",
       "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/tools/task_utils.py`.",
       "plan": "1. The `task_utils.py` module abstracts file I/O and manipulation of task JSON files. 2. It provides reliable functions for reading, creating, and updating tasks and features, which are used by the orchestrator and potentially by the agent.",
@@ -64,8 +64,14 @@
       ],
       "acceptance": [
         "`scripts/tools/task_utils.py` exists.",
-        "It provides functions such as `get_task`, `update_task`, `create_task`, and status update functions.",
-        "The functions correctly handle JSON serialization and deserialization based on the `task_format.py` schema."
+        "it directly references the interface schema from `task_format.py`",
+        "It provides the function `create_task`",
+        "It provides the function `get_task`",
+        "It provides the function `update_task`",
+        "It provides the function `move_task`",
+        "It provides the function `update_task_status`",
+        "It provides the function `update_feature_status`",
+        "It provides the function `set_agent_question`"
       ]
     },
     {
