@@ -292,7 +292,6 @@ class Agent:
                 'docs/tasks/task_example.json',
                 'docs/tasks/task_format.py',
                 'docs/PLAN_SPECIFICATION.md',
-                'docs/TESTING.md',
                 'docs/TOOL_ARCHITECTURE.md',
             ]
         else:
