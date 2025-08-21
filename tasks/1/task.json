@@ -54,7 +54,7 @@
     },
     {
       "id": "1.4",
-      "status": "-",
+      "status": "+",
       "title": "Task Utility Tooling",
       "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/tools/task_utils.py`.",
       "plan": "1. The `task_utils.py` module abstracts file I/O and manipulation of task JSON files. 2. It provides reliable functions for reading, creating, and updating tasks and features, which are used by the orchestrator and potentially by the agent.",
