@@ -47,7 +47,7 @@
     },
     {
       "id": "2.3",
-      "status": "-",
+      "status": "+",
       "title": "Orchestrator script",
       "description": "Implement the local orchestrator script and setup, fully compliant with all the spec. It allows running an LLM agent to have conversations back and forth with tool calls.",
       "context": [
