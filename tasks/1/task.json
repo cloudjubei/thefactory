@@ -14,9 +14,11 @@
         "docs/tasks/task_format.py"
       ],
       "acceptance": [
-        "`docs/tasks/task_format.py` exists.",
-        "The file defines Python TypedDicts for `Task` and `Feature`.",
-        "The schema covers all required and optional fields for tasks and features."
+        "The file 'docs/tasks/task_format.py' exists.",
+        "The file defines a TypedDict named 'Task'.",
+        "The file defines a TypedDict named 'Feature'.",
+        "The 'Task' TypedDict has exactly the following fields: 'id' of type str, 'title' of type str, 'features' of type list[Feature].",
+        "The 'Feature' TypedDict has exactly the following fields: 'id' of type str, 'title' of type str, 'description' of type str, 'acceptance_criteria' of type list[str]."
       ]
     },
     {

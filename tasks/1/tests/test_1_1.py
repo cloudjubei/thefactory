@@ -1,45 +1,42 @@
-import sys
 import os
+import sys
 import importlib.util
+from typing import TypedDict, List
 
-def run():
-    # Acceptance Criterion 1: `docs/tasks/task_format.py` exists.
-    file_path = "docs/tasks/task_format.py"
-    if not os.path.exists(file_path):
-        print(f"FAIL: {file_path} does not exist.")
-        sys.exit(1)
+# Check if file exists
+assert os.path.exists('docs/tasks/task_format.py'), "File does not exist"
 
-    # Acceptance Criterion 2: The file defines Python TypedDicts for `Task` and `Feature`.
-    try:
-        spec = importlib.util.spec_from_file_location("task_format", file_path)
-        task_format = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(task_format)
-    except Exception as e:
-        print(f"FAIL: Could not import {file_path}. Error: {e}")
-        sys.exit(1)
+# Load the module
+spec = importlib.util.spec_from_file_location("task_format", 'docs/tasks/task_format.py')
+task_format = importlib.util.module_from_spec(spec)
+sys.modules['task_format'] = task_format
+spec.loader.exec_module(task_format)
 
-    if not hasattr(task_format, "Task") or not hasattr(task_format, "Feature"):
-        print("FAIL: `Task` or `Feature` TypedDict not found in module.")
-        sys.exit(1)
+# Check for Task and Feature
+assert hasattr(task_format, 'Task'), "Task not defined"
+assert hasattr(task_format, 'Feature'), "Feature not defined"
+assert issubclass(task_format.Task, TypedDict), "Task is not a TypedDict"
+assert issubclass(task_format.Feature, TypedDict), "Feature is not a TypedDict"
 
-    # Acceptance Criterion 3: The schema covers all required and optional fields.
-    Task = task_format.Task
-    Feature = task_format.Feature
+# Check Task fields
+task_fields = task_format.Task.__annotations__
+expected_task_fields = {
+    'id': str,
+    'title': str,
+    'features': List[task_format.Feature],
+}
+assert set(task_fields.keys()) == set(expected_task_fields.keys()), "Task fields do not match"
+for field, typ in expected_task_fields.items():
+    assert task_fields[field] == typ, f"Type mismatch for Task.{field}: expected {typ}, got {task_fields[field]}"
 
-    required_task_fields = {'id', 'status', 'title', 'action', 'plan', 'features'}
-    if not required_task_fields.issubset(Task.__annotations__.keys()):
-        missing = required_task_fields - Task.__annotations__.keys()
-        print(f"FAIL: Task TypedDict is missing required fields: {missing}")
-        sys.exit(1)
-        
-    required_feature_fields = {'id', 'status', 'title', 'action', 'plan', 'context', 'acceptance'}
-    if not required_feature_fields.issubset(Feature.__annotations__.keys()):
-        missing = required_feature_fields - Feature.__annotations__.keys()
-        print(f"FAIL: Feature TypedDict is missing required fields: {missing}")
-        sys.exit(1)
-
-    print("PASS: docs/tasks/task_format.py defines the required Task and Feature TypedDicts.")
-    sys.exit(0)
-
-if __name__ == "__main__":
-    run()
+# Check Feature fields
+feature_fields = task_format.Feature.__annotations__
+expected_feature_fields = {
+    'id': str,
+    'title': str,
+    'description': str,
+    'acceptance_criteria': List[str],
+}
+assert set(feature_fields.keys()) == set(expected_feature_fields.keys()), "Feature fields do not match"
+for field, typ in expected_feature_fields.items():
+    assert feature_fields[field] == typ, f"Type mismatch for Feature.{field}: expected {typ}, got {feature_fields[field]}"
