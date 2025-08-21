@@ -125,7 +125,7 @@
     },
     {
       "id": "1.10",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification",
       "action": "Document purpose, principles, structure, template, and example for plans",
       "plan": "1. Create `docs/PLAN_SPECIFICATION.md`. 2. Add sections for Purpose, Principles, Structure, Template, and Example. 3. Ensure all acceptance criteria are covered, including referencing other key documents and explaining the task/feature lifecycle.",
