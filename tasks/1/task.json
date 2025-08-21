@@ -92,7 +92,7 @@
     },
     {
       "id": "1.7",
-      "status": "-",
+      "status": "+",
       "title": "Tools guide",
       "action": "Specify the JSON contract, tools, and execution modes",
       "plan": "",
