@@ -20,7 +20,7 @@
     },
     {
       "id": "2.2",
-      "status": "-",
+      "status": "+",
       "title": "Task Utility Tooling",
       "description": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
       "context": [
@@ -50,7 +50,6 @@
       "status": "-",
       "title": "Orchestrator script",
       "description": "Implement the local orchestrator script and setup, fully compliant with all the spec. It allows running an LLM agent to have conversations back and forth with tool calls.",
-      "plan": "",
       "context": [
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
         "docs/agent_protocol_format.json",
@@ -94,7 +93,7 @@
     },
     {
       "id": "2.5",
-      "status": "-",
+      "status": "+",
       "title": "Environment variables template",
       "description": "Provide `.env.example` containing placeholders for required API keys and settings.",
       "plan": "1. Create the `.env.example` file in the project root. 2. Add placeholder variables for API keys needed by `litellm` (e.g., `OPENAI_API_KEY=your_key_here`). 3. Include comments to explain each variable's purpose.",
@@ -110,7 +109,6 @@
       "status": "-",
       "title": "Local setup guide",
       "description": "Author `docs/LOCAL_SETUP.md` with setup and execution instructions.",
-      "plan": "",
       "acceptance": [
         "`docs/LOCAL_SETUP.md` exists and is accurate."
       ],
