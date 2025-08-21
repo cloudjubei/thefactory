@@ -80,7 +80,15 @@
       "status": "-",
       "title": "Dependency specification",
       "description": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`, `scripts/git_manager.py, `scripts/task_utils.py",
-      "plan": "",
+      "plan": [
+        "1. Inspect `scripts/run_local_agent.py` to identify all external library imports.",
+        "2. Inspect `scripts/git_manager.py` to identify all external library imports.",
+        "3. Inspect `scripts/task_utils.py` to identify all external library imports.",
+        "4. Aggregate the dependencies from all three scripts into a single, deduplicated list.",
+        "5. Differentiate between standard Python libraries and external packages that need to be installed via pip.",
+        "6. Create a new file named `requirements.txt` in the root directory of the project.",
+        "7. Write the final list of external package names into `requirements.txt`, with each package on a new line."
+      ],
       "acceptance": [
         "`requirements.txt` exists"
       ],
