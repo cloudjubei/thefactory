@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import sys
+import inspect
 from dotenv import load_dotenv
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Callable, Tuple
@@ -166,8 +167,15 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
                 print(f"Executing Tool: {tool_name} with args: {tool_args}")
                 
                 if tool_name in available_tools:
-                    tool_args.setdefault('task_id', task['id'])
-                    tool_args.setdefault('feature_id', feature['id'])
+                    tool_func = available_tools[tool_name]
+                    sig = inspect.signature(tool_func)
+                    params = sig.parameters
+                    
+                    if 'task_id' in params:
+                        tool_args.setdefault('task_id', task['id'])
+                    if 'feature_id' in params:
+                        tool_args.setdefault('feature_id', feature['id'])
+
                     result = available_tools[tool_name](**tool_args)
                     tool_outputs.append(f"Tool {tool_name} returned: {result}")
                 else:
