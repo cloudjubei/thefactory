@@ -135,7 +135,6 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
             messages.append(assistant_message)
             
             response_json = json.loads(assistant_message.content)
-            print(f"response_json: {response_json}")
             thoughts = response_json.get("thoughts", "No thoughts provided.")
             tool_calls = response_json.get("tool_calls", [])
             print(f"Agent Thoughts: {thoughts}")
