@@ -93,7 +93,8 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     available_tools = get_available_tools(agent_type, git_manager)
     context = task_utils.get_context(feature.get("context", []))
     system_prompt = construct_system_prompt(agent_type, task, feature, context, available_tools)
-    messages = [{"role": "system", "content": system_prompt}]
+
+    messages = [{"role": "user", "content": system_prompt}]
     
     if agent_type == 'developer':
         task_utils.update_feature_status(task['id'], feature['id'], '~')
@@ -123,7 +124,6 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
                 if tool_name in available_tools:
                     tool_args.setdefault('task_id', task['id'])
                     tool_args.setdefault('feature_id', feature['id'])
-                    
                     result = available_tools[tool_name](**tool_args)
                     tool_outputs.append(f"Tool {tool_name} returned: {result}")
                 else:
@@ -176,7 +176,6 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
             break
     print("\n--- Orchestrator Finished ---")
 
-
 def main():
     parser = argparse.ArgumentParser(description="Run an autonomous AI agent.")
     parser.add_argument("--model", type=str, default="gpt-4-turbo-preview", help="LLM model name.")
@@ -184,11 +183,6 @@ def main():
     parser.add_argument("--task", type=int, help="Optional: Specify a task ID to work on.")
     
     args = parser.parse_args()
-    
-    api_key = os.getenv("OPENAI_API_KEY") # Or your preferred provider
-    if not api_key:
-        print("ERROR: API key not found in .env file. Please set OPENAI_API_KEY or another supported key.")
-        return
         
     run_orchestrator(model=args.model, agent_type=args.agent, task_id=args.task)
 
