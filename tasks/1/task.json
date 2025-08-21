@@ -6,7 +6,7 @@
   "features": [
     {
       "id": "1.1",
-      "status": "+",
+      "status": "-",
       "title": "Canonical Task Schema",
       "description": "Define and maintain the canonical schema for tasks in `docs/tasks/task_format.py` using Python's TypedDict.",
       "plan": "1. The `docs/tasks/task_format.py` file serves as the single source of truth for the data structures of `Task` and `Feature` objects. 2. Any changes to the task format must be reflected here first.",
@@ -21,7 +21,7 @@
     },
     {
       "id": "1.2",
-      "status": "+",
+      "status": "-",
       "title": "Example Task File",
       "description": "Maintain a complete and valid example task file at `docs/tasks/task_example.json`.",
       "plan": "1. This file serves as a practical, copy-pasteable template for new tasks. 2. It must always be kept in sync with the canonical schema defined in `task_format.py`.",
@@ -55,7 +55,7 @@
     },
     {
       "id": "1.4",
-      "status": "+",
+      "status": "-",
       "title": "Testing",
       "description": "Establish the canonical, project-wide testing specification and integrate testing requirements into the planning specification so every feature is verifiable by deterministic tests.",
       "plan": "1. Create the file `docs/TESTING.md`. 2. Define the project's testing philosophy, scope, and structure. 3. Specify file locations (`tasks/{id}/tests/`) and naming conventions (`test_{task_id}_{feature_id}.py`). 4. Document testing tools (`run_tests`) and the development workflow.",
