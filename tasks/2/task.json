@@ -10,6 +10,9 @@
       "status": "+",
       "title": "Git manager",
       "action": "implement the git manager scripts",
+      "context": [
+        "scripts/git_manager.py"
+      ],
       "acceptance": [
         "`scripts/git_manager.py` exists",
         "inside the script a class `GitManager` is implemented with all the necessary methods to interact with git repositories"
@@ -25,7 +28,8 @@
         "docs/AGENT_PERSONAS_PLANNER.md",
         "docs/AGENT_PERSONAS_TESTER.md",
         "docs/AGENT_PERSONAS_DEVELOPER.md",
-        "docs/FILE_ORGANISATION.md"
+        "docs/FILE_ORGANISATION.md",
+        "scripts/task_utils.py"
       ],
       "acceptance": [
         "`scripts/task_utils.py` exists.",
@@ -48,7 +52,10 @@
       "plan": "",
       "context": [
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
-        "docs/agent_protocol_format.json"
+        "docs/agent_protocol_format.json",
+        "scripts/git_manager.py",
+        "scripts/tools_utils.py",
+        "scripts/run_local_agent.py"
       ],
       "acceptance": [
         "`scripts/run_local_agent.py` exists and implements the orchestrator script.",

@@ -27,7 +27,8 @@
       "action": "Maintain a complete and valid example task file at `docs/tasks/task_example.json`.",
       "plan": "1. This file serves as a practical, copy-pasteable template for new tasks. 2. It must always be kept in sync with the canonical schema defined in `task_format.py`.",
       "context": [
-        "docs/tasks/task_format.py"
+        "docs/tasks/task_format.py",
+        "docs/tasks/task_example.json"
       ],
       "acceptance": [
         "`docs/tasks/task_example.json` exists.",
@@ -44,6 +45,9 @@
       "title": "File Organisation specification",
       "action": "Create a scheme for organising files within the repository.",
       "plan": "1. Create the file `docs/FILE_ORGANISATION.md`. 2. Add the required sections: `Top-Level Directory Layout`, `File Naming Conventions`, and `Evolution Guidance`. 3. Populate each section with clear, concise guidelines and examples relevant to this project structure.",
+      "context": [
+        "docs/FILE_ORGANISATION.md"
+      ],
       "acceptance": [
         "`docs/FILE_ORGANISATION.md` exists",
         "It includes clearly titled sections: `Top-Level Directory Layout`, `File Naming Conventions`, `Evolution Guidance` and Example tree (illustrative) - showing in a `graphical` way the file structure",
@@ -56,6 +60,9 @@
       "title": "Testing",
       "action": "Establish the canonical, project-wide testing specification and integrate testing requirements into the planning specification so every feature is verifiable by deterministic tests.",
       "plan": "1. Create the file `docs/TESTING.md`. 2. Define the project's testing philosophy, scope, and structure. 3. Specify file locations (`tasks/{id}/tests/`) and naming conventions (`test_{task_id}_{feature_id}.py`). 4. Document testing tools (`run_tests`) and the development workflow.",
+      "context": [
+        "docs/TESTING.md"
+      ],
       "acceptance": [
         "`docs/TESTING.md` exists describing the philosophy, scope, structure, location, naming conventions, tooling, and workflow for tests in this project."
       ]
@@ -66,7 +73,9 @@
       "title": "Agent communication porotocol",
       "action": "Create a file that specifies the json format that an agent needs to return so that it's possible to  have a multi-step conversation and an agent can call tools",
       "plan": "",
-      "context": [],
+      "context": [
+        "docs/AGENT_COMMUNICATION_PROTOCOL.md"
+      ],
       "acceptance": [
         "A document `docs/AGENT_COMMUNICATION_PROTOCOL.md` exists explaining the protocol",
         "`docs/agent_protocol_format.json` exists containg a valid JSON object defining the format for agent responses."
@@ -81,7 +90,8 @@
         "docs/tasks/task_format.py",
         "docs/tasks/task_example.json",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
-        "docs/agent_protocol_format.json"
+        "docs/agent_protocol_format.json",
+        "docs/AGENT_PLANNER.md"
       ],
       "acceptance": [
         "`docs/AGENT_PLANNER.md` exists",
@@ -111,7 +121,8 @@
       "context": [
         "docs/TESTING.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
-        "docs/agent_protocol_format.json"
+        "docs/agent_protocol_format.json",
+        "docs/AGENT_TESTER.md"
       ],
       "acceptance": [
         "`docs/AGENT_TESTER.md` exists",
@@ -141,7 +152,8 @@
       "context": [
         "docs/FILE_ORGANISATION.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
-        "docs/agent_protocol_format.json"
+        "docs/agent_protocol_format.json",
+        "docs/AGENT_DEVELOPER.md"
       ],
       "acceptance": [
         "`docs/AGENT_DEVELOPER.md` exists",
