@@ -6,21 +6,27 @@
   "features": [
     {
       "id": "2.1",
-      "status": "+",
+      "status": "-",
       "title": "Git manager",
       "description": "implement the git manager scripts",
       "context": [
         "scripts/git_manager.py"
       ],
       "acceptance": [
-        "`scripts/git_manager.py` exists",
-        "inside the script a class `GitManager` is implemented with all the necessary methods to interact with git repositories"
+        "The file 'scripts/git_manager.py' exists.",
+        "A class 'GitManager' is defined in 'scripts/git_manager.py'.",
+        "The 'GitManager' class has an '__init__' method with a required 'repo_path' parameter.",
+        "The 'GitManager' class has a 'clone' method with required 'url' and 'path' parameters.",
+        "The 'GitManager' class has an 'add' method with an optional 'files' parameter.",
+        "The 'GitManager' class has a 'commit' method with a required 'message' parameter.",
+        "The 'GitManager' class has a 'push' method with an optional 'branch' parameter.",
+        "The 'GitManager' class has a 'pull' method with an optional 'branch' parameter."
       ],
       "plan": "Detailed Step-by-Step Implementation Plan for Git Manager Scripts (Feature ID: 2.1):\n\n1. **Define Scope and Requirements**: Identify key Git operations needed for the manager scripts. Based on typical use cases for an agent tool, include: initializing a repo, cloning, adding files, committing changes, pushing to remote, pulling updates, branching, merging, and status checking. Consider error handling, authentication (e.g., via tokens), and integration with agent workflows. Research any project-specific needs (e.g., if this is for code generation agents).\n\n2. **Choose Technology Stack**: Opt for Python as the implementation language for portability and ease of integration with other agent tools. Use the 'subprocess' module to run Git commands securely. Alternatively, use a library like GitPython for higher-level abstractions to reduce subprocess risks. Ensure scripts are modular and can be called as functions.\n\n3. **Design the Script Structure**: Create a main module (e.g., git_manager.py) with a class or functions for each operation. Include logging (using Python's logging module) for debugging and output. Define input parameters (e.g., repo_path, commit_message, remote_url) and return values (e.g., success status, output messages).\n\n4. **Implement Core Functions**:\n   - init_repo(path): Initialize a new Git repo at the given path.\n   - clone_repo(url, path): Clone a repo from URL to local path.\n   - add_files(path, files): Stage files or all changes.\n   - commit_changes(path, message): Commit with a message.\n   - push_changes(path, branch): Push to remote branch.\n   - pull_updates(path, branch): Pull from remote.\n   - create_branch(path, branch_name): Create and checkout a new branch.\n   - merge_branch(path, branch_name): Merge a branch into current.\n   - get_status(path): Retrieve repo status.\n   Handle authentication (e.g., set Git config for user/email, handle SSH/HTTPS).\n\n5. **Add Error Handling and Validation**: Implement try-except blocks for subprocess errors. Validate inputs (e.g., check if path exists, if Git is installed). Provide meaningful error messages and optional verbose mode.\n\n6. **Write Unit Tests**: Use pytest to create tests for each function. Mock subprocess calls if using GitPython isn't feasible. Test scenarios: successful operations, failures (e.g., no internet for push), edge cases (e.g., empty commit).\n\n7. **Documentation and Usage Examples**: Add docstrings to functions. Create a README.md with examples of how to use the scripts in an agent context (e.g., integrating with other tools).\n\n8. **Integration and Review**: Ensure scripts can be imported and used in the parent task (Agent tools and scripts, ID: 2). Perform code review for security (e.g., avoid shell injection) and efficiency.\n\n9. **Final Testing and Deployment Prep**: Run end-to-end tests in a sample repo. Prepare for packaging (e.g., as a Python package) if needed for the project."
     },
     {
       "id": "2.2",
-      "status": "+",
+      "status": "-",
       "title": "Task Utility Tooling",
       "description": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
       "context": [
@@ -47,7 +53,7 @@
     },
     {
       "id": "2.3",
-      "status": "+",
+      "status": "-",
       "title": "Orchestrator script",
       "description": "Implement the local orchestrator script and setup, fully compliant with all the spec. It allows running an LLM agent to have conversations back and forth with tool calls.",
       "context": [
@@ -79,7 +85,7 @@
     },
     {
       "id": "2.4",
-      "status": "+",
+      "status": "-",
       "title": "Dependency specification",
       "description": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`, `scripts/git_manager.py, `scripts/task_utils.py",
       "plan": "Scan `scripts/run_local_agent.py` and list all non-standard library imports.\nScan `scripts/git_manager.py` and list all non-standard library imports.\nScan `scripts/task_utils.py` and list all non-standard library imports.\nCompile a single, unique list of all external dependencies identified in the previous steps.\nCreate a new file named `requirements.txt` in the project's root directory.\nAdd each unique dependency from the compiled list to `requirements.txt`, with each library on a new line.",
@@ -94,7 +100,7 @@
     },
     {
       "id": "2.5",
-      "status": "+",
+      "status": "-",
       "title": "Environment variables template",
       "description": "Provide `.env.example` containing placeholders for required API keys and settings.",
       "plan": "1. Create the `.env.example` file in the project root. 2. Add placeholder variables for API keys needed by `litellm` (e.g., `OPENAI_API_KEY=your_key_here`). 3. Include comments to explain each variable's purpose.",
@@ -107,7 +113,7 @@
     },
     {
       "id": "2.6",
-      "status": "-",
+      "status": "+",
       "title": "Local setup guide",
       "description": "Author `docs/LOCAL_SETUP.md` with setup and execution instructions.",
       "acceptance": [
