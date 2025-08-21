@@ -80,7 +80,6 @@
       "context": [
         "docs/tasks/task_format.py",
         "docs/tasks/task_example.json",
-        "docs/AGENT_PERSONAS_PLANNER.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
         "docs/agent_protocol_format.json"
       ],
@@ -110,14 +109,12 @@
       "title": "Plan specification for Tester",
       "action": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_TESTER.md` serve as their starting point and guide.",
       "context": [
-        "docs/AGENT_PERSONAS_TESTER.md",
         "docs/TESTING.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
         "docs/agent_protocol_format.json"
       ],
       "acceptance": [
         "`docs/AGENT_TESTER.md` exists",
-        "The document references `docs/AGENT_PERSONAS_TESTER.md` for agent tester guidance",
         "The document references `docs/TESTING.md` for testing guidance",
         "The document references `docs/AGENT_COMMUNICATION_PROTOCOL.md` and `docs/agent_protocol_format.json` to exlain how the communication protocol works and how to respond",
         "The document has a section `Tools` that list and describe all tools this agent can use: `get_test(task_id:int,feature_id:str)->str?`, `update_acceptance_criteria(task_id:int,feature_id:str,acceptance_criteria:[str])->Feature`, `update_test(task_id:int,feature_id:str,test:str)`, `delete_test(task_id:int,feature_id:str)`, `run_test(task_id:int,feature_id:str)->TestResult`, `update_task_status(task_id:int,status:Status)->Task`, `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`, `update_agent_question(task_id:int,feature_id:str?,question:str)`",
@@ -142,7 +139,6 @@
       "title": "Plan specification for Developer",
       "action": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_DEVELOPER.md` serve as their starting point and guide.",
       "context": [
-        "docs/AGENT_PERSONAS_DEVELOPER.md",
         "docs/FILE_ORGANISATION.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
         "docs/agent_protocol_format.json"
