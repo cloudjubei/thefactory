@@ -70,13 +70,13 @@
     },
     {
       "id": "1.5",
-      "status": "+",
+      "status": "-",
       "title": "File Organisation specification",
       "action": "Create a scheme for organising files within the repository.",
       "plan": "1. Create the file `docs/FILE_ORGANISATION.md`. 2. Add the required sections: `Top-Level Directory Layout`, `File Naming Conventions`, and `Evolution Guidance`. 3. Populate each section with clear, concise guidelines and examples relevant to this project structure.",
       "acceptance": [
         "`docs/FILE_ORGANISATION.md` exists",
-        "It includes clearly titled sections: `Top-Level Directory Layout`, `File Naming Conventions`, and `Evolution Guidance`",
+        "It includes clearly titled sections: `Top-Level Directory Layout`, `File Naming Conventions`, `Evolution Guidance` and Example tree (illustrative) - showing in a `graphical` way the file structure",
         "Each section provides concise explanations and examples where helpful"
       ]
     },
@@ -92,7 +92,40 @@
     },
     {
       "id": "1.7",
-      "status": "+",
+      "status": "-",
+      "title": "Tools guide",
+      "action": "Specify the JSON contract, tools, and execution modes",
+      "plan": "",
+      "acceptance": [
+        "`docs/TOOL_ARCHITECTURE.md` exists with all sections and tool definitions"
+      ]
+    },
+    {
+      "id": "1.8",
+      "status": "-",
+      "title": "principles guide",
+      "action": "Define core principles.",
+      "plan": "",
+      "acceptance": [
+        "`docs/AGENT_PRINCIPLES.md` exists and contains required definitions referencing the tools guide."
+      ]
+    },
+    {
+      "id": "1.9",
+      "status": "-",
+      "title": "Agent personas",
+      "action": "Create 3 personas that will serve different purposes:",
+      "plan": "",
+      "acceptance": [
+        "`docs/AGENT_PERSONAS.md` exists and describes agent personas",
+         "Persona 1: Planner - An agent that looks at the task description and creates a plan for completing a task following the given specifications. This agent is the one that can edit the plan descriptions.",
+         "Persona 2: Tester - An agent that looks at the task description, and then for each feature creates the most appropriate acceptance criteria. Based on that criteria the agent creates a test case for each feature. This agent is the one that can edit the tests - no one else can.",
+         "Persona 3: Developer - An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria. They can never edit tests or acceptance criteria, only run them to confirm whether they've satisfied the acceptance criteria."
+      ]
+    },
+    {
+      "id": "1.10",
+      "status": "-",
       "title": "Plan specification",
       "action": "Document purpose, principles, structure, template, and example for plans",
       "plan": "1. Create `docs/PLAN_SPECIFICATION.md`. 2. Add sections for Purpose, Principles, Structure, Template, and Example. 3. Ensure all acceptance criteria are covered, including referencing other key documents and explaining the task/feature lifecycle.",
@@ -102,6 +135,9 @@
         "The document references `docs/tasks/task_example.json` for the task example",
         "The document references `docs/tasks/TASKS_GUIDANCE.md` for task specific guidance",
         "The document references `docs/TESTING.md` for test related guidance",
+        "The document references `docs/TOOL_ARCHITECTURE.md` for tooling guidance",
+        "The document references `docs/AGENT_PRINCIPLES.md` for agent behaviour guidance",
+        "The document references `docs/AGENT_PERSONAS.md` for agent personas guidance",
         "The document explains that creating a task with features that clearly describe the full scope of the task is mandatory",
         "The document explains that the task requires a generic high level plan",
         "The document explains that each feature requires a step-by-step plan that should make it easy to implement for an LLM",
@@ -114,7 +150,12 @@
         "1.1",
         "1.2",
         "1.3",
-        "1.4"
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "1.9"
       ]
     }
   ]
