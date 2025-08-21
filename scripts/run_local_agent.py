@@ -94,7 +94,7 @@ When you are finished and the tests pass, you MUST call 'finish_feature'.
 """
 
     prompt += f"""
-You must respond in JSON format with a "plan" and a list of "tool_calls".
+You must respond in JSON format with a "action_plan" and a list of "tool_calls". Make sure all tool calls have valid parameters.
 
 AVAILABLE TOOLS:
 {json.dumps(list(available_tools.keys()), indent=2)}
