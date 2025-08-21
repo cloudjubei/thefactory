@@ -127,7 +127,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
 
             tool_outputs = []
             for call in tool_calls:
-                tool_name = call.get("tool_name")
+                tool_name = call.get("tool_name", call.get("tool", call.get("name", "unknown_tool")))
                 tool_args = call.get("arguments", call.get("parameters", {}))
                 
                 print(f"Executing Tool: {tool_name} with args: {tool_args}")
