@@ -10,7 +10,7 @@ def test_agent_tester_doc_exists_and_has_required_content():
     # Must reference core guidance and protocol docs
     assert 'docs/TESTING.md' in content, 'Must reference docs/TESTING.md'
     assert 'docs/AGENT_COMMUNICATION_PROTOCOL.md' in content, 'Must reference docs/AGENT_COMMUNICATION_PROTOCOL.md'
-    assert 'docs/agent_protocol_example.json' in content, 'Must reference docs/agent_protocol_example.json'
+    assert 'docs/agent_response_example.json' in content, 'Must reference docs/agent_response_example.json'
 
     # Must have a Tools section and list all required tools
     assert 'Tools' in content, 'Must contain a Tools section'

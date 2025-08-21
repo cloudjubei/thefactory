@@ -26,7 +26,7 @@ def main():
         "docs/AGENT_PERSONAS_DEVELOPER.md",
         "docs/FILE_ORGANISATION.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
-        "docs/agent_protocol_example.json",
+        "docs/agent_response_example.json",
     ]
     for ref in required_refs:
         if ref not in content:

@@ -22,12 +22,12 @@ MAX_TURNS_PER_FEATURE = 10
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 try:
-    PROTOCOL_EXAMPLE_PATH = PROJECT_ROOT / "docs" / "agent_protocol_example.json"
+    PROTOCOL_EXAMPLE_PATH = PROJECT_ROOT / "docs" / "agent_response_example.json"
     with open(PROTOCOL_EXAMPLE_PATH, "r") as f:
         # Load and then dump with indentation to create a nicely formatted string for the prompt
         PROTOCOL_EXAMPLE_STR = json.dumps(json.load(f), indent=2)
 except (FileNotFoundError, json.JSONDecodeError) as e:
-    print(f"FATAL: Could not load or parse agent_protocol_example.json: {e}")
+    print(f"FATAL: Could not load or parse agent_response_example.json: {e}")
     # Provide a safe fallback if the file is missing or corrupt
     PROTOCOL_EXAMPLE_STR = '{\n  "thoughts": "Your reasoning here...",\n  "tool_calls": [ ... ]\n}'
 
@@ -135,6 +135,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
             messages.append(assistant_message)
             
             response_json = json.loads(assistant_message.content)
+            print(f"response_json: {response_json}")
             thoughts = response_json.get("thoughts", "No thoughts provided.")
             tool_calls = response_json.get("tool_calls", [])
             print(f"Agent Thoughts: {thoughts}")
