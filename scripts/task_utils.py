@@ -226,10 +226,20 @@ def find_next_pending_task() -> Optional[Task]:
             except (ValueError, FileNotFoundError): continue
     return None
 
-def find_next_available_feature(task: Task) -> Optional[Feature]:
-    """Finds the first pending feature in a task whose dependencies are all met."""
+
+def find_next_available_feature(task: Task, exclude_ids: Optional[set] = None) -> Optional[Feature]:
+    """
+    Finds the first pending feature in a task whose dependencies are all met,
+    EXCLUDING any feature IDs passed in the `exclude_ids` set.
+    """
+    if exclude_ids is None:
+        exclude_ids = set()
+
     completed_feature_ids = {f["id"] for f in task["features"] if f["status"] == "+"}
+    
     for feature in task["features"]:
+        if feature["id"] in exclude_ids:
+            continue
         if feature["status"] == "-":
             dependencies = feature.get("dependencies", [])
             if all(dep_id in completed_feature_ids for dep_id in dependencies):

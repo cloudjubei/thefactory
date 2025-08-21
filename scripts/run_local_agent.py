@@ -174,15 +174,17 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
     print(f"Selected Task: [{current_task['id']}] {current_task['title']}")
     git_manager = GitManager()
     
+    processed_feature_ids = set()
     while True:
         current_task = task_utils.get_task(current_task['id'])
-        next_feature = task_utils.find_next_available_feature(current_task)
         
+        next_feature = task_utils.find_next_available_feature(current_task, exclude_ids=processed_feature_ids)
         if not next_feature:
             print(f"\nNo more available features for task {current_task['id']}.")
             break
             
         should_continue = run_agent_on_feature(model, agent_type, current_task, next_feature, git_manager)
+        processed_feature_ids.add(next_feature['id'])
         if not should_continue:
             break
     print("\n--- Orchestrator Finished ---")
