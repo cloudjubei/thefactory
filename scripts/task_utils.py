@@ -45,7 +45,6 @@ def update_task_status(task_id: int, status: Status) -> Task:
 
 def get_context(files: List[str]) -> List[str]:
     """Retrieves the content of specific files."""
-    # ... (implementation from previous message is correct)
     content = []
     for file_path in files:
         try:
