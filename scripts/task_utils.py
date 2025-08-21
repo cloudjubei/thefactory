@@ -40,14 +40,6 @@ def update_task_status(task_id: int, status: Status) -> Task:
     save_task(task)
     return task
 
-def update_agent_question(task_id: int, feature_id: str, question: str):
-    """Adds a question to a feature, typically when it's being deferred."""
-    task = get_task(task_id)
-    for feature in task["features"]:
-        if feature["id"] == feature_id:
-            feature["agent_question"] = question
-            break
-    save_task(task)
 
 # --- Developer Agent Tools ---
 
@@ -100,17 +92,59 @@ def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Featur
     print(f"Feature {feature_id} blocked. Reason: {reason}")
     return deferred_feature
 
-def finish_feature(task_id: int, feature_id: str, git_manager: GitManager):
-    """Marks a feature as done and creates a per-feature commit."""
-    # ... (implementation from previous message is correct)
-    feature_to_commit = update_feature_status(task_id, feature_id, "+")
-    if feature_to_commit:
-        commit_message = f"feat: Complete feature {feature_id} - {feature_to_commit['title']}"
-        print(f"Committing with message: {commit_message}")
-        task_file_path = str(TASKS_DIR / str(task_id) / "task.json")
-        git_manager.stage_files([task_file_path])
+def _check_and_update_task_completion(task_id: int):
+    """Checks if all features in a task are done, and if so, marks the task as done."""
+    task = get_task(task_id)
+    all_features_done = all(f.get("status") == "+" for f in task["features"])
+    
+    if all_features_done:
+        print(f"All features for task {task_id} are complete. Updating task status to '+'.")
+        update_task_status(task_id, "+")
+
+def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: GitManager):
+    """
+    Handles the finishing logic for any agent. It stages all current changes,
+    commits them, and updates the feature status according to the agent's role.
+    """
+    task = get_task(task_id)
+    feature_title = ""
+    for f in task['features']:
+        if f['id'] == feature_id:
+            feature_title = f['title']
+            break
+
+    # 1. Stage all unstaged changes in the repository.
+    # This is a robust way to capture all work done by the agent in this turn.
+    try:
+        # Using GitManager to stage all changes. A simple '.' stages everything.
+        git_manager.stage_files(['.'])
+    except Exception as e:
+        print(f"Warning: Could not stage files. Git error: {e}")
+        # Continue anyway, as the status update is the most critical part.
+
+    # 2. Define commit message and update status based on agent role.
+    if agent_type == 'developer':
+        commit_message = f"feat: Complete feature {feature_id} - {feature_title}"
+        update_feature_status(task_id, feature_id, "+")
+        # After a developer finishes, check if the whole task is done.
+        _check_and_update_task_completion(task_id)
+    elif agent_type == 'planner':
+        commit_message = f"plan: Add plan for feature {feature_id} - {feature_title}"
+        update_feature_status(task_id, feature_id, "-")
+    elif agent_type == 'tester':
+        commit_message = f"test: Add tests for feature {feature_id} - {feature_title}"
+        update_feature_status(task_id, feature_id, "-")
+    else:
+        raise ValueError(f"Unknown agent_type '{agent_type}' called finish_feature.")
+
+    # 3. Commit the staged changes.
+    try:
         git_manager.commit(commit_message)
-    return feature_to_commit
+        print(f"Committed changes with message: '{commit_message}'")
+    except Exception as e:
+        print(f"Warning: Git commit failed. Error: {e}")
+        
+    return f"Feature {feature_id} finished by {agent_type} and changes committed."
 
 # --- Tester Agent Tools ---
 

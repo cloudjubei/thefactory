@@ -25,48 +25,39 @@ MAX_TURNS_PER_FEATURE = 10
 def get_available_tools(agent_type: str, git_manager: GitManager) -> Dict[str, Callable]:
     """Returns a dictionary of callable tool functions based on the agent persona."""
     base_tools = {
-        "finish": task_utils.finish,
-        "update_agent_question": task_utils.update_agent_question,
+        "block_feature": task_utils.block_feature,
+        "get_context": task_utils.get_context,
+        "finish_feature": lambda **kwargs: task_utils.finish_feature(**kwargs, agent_type=agent_type, git_manager=git_manager),
     }
 
     agent_tools = {}
     if agent_type == 'developer':
         agent_tools = {
-            "get_context": task_utils.get_context,
             "write_file": task_utils.write_file,
-            "run_test": task_utils.run_test,
-            "update_feature_status": task_utils.update_feature_status,
-            "block_feature": task_utils.block_feature,
-            "finish_feature": lambda **kwargs: task_utils.finish_feature(**kwargs, git_manager=git_manager),
+            "run_test": task_utils.run_test
         }
     elif agent_type == 'planner':
         agent_tools = {
             "update_feature_plan": task_utils.update_feature_plan,
-            "create_feature": task_utils.create_feature,
+            "create_feature": task_utils.create_feature
         }
     elif agent_type == 'tester':
         agent_tools = {
             "update_acceptance_criteria": task_utils.update_acceptance_criteria,
             "update_test": task_utils.update_test,
-            "run_test": task_utils.run_test,
-            "get_test": task_utils.get_test,
-            "delete_test": task_utils.delete_test,
+            "run_test": task_utils.run_test
         }
     
     base_tools.update(agent_tools)
     return base_tools
 
 def construct_system_prompt(agent_type: str, task: Task, feature: Feature, context: str, available_tools: Dict) -> str:
-    """Constructs the detailed system prompt, now specialized for the agent type."""
-    
-    # Base information for all agents
+    """Constructs the detailed system prompt, specialized for the agent type."""
     prompt = f"""You are the '{agent_type}' agent.
-
 CURRENT TASK: {task['title']} (ID: {task['id']})
 ASSIGNED FEATURE: {feature['title']} (ID: {feature['id']})
 DESCRIPTION: {feature.get('description', 'No description specified.')}
 """
-    # Acceptance criteria are relevant for developers and testers, but not planners who might be creating them.
     if agent_type in ['developer', 'tester']:
         prompt += "ACCEPTANCE CRITERIA:\n"
         for i, criterion in enumerate(feature.get('acceptance', []), 1):
@@ -76,21 +67,22 @@ DESCRIPTION: {feature.get('description', 'No description specified.')}
     if agent_type == 'planner':
         prompt += """
 Your **ONLY** job is to create a detailed, step-by-step implementation plan for the assigned feature.
-Analyze the feature and use the `update_feature_plan` tool to save your plan. Do not perform any other actions.
+Analyze the feature and use the `update_feature_plan` tool to save your plan.
+When you are done, you **MUST** call `finish_feature` to mark it as ready for the next stage.
 """
     elif agent_type == 'tester':
         prompt += """
 Your job is to write the acceptance criteria and a corresponding Python test for this feature.
 1. First, use the `update_acceptance_criteria` tool to define the success conditions.
 2. Second, use the `update_test` tool to write a test that verifies those criteria.
+When you are done, you **MUST** call `finish_feature` to mark it as ready for development.
 """
     else: # Developer prompt
         prompt += f"""
 The following context files have been provided:
 {context}
-
 Your job is to execute the feature's plan and meet all acceptance criteria.
-When you are finished and the tests pass, you MUST call 'finish_feature'.
+When you are finished and the tests pass, you **MUST** call `finish_feature`.
 """
 
     prompt += f"""
@@ -105,6 +97,9 @@ Begin now.
 
 def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Feature, git_manager: GitManager):
     print(f"\n--- Activating Agent for Feature: [{feature['id']}] {feature['title']} ---")
+
+    if agent_type == 'developer':
+        task_utils.update_feature_status(task['id'], feature['id'], '~')
     
     available_tools = get_available_tools(agent_type, git_manager)
     context = task_utils.get_context(feature.get("context", []))
@@ -124,7 +119,6 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
             messages.append(assistant_message)
             
             response_json = json.loads(assistant_message.content)
-            print(f"RAW RESPONSE: {response_json}")
             thoughts = response_json.get("thoughts", "No thoughts provided.")
             tool_calls = response_json.get("tool_calls", [])
             print(f"Agent Thoughts: {thoughts}")

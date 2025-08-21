@@ -23,7 +23,6 @@ class Feature(TypedDict):
     acceptance: List[str]
     dependencies: NotRequired[List[str]]
     rejection: NotRequired[str]
-    agent_question: NotRequired[str]
 
 
 class Task(TypedDict):
