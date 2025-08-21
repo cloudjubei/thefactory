@@ -2,9 +2,74 @@
   "id": 3,
   "status": "-",
   "title": "New child projects structure",
-  "action": "Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. This project will only oversee their specification correctness.",
-  "acceptance": [
-    "The file `docs/CHILD_PROJECTS_SPECIFICATION.md` exists detailing the structure of child projects stemming from this project. There is a folder called `projects` where all the child projects are stored. Each child project has its own repository and is linked to this one via git submodules. This project's `.gitignore` needs to be updated so it ignores the `projects` folder and all the files inside it."
-  ],
-  "features": []
+  "action": "Need helper functions to start a child project, to create all of its starting files and link it back to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. This project will only oversee their specification correctness.",
+  "plan": "1. Create the specification document for child projects. 2. Create the `projects` directory and update `.gitignore`. 3. Define boilerplate files for child projects. 4. Implement a script to automate child project creation and registration as a submodule.",
+  "features": [
+    {
+      "id": "3.1",
+      "title": "Create Child Projects Specification Document",
+      "status": "-",
+      "action": "Create the `docs/CHILD_PROJECTS_SPECIFICATION.md` file to define the structure, purpose, and management of child projects linked to this main project.",
+      "plan": "1. Create a new file at `docs/CHILD_PROJECTS_SPECIFICATION.md`. 2. Add content explaining that child projects are managed as Git submodules within the `projects/` directory. 3. Detail the expected repository structure for a child project and how it links back to this parent project.",
+      "context": [],
+      "acceptance": [
+        "The file `docs/CHILD_PROJECTS_SPECIFICATION.md` exists.",
+        "The file details the structure of child projects.",
+        "The file explains the use of the `projects/` directory and Git submodules."
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "3.2",
+      "title": "Create `projects` Directory and Update `.gitignore`",
+      "status": "-",
+      "action": "Create the `projects` directory to house future submodules and update the root `.gitignore` file to ignore this directory as per the task specification.",
+      "plan": "1. Create an empty directory named `projects`. 2. To ensure the directory can be tracked if needed before submodules are added, create an empty file `projects/.gitkeep`. 3. Retrieve the content of the root `.gitignore` file. 4. Append a new line `/projects/` to ignore the directory and its contents.",
+      "context": [
+        ".gitignore"
+      ],
+      "acceptance": [
+        "The `projects/` directory exists.",
+        "The root `.gitignore` file contains the line `/projects/`."
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "3.3",
+      "title": "Define Child Project Boilerplate Structure and Content",
+      "status": "-",
+      "action": "Create the template files that will be used to populate a new child project. These files will live in a `templates/child_project/` directory.",
+      "plan": "1. Create a directory `templates/child_project/`. 2. Create a template `README.md` file inside, with placeholders for the project name (e.g., `{{PROJECT_NAME}}`). 3. Create a template `.gitignore` file suitable for a generic child project. 4. Create a template `spec.md` file to guide the child project's own specification.",
+      "context": [],
+      "acceptance": [
+        "The directory `templates/child_project/` exists.",
+        "The directory contains `README.md`, `.gitignore`, and `spec.md`.",
+        "The content of the files is suitable as a generic starting point for a child project."
+      ],
+      "dependencies": [
+        "3.1",
+        "3.2"
+      ]
+    },
+    {
+      "id": "3.4",
+      "title": "Create Child Project Initialization Script",
+      "status": "-",
+      "action": "Develop a Python script to automate the creation and registration of a new child project. The script will use the templates created in feature 3.3.",
+      "plan": "1. Create a new file `scripts/project_manager.py`. 2. Implement a function `create_child_project(project_name)`. 3. This function will: a. Check if a project with the same name already exists in `projects/`. b. Create the directory `projects/{project_name}`. c. Copy the boilerplate files from `templates/child_project/` into the new directory. d. Replace placeholders (like `{{PROJECT_NAME}}`) in the template files. e. Initialize a new Git repository within `projects/{project_name}`. f. Create an initial commit in the new repository. g. Run the `git submodule add` command to link the new local repository to the parent project under `projects/{project_name}`.",
+      "context": [
+        "templates/child_project/README.md",
+        "templates/child_project/.gitignore",
+        "templates/child_project/spec.md"
+      ],
+      "acceptance": [
+        "The file `scripts/project_manager.py` exists.",
+        "It contains a function `create_child_project` that accepts a project name.",
+        "Executing the script successfully creates a new directory in `projects/`, populates it with templated files, initializes a git repository, and adds it as a git submodule."
+      ],
+      "dependencies": [
+        "3.3"
+      ]
+    }
+  ]
 }
