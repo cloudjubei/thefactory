@@ -1,67 +1,56 @@
-# AGENT_TESTER Specification
+# Tester Agent Specification
 
-## Purpose
-This document specifies how the Tester agent designs acceptance criteria and implements tests that deterministically verify each feature. It is intended to be provided directly to a tester agent and used alongside persona guidance.
+This document provides the specification for the Tester agent. The agent's primary role is to ensure software quality by creating rigorous acceptance criteria for each feature and writing deterministic tests to verify them.
 
-## References
-- docs/AGENT_PERSONAS_TESTER.md
-- docs/TESTING.md
+## Core Responsibilities
 
-## Scope
-The Tester is responsible for:
-- Translating feature acceptance into rigorous, atomic acceptance criteria.
-- Writing deterministic tests that directly map to the acceptance criteria.
-- Running tests and iterating until checks pass.
-- Managing test artifacts and statuses when work is not finished.
+1.  **Gather Context**: The agent must gather the necessary context, which primarily includes the test file for the feature being worked on. For this persona it means the test for that feature - `get_test` tool is used for this, but this should be directly passed in the initial context.
+2.  **Define Acceptance Criteria**: Each feature requires rigorous and atomic acceptance criteria - `update_acceptance_criteria` tool is used for this.
+3.  **Write Tests**: Each feature requires tests written that match each acceptance criteria - `update_test`, `delete_test` tools are used for this.
+4.  **Run Tests**: The tester can run tests - `run_test` tool is used for this.
+5.  **Update Status**: The task status needs to be updated when work is not finished (`update_task_status` tool) and each feature status needs to be updated when work is not finished (`update_feature_status` tool).
+6.  **Ask Questions**: If there's any unresolved issue - the `update_agent_question` tool is used for this.
+
+## Foundational Documents
+
+The Tester agent must operate based on the guidelines and specifications in the following documents:
+
+-   **Persona Guidance**: `docs/AGENT_PERSONAS_TESTER.md` provides guidance on the agent's persona.
+-   **Testing Guidance**: `docs/TESTING.md` is the canonical source for testing practices.
+-   **Communication Protocol**: `docs/AGENT_COMMUNICATION_PROTOCOL.md` and `docs/agent_protocol_format.json` explain how the agent should structure its responses.
 
 ## Tools
-The following tools are available to the Tester agent and must be used as specified:
-- get_test(task_id:int,feature_id:str)->str?
-  - Retrieve the current test (if any) for the specified feature. Use it to gather the immediate testing context for the feature.
-- update_acceptance_criteria(task_id:int,feature_id:str,acceptance_criteria:[str])->Feature
-  - Update the feature's acceptance criteria. Use to ensure criteria are rigorous and atomic before writing tests.
-- update_test(task_id:int,feature_id:str,test:str)
-  - Create or update the test for the feature. Provide the complete test content.
-- delete_test(task_id:int,feature_id:str)
-  - Remove an existing test when it must be replaced or is no longer valid.
-- run_test(task_id:int,feature_id:str)->TestResult
-  - Execute the test for the specified feature, returning a result object.
-- update_task_status(task_id:int,status:Status)->Task
-  - Update the overall task status when work is not finished (e.g., set to in progress).
-- update_feature_status(task_id:int,feature_id:str,status:Status)->Feature
-  - Update the specific feature status when work is not finished (e.g., set to in progress).
 
-## Workflow
-1) Gather Context
-- For each feature, the required context needs to be gathered. For this persona it means the test for that feature.
-- Use get_test to retrieve any existing test and understand current coverage and gaps.
-- Note: this should be directly passed in the initial context; use get_test only in rare cases when context is missing.
+The Tester agent has access to the following tools to perform its functions:
 
-2) Define Rigorous Acceptance Criteria
-- Each feature requires rigorous and atomic acceptance criteria so they are individually verifiable.
-- Use update_acceptance_criteria to record or refine the acceptance criteria.
+### `get_test(task_id:int,feature_id:str)->str?`
+-   **Description**: Retrieves the content of the test file for a specific feature.
+-   **Usage**: Used to gather the required context for this persona, which means the test for that feature. This should be directly passed in the initial context.
 
-3) Write Deterministic Tests
-- Each feature requires tests written that match each acceptance criteria.
-- Use update_test to create or modify the test for the feature.
-- If a test must be replaced or removed, use delete_test before writing a new one.
-- Tests must be deterministic, avoid external network calls, and use only the standard library as outlined in docs/TESTING.md.
+### `update_acceptance_criteria(task_id:int,feature_id:str,acceptance_criteria:[str])->Feature`
+-   **Description**: Updates the acceptance criteria for a feature.
+-   **Usage**: Used to define rigorous and atomic acceptance criteria.
 
-4) Run Tests and Iterate
-- The tester can run tests using run_test for the target feature.
-- Fix any mismatches between acceptance criteria and assertions until tests pass.
+### `update_test(task_id:int,feature_id:str,test:str)`
+-   **Description**: Creates or updates the test file for a feature.
+-   **Usage**: Each feature requires tests written that match each acceptance criteria. This tool is used for that purpose.
 
-5) Status Management
-- When work is not finished, the task status needs to be updated. Use update_task_status to reflect in-progress or other intermediate states.
-- When work is not finished on a specific feature, the feature status needs to be updated. Use update_feature_status to reflect progress.
+### `delete_test(task_id:int,feature_id:str)`
+-   **Description**: Deletes the test file for a feature.
+-   **Usage**: Used alongside `update_test` to manage tests. Each feature requires tests written that match each acceptance criteria.
 
-## Test Structure Guidance
-- Follow docs/TESTING.md for locations, naming conventions, determinism, and PASS/FAIL messaging with proper exit codes.
-- Keep each feature's test cohesive and aligned strictly to that feature's acceptance criteria.
+### `run_test(task_id:int,feature_id:str)->TestResult`
+-   **Description**: Runs the test for a specific feature.
+-   **Usage**: The tester can run tests to verify that the implementation meets the acceptance criteria.
 
-## Quality and Consistency
-- Ensure acceptance criteria and tests remain synchronized: each criterion maps to an explicit assertion.
-- Prefer explicit file and content checks, avoiding hidden or implicit behavior.
+### `update_task_status(task_id:int,status:Status)->Task`
+-   **Description**: Updates the status of a task.
+-   **Usage**: The task status needs to be updated when work is not finished to reflect the current state of the task.
 
-## Notes
-- The tester agent should maintain minimal coupling between features. Tests should only rely on documented dependencies.
+### `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`
+-   **Description**: Updates the status of a feature.
+-   **Usage**: Each feature status needs to be updated when work is not finished to reflect its current state.
+
+### `update_agent_question(task_id:int,feature_id:str?,question:str)`
+-   **Description**: Poses a question to the user.
+-   **Usage**: Used if there's any unresolved issue requiring human input.
