@@ -33,36 +33,49 @@ except (FileNotFoundError, json.JSONDecodeError) as e:
 
 # --- Tool Mapping ---
 
-def get_available_tools(agent_type: str, git_manager: GitManager) -> Dict[str, Callable]:
-    """Returns a dictionary of callable tool functions based on the agent persona."""
+def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[str, Callable], List[str]]:
+    """
+    Returns a tuple containing:
+    1. A dictionary of callable tool functions.
+    2. A list of formatted tool signature strings for the prompt.
+    """
     base_tools = {
-        "block_feature": task_utils.block_feature,
-        "get_context": task_utils.get_context,
-        "finish_feature": lambda **kwargs: task_utils.finish_feature(**kwargs, agent_type=agent_type, git_manager=git_manager),
+        "get_context": (task_utils.get_context, "get_context(files: list[str]) -> list[str]"),
+        "block_feature": (task_utils.block_feature, "block_feature(reason: str)"),
+        "finish_feature": (
+            lambda **kwargs: task_utils.finish_feature(**kwargs, agent_type=agent_type, git_manager=git_manager),
+            "finish_feature()"
+        ),
     }
 
     agent_tools = {}
+    # The signatures are simplified for the agent. The orchestrator handles the rest.
     if agent_type == 'developer':
         agent_tools = {
-            "write_file": task_utils.write_file,
-            "run_test": task_utils.run_test
+            "write_file": (task_utils.write_file, "write_file(filename: str, content: str)"),
+            "run_test": (task_utils.run_test, "run_test() -> str"),
         }
     elif agent_type == 'planner':
         agent_tools = {
-            "update_feature_plan": task_utils.update_feature_plan,
-            "create_feature": task_utils.create_feature
+            "update_feature_plan": (task_utils.update_feature_plan, "update_feature_plan(plan: str)"),
+            "create_feature": (task_utils.create_feature, "create_feature(feature: dict)"),
         }
     elif agent_type == 'tester':
         agent_tools = {
-            "update_acceptance_criteria": task_utils.update_acceptance_criteria,
-            "update_test": task_utils.update_test,
-            "run_test": task_utils.run_test
+            "update_acceptance_criteria": (task_utils.update_acceptance_criteria, "update_acceptance_criteria(criteria: list[str])"),
+            "update_test": (task_utils.update_test, "update_test(test: str)"),
+            "run_test": (task_utils.run_test, "run_test() -> str")
         }
     
     base_tools.update(agent_tools)
-    return base_tools
+    
+    # Unzip the dictionary into two separate structures
+    tool_functions = {name: func for name, (func, sig) in base_tools.items()}
+    tool_signatures = [sig for name, (func, sig) in base_tools.items()]
+    
+    return tool_functions, tool_signatures
 
-def construct_system_prompt(agent_type: str, task: Task, feature: Feature, context: str, available_tools: Dict) -> str:
+def construct_system_prompt(agent_type: str, task: Task, feature: Feature, context: str, tool_signatures: List[str]) -> str:
     """Constructs the detailed system prompt, specialized for the agent type."""
     prompt = f"""You are the '{agent_type}' agent.
 CURRENT TASK: {task['title']} (ID: {task['id']})
@@ -103,12 +116,16 @@ You **MUST** respond in a single, valid JSON object. This object must adhere to 
 ```
 The thoughts field is for your reasoning, and tool_calls is a list of actions to execute.
 Your response will be parsed as JSON. Do not include any text outside of this JSON object.
-
-AVAILABLE TOOLS:
-{json.dumps(list(available_tools.keys()), indent=2)}
-
-Begin now.
 """
+    prompt += """
+Your available tools are defined below. Call them with the exact function and argument names.
+--- TOOL SIGNATURES ---
+"""
+    for sig in tool_signatures:
+        prompt += f"- {sig}\n"
+        prompt += "--- END OF TOOL SIGNATURES ---\n"
+        
+    prompt += "\nBegin now."
     return prompt
 
 def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Feature, git_manager: GitManager):
@@ -116,10 +133,10 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
 
     if agent_type == 'developer':
         task_utils.update_feature_status(task['id'], feature['id'], '~')
-    
-    available_tools = get_available_tools(agent_type, git_manager)
+
+    available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
     context = task_utils.get_context(feature.get("context", []))
-    system_prompt = construct_system_prompt(agent_type, task, feature, context, available_tools)
+    system_prompt = construct_system_prompt(agent_type, task, feature, context, tool_signatures)
 
     messages = [{"role": "user", "content": system_prompt}]
     
