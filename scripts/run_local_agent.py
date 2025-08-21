@@ -75,8 +75,8 @@ DESCRIPTION: {feature.get('description', 'No description specified.')}
     # --- Agent-specific instructions ---
     if agent_type == 'planner':
         prompt += """
-Your **ONLY** job is to create a detailed, step-by-step implementation plan for the assigned feature.
-Analyze the feature and use the `update_feature_plan` tool to save your plan. Do not perform any other actions.
+Your **ONLY** job is to create a detailed, step-by-step implementation feature_plan for the assigned feature.
+Analyze the feature and use the `update_feature_plan` tool to save your feature_plan. Do not perform any other actions.
 """
     elif agent_type == 'tester':
         prompt += """
