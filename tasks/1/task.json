@@ -57,7 +57,7 @@
     },
     {
       "id": "1.4",
-      "status": "-",
+      "status": "+",
       "title": "Testing",
       "description": "Establish the canonical, project-wide testing specification and integrate testing requirements into the planning specification so every feature is verifiable by deterministic tests.",
       "plan": "1. Create the file `docs/TESTING.md`. 2. Define the project's testing philosophy, scope, and structure. 3. Specify file locations (`tasks/{id}/tests/`) and naming conventions (`test_{task_id}_{feature_id}.py`). 4. Document testing tools (`run_tests`) and the development workflow.",
@@ -77,7 +77,7 @@
     },
     {
       "id": "1.5",
-      "status": "-",
+      "status": "+",
       "title": "Agent communication porotocol",
       "description": "Create a file that specifies the json format that an agent needs to return so that it's possible to  have a multi-step conversation and an agent can call tools",
       "context": [
@@ -124,7 +124,7 @@
     },
     {
       "id": "1.7",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Tester",
       "description": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_TESTER.md` serve as their starting point and guide.",
       "context": [
