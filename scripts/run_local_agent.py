@@ -43,10 +43,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
     base_tools = {
         "get_context": (task_utils.get_context, "get_context(files: list[str]) -> list[str]"),
         "block_feature": (task_utils.block_feature, "block_feature(reason: str)"),
-        "finish_feature": (
-            lambda **kwargs: task_utils.finish_feature(**kwargs, agent_type=agent_type, git_manager=git_manager),
-            "finish_feature()"
-        ),
+        "finish_feature": (task_utils.finish_feature, "finish_feature()"),
     }
 
     agent_tools = {}
@@ -65,7 +62,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
         agent_tools = {
             "update_acceptance_criteria": (task_utils.update_acceptance_criteria, "update_acceptance_criteria(criteria: list[str])"),
             "update_test": (task_utils.update_test, "update_test(test: str)"),
-            "run_test": (task_utils.run_test, "run_test() -> str")
+            "run_test": (task_utils.run_test, "run_test() -> str"),
         }
     
     base_tools.update(agent_tools)

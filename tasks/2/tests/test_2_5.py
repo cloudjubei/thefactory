@@ -1,16 +1,23 @@
 import os
-import re
+
 def test_env_example():
     file_path = '.env.example'
-    assert os.path.exists(file_path), f"{file_path} does not exist in the project root."
+    assert os.path.exists(file_path), ".env.example file does not exist"
+
     with open(file_path, 'r') as f:
         lines = f.readlines()
-    documented_vars = 0
-    for i in range(len(lines)):
-        line = lines[i].strip()
-        if re.match(r'^[A-Z_][A-Z0-9_]*=$', line):
-            assert i > 0, "Placeholder at the beginning without comment."
-            prev_line = lines[i-1].strip()
-            assert prev_line.startswith('#'), f"Placeholder '{line}' at line {i+1} is not preceded by a comment."
-            documented_vars += 1
-    assert documented_vars >= 1, "No documented placeholders found in .env.example."
+
+    var_count = 0
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped and '=' in stripped and not stripped.startswith('#'):
+            # Check preceding comment
+            assert i > 0, "First line cannot be a variable without preceding comment"
+            prev_stripped = lines[i-1].strip()
+            assert prev_stripped.startswith('#'), f"No comment before variable at line {i+1}"
+            # Check placeholder (empty value after =)
+            key, value = stripped.split('=', 1)
+            assert value.strip() == '', f"Variable '{key}' should have empty placeholder value"
+            var_count += 1
+
+    assert var_count >= 1, "At least one documented variable required"

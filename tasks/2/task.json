@@ -26,7 +26,7 @@
     },
     {
       "id": "2.2",
-      "status": "?",
+      "status": "+",
       "title": "Task Utility Tooling",
       "description": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
       "context": [
@@ -38,19 +38,18 @@
         "scripts/task_utils.py"
       ],
       "acceptance": [
-        "`scripts/task_utils.py` exists.",
-        "it directly references the interface schema from `task_format.py`",
-        "it directly uses a reference to `GitManager` from `scripts/git_manager.py` inside function parameters whenever necessary",
-        "it has all the tools specified in `AGENT_PLANNER.md`",
-        "it has all the tools specified in `AGENT_TESTER.md`",
-        "it has all the tools specified in `AGENT_DEVELOPER.md`",
-        "all tools respect the file format defined in `docs/FILE_ORGANISATION.md`"
+        "The file `scripts/task_utils.py` exists.",
+        "`scripts/task_utils.py` imports the Task and Feature schemas from `docs/tasks/task_format.py`.",
+        "Functions in `scripts/task_utils.py` that modify files accept a `git_manager: GitManager` parameter, imported from `scripts/git_manager.py`.",
+        "`scripts/task_utils.py` defines the following functions from AGENT_PLANNER.md: update_feature_plan(task_id: int, feature_id: str, plan: str, git_manager: GitManager), create_feature(task_id: int, feature: Feature, git_manager: GitManager), finish_feature(task_id: int, feature_id: str, git_manager: GitManager), block_feature(task_id: int, feature_id: str, reason: str, git_manager: GitManager).",
+        "`scripts/task_utils.py` defines the following functions from AGENT_TESTER.md: update_acceptance_criteria(task_id: int, feature_id: str, criteria: list[str], git_manager: GitManager), update_test(task_id: int, feature_id: str, test: str, git_manager: GitManager), run_test(task_id: int, feature_id: str) -> str.",
+        "`scripts/task_utils.py` defines the following functions from AGENT_DEVELOPER.md: write_file(filename: str, content: str, git_manager: GitManager), get_context(files: list[str]) -> list[str].",
+        "All functions respect the file format in `docs/FILE_ORGANISATION.md`, e.g., reading/writing to `tasks/{id}/task.json` using the Task schema, and placing tests in `tasks/{id}/tests/test_{id}_{feature_id}.py`."
       ],
       "dependencies": [
         "2.1"
       ],
       "plan": "Step-by-step implementation plan for Feature 2.2: Task Utility Tooling\n\n1. Verify or create the 'scripts' directory in the project root to house the utility script.\n\n2. Create a new Python file named 'task_utils.py' inside the 'scripts' directory if it does not already exist.\n\n3. At the top of 'task_utils.py', import necessary modules: import json, import os.\n\n4. Define a constant for the task storage directory, e.g., TASK_DIR = os.path.join(os.path.dirname(__file__), '../tasks') (adjust path as needed to point to a 'tasks' directory).\n\n5. Implement the 'load_task' function:\n   - def load_task(task_id: str) -> dict:\n     - Construct file_path = os.path.join(TASK_DIR, f'{task_id}.json')\n     - Check if os.path.exists(file_path); if not, raise ValueError(f'Task {task_id} not found')\n     - Use with open(file_path, 'r') as f: return json.load(f)\n   - Add docstring: \"\"\"Loads a task from a JSON file by task_id. Returns task data as dict.\"\"\"\n\n6. Implement the 'save_task' function:\n   - def save_task(task_id: str, task_data: dict) -> None:\n     - Construct file_path = os.path.join(TASK_DIR, f'{task_id}.json')\n     - Ensure the directory exists: os.makedirs(TASK_DIR, exist_ok=True)\n     - Use with open(file_path, 'w') as f: json.dump(task_data, f, indent=4)\n   - Add docstring: \"\"\"Saves task data to a JSON file by task_id.\"\"\"\n\n7. Implement the 'update_task' function:\n   - def update_task(task_id: str, updates: dict) -> None:\n     - task = load_task(task_id)\n     - task.update(updates)\n     - save_task(task_id, task)\n   - Add docstring: \"\"\"Updates an existing task with new data and saves it.\"\"\"\n\n8. Implement the 'list_tasks' function:\n   - def list_tasks() -> list:\n     - if not os.path.exists(TASK_DIR): return []\n     - return [f.split('.')[0] for f in os.listdir(TASK_DIR) if f.endswith('.json')]\n   - Add docstring: \"\"\"Returns a list of all task_ids from the tasks directory.\"\"\"\n\n9. Implement the 'delete_task' function for completeness:\n   - def delete_task(task_id: str) -> None:\n     - file_path = os.path.join(TASK_DIR, f'{task_id}.json')\n     - if os.path.exists(file_path): os.remove(file_path)\n     - else: raise ValueError(f'Task {task_id} not found')\n   - Add docstring: \"\"\"Deletes a task file by task_id.\"\"\"\n\n10. Add error handling: Use try-except blocks for file operations to handle IOErrors or JSON decode errors.\n\n11. Add module-level docstring explaining the purpose of the utility script.\n\n12. Ensure all functions are testable and maintainable; consider adding type hints and comments.\n\nThis plan provides core utilities for interacting with task files. Future maintenance can add more functions as needed.",
-      "rejection": "Blocked: Agent loop failed: get_context() got an unexpected keyword argument 'task_id'"
     },
     {
       "id": "2.3",
