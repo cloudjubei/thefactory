@@ -74,7 +74,7 @@
     },
     {
       "id": "1.6",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Planner",
       "action": "Create a specification for the Planner task that describes how to create a task with features that clearly describe the full scope of the task, and how to create a plan for each feature. This document is meant to be directly passed to a planner agent and alongside `docs/AGENT_PERSONAS_PLANNER.md` serve as their starting point and guide.",
       "context": [
@@ -106,7 +106,7 @@
     },
     {
       "id": "1.7",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Tester",
       "action": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_TESTER.md` serve as their starting point and guide.",
       "context": [
@@ -138,7 +138,7 @@
     },
     {
       "id": "1.8",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Developer",
       "action": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_DEVELOPER.md` serve as their starting point and guide.",
       "context": [
