@@ -160,13 +160,13 @@ def get_test(task_id: int, feature_id: str) -> str:
     except FileNotFoundError:
         return f"Test file not found at {test_path}"
 
-def update_acceptance_criteria(task_id: int, feature_id: str, acceptance_criteria: List[str]) -> Optional[Feature]:
+def update_acceptance_criteria(task_id: int, feature_id: str, criteria: List[str]) -> Optional[Feature]:
     """Replace the feature's acceptance criteria with a new list."""
     task = get_task(task_id)
     updated_feature = None
     for feature in task["features"]:
         if feature["id"] == feature_id:
-            feature["acceptance"] = acceptance_criteria
+            feature["acceptance"] = criteria
             updated_feature = feature
             break
     if updated_feature:
