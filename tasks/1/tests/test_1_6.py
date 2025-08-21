@@ -1,52 +1,68 @@
-import os, sys
+import os
+import sys
 
-def require(substrings, content, section):
-    missing = [s for s in substrings if s not in content]
-    if missing:
-        print(f"FAIL: {section} missing required strings: " + ", ".join(missing))
+def run_test():
+    """
+    Verifies the acceptance criteria for feature 1.6.
+    """
+    file_path = "docs/AGENT_PLANNER.md"
+    errors = []
+
+    # 1. Check if file exists
+    if not os.path.exists(file_path):
+        errors.append(f"FAIL: File '{file_path}' does not exist.")
+        print("\n".join(errors))
         sys.exit(1)
 
-def run():
-    path = "docs/AGENT_TESTER.md"
-    if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
-        sys.exit(1)
-    with open(path, "r", encoding="utf-8") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # References
-    require(["docs/AGENT_PERSONAS_TESTER.md", "docs/TESTING.md"], content, "References")
-
-    # Tools presence with signatures
-    tools = [
-        "get_test(",
-        "update_acceptance_criteria(",
-        "update_test(",
-        "delete_test(",
-        "run_test(",
-        "update_task_status(",
-        "update_feature_status("
+    # 2. Check for key sections and references
+    expected_references = [
+        "`docs/tasks/task_format.py`",
+        "`docs/tasks/task_example.json`",
+        "`docs/AGENT_COMMUNICATION_PROTOCOL.md`",
+        "`docs/agent_protocol_format.json`"
     ]
-    require(tools, content, "Tools")
+    for ref in expected_references:
+        if ref not in content:
+            errors.append(f"FAIL: Missing reference to '{ref}'.")
 
-    # Context gathering guidance
-    require(["required context", "get_test", "initial context"], content, "Context gathering guidance")
+    # 3. Check for Tools section and specific tools
+    if "## Tools" not in content:
+        errors.append("FAIL: Missing '## Tools' section.")
 
-    # Acceptance criteria guidance
-    require(["rigorous", "acceptance criteria", "update_acceptance_criteria"], content, "Acceptance criteria guidance")
+    expected_tools = [
+        "`create_task(task:Task)->Task`",
+        "`create_feature(feature:Feature)->Feature`",
+        "`update_task(id:int,title:str,action:str,plan:str)->Task`",
+        "`update_feature(task_id:int,feature_id:str,title:str,action:str,context:[str],plan:str)->Feature`",
+        "`update_agent_question(task_id:int,feature_id:str?,question:str)`"
+    ]
 
-    # Tests writing guidance
-    require(["tests", "update_test", "delete_test"], content, "Tests writing guidance")
+    for tool in expected_tools:
+        if tool not in content:
+            errors.append(f"FAIL: Missing tool signature: {tool}.")
 
-    # Running tests guidance
-    require(["run_test"], content, "Running tests guidance")
+    # 4. Check for workflow explanations
+    workflow_keywords = [
+        "creating a task with features that clearly describe the full scope of the task is mandatory",
+        "creating features that are missing for the task to be complete is mandatory",
+        "task requires a generic high level plan",
+        "feature requires a step-by-step plan",
+        "feature requires gathering a minimal context"
+    ]
+    for keyword in workflow_keywords:
+        if keyword not in content.lower():
+            errors.append(f"FAIL: Missing explanation for workflow keyword: '{keyword}'.")
 
-    # Status update guidance
-    require(["task status", "update_task_status"], content, "Task status guidance")
-    require(["feature status", "update_feature_status"], content, "Feature status guidance")
 
-    print("PASS: AGENT_TESTER.md exists with required content.")
-    sys.exit(0)
+    if errors:
+        print("\n".join(errors))
+        sys.exit(1)
+    else:
+        print("PASS: All acceptance criteria for feature 1.6 met.")
+        sys.exit(0)
 
 if __name__ == "__main__":
-    run()
+    run_test()
