@@ -7,7 +7,8 @@
     "The file `docs/docker/RUNNING_DOCKER_README.md` exists detailing the steps involved in running the project in a container environment.",
     "A `docs/docker/Dockerfile` exists that a user can copy and use. ",
     "A script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in a prepare `.env` file that the script will look into and set everything up.",
-    "The purpose is to have an agent periodically run in a container and not affect the host machine."
+    "The purpose is to have an agent periodically run in a container and not affect the host machine.",
+    "whenever an agent is run on a task - at the beginning a feature branch `features/{task_id}` needs to be created and all code is pushed to it"
   ],
   "features": []
 }

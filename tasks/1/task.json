@@ -65,7 +65,14 @@
         "docs/TESTING.md"
       ],
       "acceptance": [
-        "`docs/TESTING.md` exists describing the philosophy, scope, structure, location, naming conventions, tooling, and workflow for tests in this project."
+        "The file 'docs/TESTING.md' exists.",
+        "The file 'docs/TESTING.md' contains the Markdown heading '## Philosophy'.",
+        "The file 'docs/TESTING.md' contains the Markdown heading '## Scope'.",
+        "The file 'docs/TESTING.md' contains the Markdown heading '## Structure'.",
+        "The file 'docs/TESTING.md' contains the Markdown heading '## Location'.",
+        "The file 'docs/TESTING.md' contains the Markdown heading '## Naming Conventions'.",
+        "The file 'docs/TESTING.md' contains the Markdown heading '## Tooling'.",
+        "The file 'docs/TESTING.md' contains the Markdown heading '## Workflow'."
       ]
     },
     {
