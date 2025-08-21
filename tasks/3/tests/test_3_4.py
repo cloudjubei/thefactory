@@ -1,116 +1,127 @@
 import os
 import sys
 import shutil
-import importlib.util
-import subprocess
+from pathlib import Path
 
-def cleanup(test_project_path, gitmodules_path, original_gitmodules_content):
-    print("Cleaning up test artifacts...")
-    if os.path.exists(test_project_path):
-        shutil.rmtree(test_project_path)
-    
-    if original_gitmodules_content is not None:
-        with open(gitmodules_path, "w") as f:
-            f.write(original_gitmodules_content)
-    elif os.path.exists(gitmodules_path):
-        try:
-            subprocess.run(
-                ['git', 'ls-files', '--error-unmatch', gitmodules_path],
-                check=True, capture_output=True, text=True
-            )
-        except subprocess.CalledProcessError:
-            os.remove(gitmodules_path)
-    print("Cleanup finished.")
+
+def fail(msg: str):
+    print(f"FAIL: {msg}")
+    sys.exit(1)
+
+
+def pass_msg(msg: str):
+    print(f"PASS: {msg}")
+    sys.exit(0)
+
 
 def run():
-    print("Checking test for feature 3.4: Child project initialization script")
-    
-    script_path = "scripts/project_manager.py"
-    test_project_name = "_test_child_project_12345"
-    test_project_path = os.path.join("projects", test_project_name)
-    gitmodules_path = ".gitmodules"
-    original_gitmodules_content = None
+    # Import the module
+    try:
+        import scripts.project_manager as pm
+    except Exception as e:
+        fail(f"Could not import scripts.project_manager: {e}")
 
-    if os.path.exists(gitmodules_path):
-        with open(gitmodules_path, 'r') as f:
-            original_gitmodules_content = f.read()
+    # Validate function exists
+    if not hasattr(pm, "create_child_project") or not callable(pm.create_child_project):
+        fail("create_child_project function not found or not callable in scripts/project_manager.py")
 
-    if os.path.exists(test_project_path):
-        shutil.rmtree(test_project_path)
-    
-    if not os.path.exists(script_path):
-        print(f"FAIL: Script file '{script_path}' does not exist.")
-        sys.exit(1)
+    repo_root = Path(pm.__file__).resolve().parent.parent
 
-    if not os.path.exists('templates/child_project'):
-        print("FAIL: Prerequisite from feature 3.3 (templates/child_project) not met. Cannot test feature 3.4.")
-        sys.exit(1)
+    # Ensure templates exist (dependency from feature 3.3)
+    templates_dir = repo_root / "templates" / "child_project"
+    expected_templates = [templates_dir / "README.md", templates_dir / ".gitignore", templates_dir / "spec.md"]
+    if not templates_dir.exists():
+        fail(f"Templates directory missing: {templates_dir}")
+    for t in expected_templates:
+        if not t.exists():
+            fail(f"Template file missing: {t}")
+
+    # Prepare test project name and ensure clean state
+    project_name = "test_child_project_init"
+    target_dir = repo_root / "projects" / project_name
+    if target_dir.exists():
+        shutil.rmtree(target_dir)
+
+    # Monkeypatch subprocess.run to avoid executing git commands and to capture calls
+    captured = {"calls": []}
+
+    def fake_run(args, cwd=None, check=False, capture_output=False, text=False):
+        captured["calls"].append({"args": list(args), "cwd": str(cwd) if cwd else None})
+        class Res:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+        return Res()
+
+    original_run = pm.subprocess.run
+    pm.subprocess.run = fake_run
 
     try:
-        spec = importlib.util.spec_from_file_location("project_manager", script_path)
-        project_manager = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(project_manager)
-        create_child_project_func = getattr(project_manager, 'create_child_project')
-    except Exception as e:
-        print(f"FAIL: Could not import or inspect {script_path}. Error: {e}")
-        sys.exit(1)
+        # Execute the function
+        pm.create_child_project(project_name)
 
-    try:
-        print(f"Attempting to create child project '{test_project_name}'...")
-        create_child_project_func(test_project_name)
+        # Validate directory and files created
+        if not target_dir.exists():
+            fail(f"Child project directory not created: {target_dir}")
 
-        if not os.path.isdir(test_project_path):
-            print(f"FAIL: Project directory '{test_project_path}' was not created.")
-            cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-            sys.exit(1)
-        
-        expected_files = ["README.md", ".gitignore", "spec.md"]
-        for f in expected_files:
-            if not os.path.exists(os.path.join(test_project_path, f)):
-                print(f"FAIL: Expected file '{f}' not found in '{test_project_path}'.")
-                cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-                sys.exit(1)
+        for fname in ["README.md", ".gitignore", "spec.md"]:
+            fpath = target_dir / fname
+            if not fpath.exists():
+                fail(f"Expected file not found in child project: {fpath}")
 
-        with open(os.path.join(test_project_path, "README.md"), 'r') as f:
-            readme_content = f.read()
-        if '{{PROJECT_NAME}}' in readme_content:
-            print(f"FAIL: Placeholder '{{{{PROJECT_NAME}}}}' was not replaced in README.md.")
-            cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-            sys.exit(1)
-        if test_project_name not in readme_content:
-            print(f"FAIL: Project name '{test_project_name}' not found in README.md.")
-            cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-            sys.exit(1)
-            
-        if not os.path.isdir(os.path.join(test_project_path, ".git")):
-            print(f"FAIL: Git repository was not initialized in '{test_project_path}'.")
-            cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-            sys.exit(1)
+        # Validate placeholder replacement in README.md and spec.md
+        for fname in ["README.md", "spec.md"]:
+            fpath = target_dir / fname
+            try:
+                content = fpath.read_text(encoding="utf-8")
+            except Exception as e:
+                fail(f"Failed reading {fpath}: {e}")
+            if "{{PROJECT_NAME}}" in content:
+                fail(f"Placeholder not replaced in {fpath}")
+            if project_name not in content:
+                fail(f"Project name not injected in {fpath}")
 
-        if not os.path.exists(gitmodules_path):
-            print("FAIL: .gitmodules file was not created in the root directory.")
-            cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-            sys.exit(1)
+        # Validate expected git commands were invoked with correct working directories
+        def called_with(prefix_args, cwd_endswith):
+            for call in captured["calls"]:
+                args = call["args"]
+                cwd = call["cwd"] or ""
+                if args[:len(prefix_args)] == prefix_args and cwd.endswith(cwd_endswith):
+                    return True
+            return False
 
-        with open(gitmodules_path, 'r') as f:
-            gitmodules_content = f.read()
-        
-        expected_submodule_entry = f'[submodule "projects/{test_project_name}"]'
-        if expected_submodule_entry not in gitmodules_content:
-            print(f"FAIL: Submodule entry for '{test_project_name}' not found in .gitmodules.")
-            cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-            sys.exit(1)
-        
-        print("PASS: Child project initialization script works as expected.")
-        cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-        sys.exit(0)
+        child_cwd_suffix = str(Path("projects") / project_name)
+        root_cwd_suffix = str(repo_root)
 
-    except Exception as e:
-        import traceback
-        print(f"FAIL: Execution of create_child_project failed with an error: {e}")
-        traceback.print_exc()
-        cleanup(test_project_path, gitmodules_path, original_gitmodules_content)
-        sys.exit(1)
+        if not called_with(["git", "init"], child_cwd_suffix):
+            fail("git init not called in child project directory")
+        if not called_with(["git", "add", "."], child_cwd_suffix):
+            fail("git add . not called in child project directory")
+        if not called_with(["git", "commit", "-m", "Initial commit"], child_cwd_suffix):
+            fail("git commit not called in child project directory with expected message")
+
+        # Check submodule add: last arg should be projects/{project_name} and cwd should be repo root
+        submodule_calls = [c for c in captured["calls"] if c["args"][:3] == ["git", "submodule", "add"]]
+        if not submodule_calls:
+            fail("git submodule add was not invoked")
+        ok_sub = False
+        for c in submodule_calls:
+            args = c["args"]
+            cwd = c["cwd"] or ""
+            if args[-1] == f"projects/{project_name}" and cwd == str(repo_root):
+                ok_sub = True
+                break
+        if not ok_sub:
+            fail("git submodule add did not use expected destination or working directory")
+
+        pass_msg("Child project initialization script meets acceptance criteria.")
+
+    finally:
+        # Cleanup and restore
+        pm.subprocess.run = original_run
+        if target_dir.exists():
+            shutil.rmtree(target_dir)
+
 
 if __name__ == "__main__":
     run()
