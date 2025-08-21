@@ -1,29 +1,24 @@
-import os
-import sys
+import os, sys
 
 def run():
-    print("Checking test for feature 3.2: projects directory and .gitignore")
-
-    # Check for projects directory
-    projects_dir = "projects"
-    if not os.path.isdir(projects_dir):
-        print(f"FAIL: Directory '{projects_dir}' does not exist.")
-        sys.exit(1)
-    
-    # Check .gitignore content
-    gitignore_path = ".gitignore"
-    if not os.path.exists(gitignore_path):
-        print(f"FAIL: {gitignore_path} does not exist.")
+    proj_dir = "projects"
+    if not os.path.isdir(proj_dir):
+        print(f"FAIL: '{proj_dir}/' directory does not exist.")
         sys.exit(1)
 
-    with open(gitignore_path, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    if "/projects/" not in content.splitlines():
-        print(f"FAIL: '/projects/' not found in {gitignore_path}.")
+    gi_path = ".gitignore"
+    if not os.path.exists(gi_path):
+        print("FAIL: .gitignore does not exist at repository root.")
         sys.exit(1)
-    
-    print("PASS: 'projects/' directory exists and is listed in .gitignore.")
+
+    with open(gi_path, "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f.readlines()]
+
+    if "/projects/" not in lines:
+        print("FAIL: .gitignore does not contain the required '/projects/' line.")
+        sys.exit(1)
+
+    print("PASS: projects/ directory exists and .gitignore contains '/projects/'.")
     sys.exit(0)
 
 if __name__ == "__main__":

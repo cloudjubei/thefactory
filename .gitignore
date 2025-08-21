@@ -1,7 +1,20 @@
-venv
-venv_linux
-__pycache__
-.ruff_cache
-.pytest_cache
+# Root .gitignore
+# Common Python ignores
+__pycache__/
+*.py[cod]
+*.egg-info/
 .env
-.env.*
+.venv/
+.envrc
+.DS_Store
+
+# Build and dist
+build/
+dist/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Child projects directory (managed via submodules)
+/projects/
