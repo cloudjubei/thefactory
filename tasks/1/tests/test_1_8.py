@@ -1,24 +1,60 @@
 import os
 import sys
+import re
 
-def run():
-    file_path = "docs/AGENT_PRINCIPLES.md"
-    print(f"--- Running Test for Feature 1.8: Principles Guide ---")
 
-    if not os.path.exists(file_path):
-        print(f"FAIL: File '{file_path}' does not exist.")
-        sys.exit(1)
+def fail(msg: str):
+    print(f"FAIL: {msg}")
+    sys.exit(1)
 
-    with open(file_path, "r", encoding="utf-8") as f:
+
+def ok(msg: str):
+    print(f"PASS: {msg}")
+
+
+def main():
+    path = os.path.join("docs", "AGENT_DEVELOPER.md")
+    if not os.path.isfile(path):
+        fail("docs/AGENT_DEVELOPER.md does not exist")
+    ok("AGENT_DEVELOPER.md exists")
+
+    with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    reference = "docs/TOOL_ARCHITECTURE.md"
-    if reference not in content:
-        print(f"FAIL: The file does not reference '{reference}' as required.")
-        sys.exit(1)
+    # Required references
+    required_refs = [
+        "docs/AGENT_PERSONAS_DEVELOPER.md",
+        "docs/FILE_ORGANISATION.md",
+        "docs/AGENT_COMMUNICATION_PROTOCOL.md",
+        "docs/agent_protocol_format.json",
+    ]
+    for ref in required_refs:
+        if ref not in content:
+            fail(f"Reference missing: {ref}")
+    ok("All required references present")
 
-    print(f"PASS: '{file_path}' exists and references the tools guide.")
+    # Tools section and required tool names
+    if "Tools" not in content:
+        fail("Tools section missing")
+
+    tool_markers = [
+        "get_context(",
+        "write_file(",
+        "run_test(",
+        "update_task_status(",
+        "update_feature_status(",
+        "finish_feature(",
+        "finish(",
+        "update_agent_question(",
+    ]
+    for marker in tool_markers:
+        if marker not in content:
+            fail(f"Tool not documented: {marker}")
+    ok("All required tools documented")
+
+    print("ALL CHECKS PASSED for feature 1.8")
     sys.exit(0)
 
+
 if __name__ == "__main__":
-    run()
+    main()

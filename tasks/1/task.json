@@ -135,7 +135,7 @@
     },
     {
       "id": "1.8",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Developer",
       "action": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_DEVELOPER.md` serve as their starting point and guide.",
       "context": [
