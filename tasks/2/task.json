@@ -21,7 +21,8 @@
         "Create a tool called `submit_for_review` to create Git Pull Requests, where the branch naming follows `features/{task_id}`",
         "Create a tool called `ask_question` to indicate an agent wanting to ask a question about a feature being worked on. Calls the corresponding `scripts/task_utils.py` function",
         "Create a tool called `finish` to finish a task.",
-        "Create a tool called `finish_feature` to finish a feature."
+        "Create a tool called `finish_feature` to finish a feature.",
+        "Create a tool called `move_task` to move a task to a different position in the list of tasks (and update all ids accordingly)"
       ]
     },
     {
