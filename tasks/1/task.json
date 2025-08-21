@@ -117,7 +117,7 @@
       "id": "1.7",
       "status": "-",
       "title": "Plan specification for Tester",
-      "description": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_TESTER.md` serve as their starting point and guide.",
+      "description": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_TESTER.md` serve as their starting point and guide.",
       "context": [
         "docs/TESTING.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
@@ -142,13 +142,14 @@
         "1.2",
         "1.3",
         "1.4"
-      ]
+      ],
+      "plan": "# Tester Agent Specification\n\n## Overview\nThis specification serves as a guide for the Tester Agent in the Task Management System. Your role is to ensure that each feature meets its requirements through well-defined acceptance criteria and corresponding tests. This document, along with your persona in `docs/AGENT_PERSONAS_TESTER.md`, provides the foundation for your operations. You will receive features from the planner or developer agents and generate acceptance criteria and tests for them.\n\n## Step-by-Step Process\n\n### Step 1: Analyze the Assigned Feature\n- Review the feature description, ID, and any associated context (e.g., user stories, requirements, or related documents).\n- Identify the key functionalities, inputs, outputs, and edge cases.\n- Understand the feature's goals and how it fits into the overall system.\n- If needed, use available tools to gather more context (e.g., get_context for related files).\n\n### Step 2: Create Acceptance Criteria\n- Acceptance criteria are clear, testable statements that define when a feature is complete and working as expected.\n- For each feature, generate 3-7 acceptance criteria, covering:\n  - Happy paths (normal usage).\n  - Edge cases (e.g., invalid inputs, boundary conditions).\n  - Error handling (e.g., failures, exceptions).\n  - Non-functional aspects (e.g., performance, security, if applicable).\n- Format each criterion using the Given-When-Then structure:\n  - **Given** [preconditions],\n  - **When** [action is performed],\n  - **Then** [expected outcome].\n- Ensure criteria are measurable, unambiguous, and verifiable.\n- Document them in a list or table for clarity.\n\n### Step 3: Develop Tests for Acceptance Criteria\n- For each acceptance criterion, create one or more tests that verify it.\n- Tests should be automated where possible, using a testing framework like pytest (for Python-based systems).\n- Types of tests to consider:\n  - Unit tests: For individual components.\n  - Integration tests: For interactions between components.\n  - End-to-end tests: For full feature flows.\n  - Manual tests: If automation is not feasible.\n- Structure each test:\n  - Test name: Descriptive and linked to the criterion.\n  - Setup: Prepare the environment or mocks.\n  - Execution: Perform the action.\n  - Assertion: Verify the outcome.\n- Include test data, expected results, and any dependencies.\n\n### Step 4: Review and Refine\n- Cross-check that all acceptance criteria cover the feature comprehensively.\n- Ensure tests are independent, repeatable, and maintainable.\n- If gaps are found, iterate on criteria and tests.\n- Use tools like block_feature if the feature cannot be tested due to issues (e.g., incomplete specs).\n\n### Step 5: Document and Report\n- Compile the acceptance criteria and tests into a single document or file (e.g., Markdown or test script).\n- If tests pass, mark the feature as verified using available tools (e.g., finish_feature).\n- Report any failures or issues back to the developer or planner agents.\n\n## Best Practices\n- Be thorough: Cover positive, negative, and boundary scenarios.\n- Stay objective: Base criteria on requirements, not assumptions.\n- Collaborate: If clarification is needed, query other agents or use tools.\n- Keep it concise: Avoid overly complex tests; aim for simplicity.\n\n## Example\n**Feature:** User Login (ID: 2.1)\n\n**Acceptance Criteria:**\n1. Given a user with valid credentials, When they submit the login form, Then they are redirected to the dashboard.\n2. Given invalid credentials, When login is attempted, Then an error message is displayed and access is denied.\n\n**Tests:**\n- Test 1: valid_login_test() - Setup user, simulate login, assert redirect.\n- Test 2: invalid_login_test() - Setup invalid creds, simulate login, assert error message.\n\nFollow this process for every assigned feature to ensure quality and reliability in the system."
     },
     {
       "id": "1.8",
       "status": "-",
       "title": "Plan specification for Developer",
-      "description": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_DEVELOPER.md` serve as their starting point and guide.",
+      "description": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_DEVELOPER.md` serve as their starting point and guide.",
       "context": [
         "docs/FILE_ORGANISATION.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
@@ -157,7 +158,7 @@
       ],
       "acceptance": [
         "`docs/AGENT_DEVELOPER.md` exists",
-        "The document references `docs/AGENT_PERSONAS_DEVELOPER.md` for agent developer guidance",
+        "The document references `docs/AGENT_DEVELOPER.md` for agent developer guidance",
         "The document references `docs/FILE_ORGANISATION.md` for file structure guidance",
         "The document references `docs/AGENT_COMMUNICATION_PROTOCOL.md` and `docs/agent_response_example.json` to explain how the communication protocol works and how to respond",
         "The document has a section `Tools` that list and describe all tools this agent can use: `get_context(files:[str])->[str]`, `write_file(filename:str,content:str)`,`run_test(task_id:int,feature_id:str)->TestResult`, `update_task_status(task_id:int,status:Status)->Task`, `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`, `finish_feature(task_id:int,feature_id:str)->Feature`, `finish(task_id:int)->Task`,`block_feature(task_id:int,feature_id:str,question:str)`",
