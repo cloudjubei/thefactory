@@ -16,6 +16,7 @@ from scripts.tools.finish import finish_tool
 from scripts.tools.finish_feature import finish_feature_tool
 from scripts.tools.run_tests import run_tests_tool
 from scripts.tools.task_utils import get_task
+from scripts.tools.move_task import move_task_tool
 
 class AgentTools:
     def __init__(self, repo_path: str, git_manager: GitManager):
@@ -48,6 +49,9 @@ class AgentTools:
 
     def run_tests(self):
         return run_tests_tool(self.repo_path)
+
+    def move_task(self, task_id: int, new_index: int):
+        return move_task_tool(task_id, new_index, self.repo_path)
 
 class UnifiedEngine:
     def _build_prompt(self, context: dict, task_id: int = None, feature_id: int = None, persona: str = None) -> list:

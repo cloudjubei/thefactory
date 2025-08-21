@@ -1,13 +1,13 @@
 {
   "id": 2,
-  "status": "-",
+  "status": "~",
   "title": "Define Core Agent Terminology and Principles",
   "action": "Create the specification that defines the agent's high-level principles and establishes the key terms \"Orchestrator\" and \"Agent\". The agent uses a tool-based architecture.",
   "plan": "1. Formulate detailed plans for each feature: the orchestrator script, dependencies, environment template, and setup guide. 2. Implement the orchestrator script (`run_local_agent.py`) with all specified tools and CLI arguments. 3. Create the `requirements.txt` file with all necessary libraries. 4. Create the `.env.example` file for environment configuration. 5. Write the `docs/LOCAL_SETUP.md` guide. 6. Ensure all features meet acceptance criteria before submission.",
   "features": [
     {
       "id": "2.1",
-      "status": "-",
+      "status": "+",
       "title": "Orchestrator script",
       "action": "Implement the local orchestrator script and setup, fully compliant with AGENT_PRINCIPLES and TOOL_ARCHITECTURE, including CLI options to run specific tasks/features and supporting local setup.",
       "plan": "1. Create the main script file `scripts/run_local_agent.py`. 2. Implement command-line argument parsing for `--mode`, `--task`, `--feature`, and `--persona`. 3. Implement an `Agent` class to manage the execution lifecycle. 4. Implement an `AgentTools` class to provide tool functionalities like `write_file`, `retrieve_context_files`, `rename_files`, `run_tests`, `submit_for_review`, `ask_question`, `finish`, and `finish_feature`. 5. Implement a `UnifiedEngine` class to handle prompt construction and LLM API calls. 6. Structure the main execution loop to gather context, call the LLM, parse the response, and execute tool calls. 7. Ensure tool implementations are modularized into the `scripts/tools/` directory.",
