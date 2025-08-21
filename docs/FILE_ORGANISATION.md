@@ -1,25 +1,61 @@
-# File Organisation Specification
+# File Organisation
 
-This document outlines the standard file and directory structure for this repository. Adhering to this structure ensures consistency and predictability.
+This document outlines the file and directory structure for the project, providing a clear scheme for organising all artifacts.
 
-## 1. Top-Level Directory Layout
+## Top-Level Directory Layout
 
--   **/docs**: Contains all project documentation, including specifications, guidance, and architecture documents.
-    -   **/docs/tasks**: Specific documentation related to the task management system (e.g., format, guidance, examples).
--   **/scripts**: Holds automation and utility scripts.
-    -   **/scripts/tools**: Contains the implementations of tools available to the AI agent.
--   **/tasks**: The core directory for all tasks. Each task has its own subdirectory.
-    -   **/tasks/{task_id}**: A directory for a specific task.
-        -   `task.json`: The canonical definition, plan, and status for the task and its features.
-        -   **/tests**: Contains test files for the features of this task.
+The repository is structured to separate documentation, application source code, scripts, and task-specific files.
 
-## 2. File Naming Conventions
+-   `/docs`: Contains all project documentation, including specifications, guidance, and architectural documents.
+-   `/scripts`: Holds utility scripts for development, testing, and automation.
+    -   `/scripts/tools`: Contains Python modules that implement the tools available to the agent.
+-   `/src`: Reserved for the primary source code of the application (if any). *Currently unused.*
+-   `/tasks`: The core directory for all task-related artifacts. Each task has its own subdirectory.
+    -   `/tasks/{task_id}/`: A directory for a specific task.
+        -   `task.json`: The canonical definition of the task and its features.
+        -   `/tests/`: Contains test files for the features of this task.
 
--   **Task Definition File**: `tasks/{task_id}/task.json`
--   **Test Files**: `tasks/{task_id}/tests/test_{task_id}_{feature_id}.py`. For example, the test for feature 1.2 would be `tasks/1/tests/test_1_2.py`.
--   **Documentation**: Files in `/docs` should have clear, descriptive names in uppercase with underscores, e.g., `PLAN_SPECIFICATION.md`.
--   **Python Scripts**: Use snake_case for Python filenames, e.g., `run_local_agent.py`.
+## File Naming Conventions
 
-## 3. Evolution Guidance
+-   **Task Definition Files**: `tasks/{task_id}/task.json`
+-   **Test Files**: `tasks/{task_id}/tests/test_{task_id}_{feature_number}.py` (e.g., `test_1_5.py` for feature 1.5).
+-   **Documentation**: Markdown files should use `UPPERCASE_SNAKE_CASE.md` (e.g., `FILE_ORGANISATION.md`).
+-   **Python Scripts**: Python files should use `lowercase_snake_case.py`.
 
-This structure is intended to be stable but can evolve. Any proposed changes to the top-level structure or core naming conventions should be discussed and implemented as a dedicated task. The goal is to maintain a logical and scalable organisation as the project grows. All changes must be reflected in this document.
+## Evolution Guidance
+
+This structure is designed to be extensible.
+-   New top-level directories should be added only for entirely new categories of artifacts (e.g., a `/data` directory for datasets).
+-   Changes to the core structure, especially within `/tasks`, must be reflected in the project's documentation (`docs/tasks/TASKS_GUIDANCE.md`) and tooling (`scripts/tools/task_utils.py`).
+-   The principle is to keep related items co-located, especially for tasks, where the definition and its tests live under the same parent directory.
+
+## Example Tree
+
+Here is an illustrative tree of the repository structure:
+
+```
+.
+├── docs
+│   ├── AGENT_PRINCIPLES.md
+│   ├── FILE_ORGANISATION.md
+│   ├── PLAN_SPECIFICATION.md
+│   ├── TESTING.md
+│   ├── TOOL_ARCHITECTURE.md
+│   └── tasks
+│       ├── TASKS_GUIDANCE.md
+│       ├── task_example.json
+│       └── task_format.py
+├── scripts
+│   ├── run_local_agent.py
+│   ├── run_tests.py
+│   └── tools
+│       ├── ask_question.py
+│       ├── ...
+│       └── write_file.py
+├── tasks
+│   └── 1
+│       ├── task.json
+│       └── tests
+│           └── test_1_5.py
+└── .gitignore
+```
