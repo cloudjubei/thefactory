@@ -37,7 +37,7 @@
     {
       "id": "3.3",
       "title": "Define Child Project Boilerplate Structure and Content",
-      "status": "-",
+      "status": "+",
       "action": "Create the template files that will be used to populate a new child project. These files will live in a `templates/child_project/` directory.",
       "plan": "1. Create a directory `templates/child_project/`. 2. Create a template `README.md` file inside, with placeholders for the project name (e.g., `{{PROJECT_NAME}}`). 3. Create a template `.gitignore` file suitable for a generic child project. 4. Create a template `spec.md` file to guide the child project's own specification.",
       "context": [],

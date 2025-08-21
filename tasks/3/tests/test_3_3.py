@@ -1,33 +1,67 @@
-import os
-import sys
+import os, sys
+
+
+def fail(msg):
+    print(f"FAIL: {msg}")
+    sys.exit(1)
+
 
 def run():
-    print("Checking test for feature 3.3: Child project boilerplate")
-    
-    base_dir = "templates/child_project"
-    
+    base_dir = os.path.join("templates", "child_project")
     if not os.path.isdir(base_dir):
-        print(f"FAIL: Directory '{base_dir}' does not exist.")
-        sys.exit(1)
+        fail(f"Directory '{base_dir}' does not exist.")
 
-    required_files = ["README.md", ".gitignore", "spec.md"]
-    for filename in required_files:
-        path = os.path.join(base_dir, filename)
-        if not os.path.exists(path):
-            print(f"FAIL: Boilerplate file '{path}' does not exist.")
-            sys.exit(1)
+    files = [
+        ("README.md", True),
+        (".gitignore", True),
+        ("spec.md", True),
+    ]
 
-    # Check for placeholder in README.md
+    for fname, must_exist in files:
+        path = os.path.join(base_dir, fname)
+        if must_exist and not os.path.exists(path):
+            fail(f"Required file missing: {path}")
+
+    # Validate README.md content
     readme_path = os.path.join(base_dir, "README.md")
     with open(readme_path, "r", encoding="utf-8") as f:
-        content = f.read()
+        readme = f.read()
+    required_readme_markers = [
+        "{{PROJECT_NAME}}",
+        "# ",  # has a title
+        "submodule",  # mentions submodule linkage
+        "projects/",  # mentions projects dir in parent
+    ]
+    missing_readme = [m for m in required_readme_markers if m not in readme]
+    if missing_readme:
+        fail("README.md is missing required markers: " + ", ".join(missing_readme))
 
-    if "{{PROJECT_NAME}}" not in content:
-        print(f"FAIL: Placeholder '{{{{PROJECT_NAME}}}}' not found in {readme_path}.")
-        sys.exit(1)
+    # Validate spec.md content
+    spec_path = os.path.join(base_dir, "spec.md")
+    with open(spec_path, "r", encoding="utf-8") as f:
+        spec = f.read()
+    required_spec_markers = [
+        "Specification: {{PROJECT_NAME}}",
+        "## 1. Purpose",
+        "## 3. Requirements",
+        "projects/{{PROJECT_NAME}}",
+    ]
+    missing_spec = [m for m in required_spec_markers if m not in spec]
+    if missing_spec:
+        fail("spec.md is missing required sections/markers: " + ", ".join(missing_spec))
 
-    print("PASS: Boilerplate directory and files exist with correct content.")
+    # Validate .gitignore has generic entries
+    gi_path = os.path.join(base_dir, ".gitignore")
+    with open(gi_path, "r", encoding="utf-8") as f:
+        gi = f.read()
+    required_gitignore = ["__pycache__/", "node_modules/", ".DS_Store"]
+    missing_gi = [m for m in required_gitignore if m not in gi]
+    if missing_gi:
+        fail(".gitignore missing generic patterns: " + ", ".join(missing_gi))
+
+    print("PASS: Child project boilerplate templates exist with suitable content.")
     sys.exit(0)
+
 
 if __name__ == "__main__":
     run()
