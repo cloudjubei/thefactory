@@ -1,59 +1,68 @@
-# File Organisation
+# Repository File Organisation Specification
 
-This document describes how files and directories are organised in this repository to keep the project navigable, consistent, and easy to evolve.
+This document defines how files and directories are structured in this repository so contributors can navigate, extend, and evolve it consistently.
 
-## Top-Level Directory Layout
-- docs/: Project documentation and specifications.
-  - docs/tasks/: Canonical task schema and examples.
-- scripts/: Executables and tools used by the agent and CI.
-- tasks/: Per-task workspaces containing task metadata and tests.
-  - tasks/{id}/task.json: Canonical task definition for a single task.
-  - tasks/{id}/tests/: Deterministic tests validating each feature in the task.
-- .github/, .env, and other setup files may exist as needed.
+# Top-Level Directory Layout
+
+This section describes the purpose of each top-level folder and notable files.
+
+- docs/
+  - Project-wide documentation, specifications, and reference formats used by all personas.
+  - Examples: task schemas, testing guidance, agent protocols.
+- tasks/
+  - Source of truth for tasks. Each task has its own folder with task.json and a tests/ subfolder for per-feature tests.
+- scripts/
+  - Orchestration code, tooling, and developer utilities (e.g., test runner, agent harness).
+- .gitignore, README, configuration files
+  - Standard project metadata and VCS configuration.
+
+Guiding principle: documentation lives under docs/, automated tests per task live under tasks/{id}/tests/, and orchestration lives under scripts/.
+
+# File Naming Conventions
+
+Consistency improves discoverability. Use the following conventions:
+
+- Tasks
+  - Task definition: tasks/{task_id}/task.json
+  - Tests per feature: tasks/{task_id}/tests/test_{task_id}_{feature_number}.py
+    - Example: tasks/15/tests/test_15_3.py
+- Documentation
+  - Markdown specs: use UPPER_SNAKE_CASE for canonical documents (e.g., docs/TESTING.md, docs/FILE_ORGANISATION.md).
+  - Task schema and examples live under docs/tasks/ (e.g., docs/tasks/task_format.py, docs/tasks/task_example.json).
+- Python modules
+  - snake_case.py for modules; TypedDict and schemas live in clearly named files (e.g., task_format.py).
+
+# Evolution Guidance
+
+The structure should evolve incrementally and intentionally:
+
+- Backward compatibility: prefer additive changes; update specs and examples together.
+- Single source of truth: schemas are authoritative (e.g., docs/tasks/task_format.py). Keep examples in sync.
+- Locality: place new feature-specific assets within the owning task folder to reduce coupling.
+- Testing-first: whenever adding documents or tools, create or update per-feature tests that assert required artifacts and content.
+- Minimal surface: introduce shared utilities only when multiple tasks need them, and document rationale in docs/.
+
+# Example tree (illustrative)
+
+Below is a graphical, high-level view of the repository layout. This is illustrative, not exhaustive.
+
+```
+.
+├── docs/
+│   ├── FILE_ORGANISATION.md
+│   ├── TESTING.md
+│   └── tasks/
+│       ├── task_format.py
+│       └── task_example.json
+├── scripts/
+│   └── run_local_agent.py
+└── tasks/
+    └── 1/
+        ├── task.json
+        └── tests/
+            └── test_1_3.py
+```
 
 Notes:
-- All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
-- Documentation in docs/ is the single source of truth for specs and formats.
-
-## File Naming Conventions
-- Tasks and features:
-  - Task directories are numeric IDs: tasks/{id}/ (e.g., tasks/1/).
-  - Tests are named per-feature: tasks/{task_id}/tests/test_{task_id}_{feature_number}.py (e.g., tasks/15/tests/test_15_3.py).
-- Python modules: snake_case.py (e.g., task_format.py, run_local_agent.py).
-- Documentation files: UPPERCASE or Title_Case for project-wide specs (e.g., TESTING.md, FILE_ORGANISATION.md). Place task-related docs under docs/tasks/.
-- JSON examples/templates: Use .json with clear, descriptive names (e.g., task_example.json).
-
-## Evolution Guidance
-- Make minimal, incremental changes that are easy to review and test.
-- Keep documentation authoritative: update docs first when changing schemas or protocols.
-- Introduce shared utilities only when multiple tasks need them; otherwise keep helpers local to a task.
-- Deprecate gradually: create new files/specs alongside old ones, migrate, then remove deprecated artifacts when tests prove stability.
-- Each feature must have deterministic tests; do not mark features complete until tests pass.
-
-## Example Tree (illustrative)
-The following tree is graphical and illustrative of a typical repository layout:
-
-```
-repo_root/
-├─ docs/
-│  ├─ FILE_ORGANISATION.md
-│  ├─ TESTING.md
-│  ├─ AGENT_COMMUNICATION_PROTOCOL.md
-│  └─ tasks/
-│     ├─ task_format.py
-│     └─ task_example.json
-├─ scripts/
-│  ├─ run_local_agent.py
-│  ├─ task_utils.py
-│  └─ git_manager.py
-└─ tasks/
-   ├─ 1/
-   │  ├─ task.json
-   │  └─ tests/
-   │     └─ test_1_3.py
-   └─ 2/
-      ├─ task.json
-      └─ tests/
-```
-
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including where tests for each feature live.
+- Use this structure as a guide when adding new tasks, tests, and documentation.
+- Keep examples and schemas synchronized to avoid drift.
