@@ -1,160 +1,176 @@
-# scripts/git_manager.py
-
-import subprocess
-import sys
 import os
+import subprocess
+from typing import Optional, Tuple
+
 
 class GitManager:
-    """A class to handle basic git operations for the autonomous agent."""
+    """
+    Lightweight Git helper used by agent tools to interact with repositories.
 
-    def __init__(self, repo_url: str, working_dir: str = "/tmp/agent_repo"):
-        """
-        Initializes the GitManager.
+    Responsibilities:
+    - Clone/setup a working repository in a given directory.
+    - Create/check out branches.
+    - Stage and commit changes.
+    - Push branches/tags to origin.
 
-        Args:
-            repo_url (str): The URL of the git repository.
-            working_dir (str): The local directory to clone the repo into.
-        """
+    Notes:
+    - This manager relies on the system `git` CLI via subprocess for portability.
+    - Networked operations (push, PR creation) are best-effort and should fail gracefully.
+    """
+
+    def __init__(self, repo_url: str, working_dir: str):
         self.repo_url = repo_url
         self.working_dir = working_dir
-        self.repo_path = os.path.join(self.working_dir, os.path.basename(repo_url).replace('.git', ''))
+        self.repo_path = working_dir
 
-    def _run_command(self, command: list[str], cwd: str = None):
-        """
-        Runs a shell command and handles errors.
+    # --------------------------
+    # Internal helpers
+    # --------------------------
+    def _run(self, *args: str, cwd: Optional[str] = None, check: bool = False) -> Tuple[int, str, str]:
+        """Run a git (or other) command. Returns (returncode, stdout, stderr)."""
+        proc = subprocess.run(
+            list(args),
+            cwd=cwd or self.repo_path,
+            capture_output=True,
+            text=True,
+        )
+        if check and proc.returncode != 0:
+            raise subprocess.CalledProcessError(proc.returncode, args, output=proc.stdout, stderr=proc.stderr)
+        return proc.returncode, proc.stdout.strip(), proc.stderr.strip()
 
-        Args:
-            command (list[str]): The command to run as a list of strings.
-            cwd (str, optional): The directory to run the command in. Defaults to None.
+    def _git(self, *git_args: str, cwd: Optional[str] = None, check: bool = False) -> Tuple[int, str, str]:
+        return self._run("git", *git_args, cwd=cwd, check=check)
 
-        Returns:
-            bool: True if the command was successful, False otherwise.
-        """
-        print(f"Executing command: {' '.join(command)}")
-        try:
-            subprocess.run(
-                command,
-                check=True,
-                capture_output=True,
-                text=True,
-                cwd=cwd or self.repo_path
-            )
-            return True
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing command: {' '.join(command)}", file=sys.stderr)
-            print(f"Stderr: {e.stderr}", file=sys.stderr)
-            print(f"Stdout: {e.stdout}", file=sys.stderr)
-            return False
+    # --------------------------
+    # Public API
+    # --------------------------
+    def ensure_user_config(self, name: str = "AI Agent", email: str = "agent@example.com") -> bool:
+        """Ensure git user.name and user.email are configured locally for this repo."""
+        rc_name, out_name, _ = self._git("config", "user.name")
+        rc_email, out_email, _ = self._git("config", "user.email")
+        changed = False
+        if rc_name != 0 or not out_name:
+            self._git("config", "user.name", name)
+            changed = True
+        if rc_email != 0 or not out_email:
+            self._git("config", "user.email", email)
+            changed = True
+        return changed
 
     def setup_repository(self, branch_name: str = "main") -> bool:
         """
-        Clones the repository, fetches latest changes, and creates a new branch.
-
-        Args:
-            branch_name (str): The name of the new branch to create.
-
-        Returns:
-            bool: True if setup was successful, False otherwise.
+        Prepare the working directory as a git repository:
+        - If not already a git repo, clone repo_url into working_dir.
+        - Fetch remotes, create/checkout the specified branch.
+        - Ensure user config exists.
+        Returns True on success, False otherwise.
         """
-        if os.path.exists(self.working_dir):
-            print(f"Cleaning up existing working directory: {self.working_dir}")
-            if not self._run_command(["rm", "-rf", self.working_dir], cwd="/"):
+        os.makedirs(self.working_dir, exist_ok=True)
+        # If not a repo yet, clone
+        if not os.path.isdir(os.path.join(self.repo_path, ".git")):
+            rc, _, err = self._git("clone", self.repo_url, self.repo_path, cwd="/")
+            # Some git versions require running from a different cwd for clone
+            if rc != 0:
+                # Fallback attempt: run from working_dir's parent
+                parent = os.path.dirname(os.path.abspath(self.repo_path)) or "/"
+                os.makedirs(parent, exist_ok=True)
+                rc, _, err = self._git("clone", self.repo_url, self.repo_path, cwd=parent)
+                if rc != 0:
+                    return False
+        # Ensure we operate inside the repo
+        # Fetch and checkout/create branch
+        self._git("fetch", "--all")
+        # Try to checkout existing branch, else create it
+        rc, _, _ = self._git("checkout", branch_name)
+        if rc != 0:
+            rc, _, _ = self._git("checkout", "-b", branch_name)
+            if rc != 0:
                 return False
-        
-        if not self._run_command(["git", "clone", self.repo_url, self.repo_path], cwd="/"):
-            return False
-            
-        if not self._run_command(["git", "checkout", "main"]): return False
-        if not self._run_command(["git", "pull"]): return False
-        if (branch_name != "main"):
-            if not self._run_command(["git", "checkout", "-b", branch_name]): return False
-            self._run_command(["git", "pull", "origin", branch_name]) # this can fail as this could be a fresh branch
-            
-        print(f"Successfully created and checked out branch '{branch_name}' in '{self.repo_path}'")
+        self.ensure_user_config()
         return True
 
-    def commit_and_push(self, commit_message: str) -> bool:
-        """
-        Adds all changes, commits them, and pushes the branch to origin.
+    def create_branch(self, branch_name: str, checkout: bool = True) -> bool:
+        rc, _, _ = self._git("branch", "--list", branch_name)
+        # Always attempt to create; git will fail if exists
+        rc_create, _, _ = self._git("branch", branch_name)
+        # If requested, checkout
+        if checkout:
+            rc_co, _, _ = self._git("checkout", branch_name)
+            return rc_co == 0
+        return rc_create == 0 or rc == 0
 
-        Args:
-            commit_message (str): The commit message.
+    def checkout_branch(self, branch_name: str) -> bool:
+        rc, _, _ = self._git("checkout", branch_name)
+        return rc == 0
 
-        Returns:
-            bool: True if the operation was successful, False otherwise.
-        """
-        branch_name = self._get_current_branch()
-        if not branch_name: return False
-            
-        if not self._run_command(["git", "add", "."]): return False
-        if not self._run_command(["git", "commit", "-m", commit_message]):
-            print("Warning: `git commit` failed. This may be because there were no changes to commit.")
-        if not self._run_command(["git", "push", "-u", "origin", branch_name]): return False
-            
-        print(f"Successfully committed and pushed branch '{branch_name}' to origin.")
-        return True
-        
-    def create_pull_request(self, title: str, body: str) -> bool:
-        """
-        Creates a pull request using the GitHub CLI.
+    def current_branch(self) -> Optional[str]:
+        rc, out, _ = self._git("rev-parse", "--abbrev-ref", "HEAD")
+        return out if rc == 0 else None
 
-        Args:
-            title (str): The title of the pull request.
-            body (str): The body content of the pull request.
-
-        Returns:
-            bool: True if the operation was successful, False otherwise.
-        """
-        command = ["gh", "pr", "create", "--title", title, "--body", body, "--base", "main"]
-        if not self._run_command(command):
-            print("Error: Failed to create pull request. Ensure 'gh' is installed and authenticated ('gh auth login').", file=sys.stderr)
+    def commit_all(self, message: str = "chore: automated update") -> bool:
+        self._git("add", "-A")
+        # Commit only if there are staged changes
+        rc_diff, out_diff, _ = self._git("diff", "--cached", "--name-only")
+        if rc_diff != 0 or not out_diff:
             return False
-        
-        if not self._run_command(["rm", "-rf", self.working_dir], cwd="/"):
-            print("Error: Failed to cleanup tmp repository.", file=sys.stderr)
-            return False
-        
-        print(f"Successfully created pull request with title: '{title}'")
-        return True
+        rc, _, _ = self._git("commit", "-m", message)
+        return rc == 0
 
-    def _get_current_branch(self) -> str:
-        """Helper to get the current git branch."""
-        try:
-            result = subprocess.run(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-                check=True, capture_output=True, text=True, cwd=self.repo_path
-            )
-            return result.stdout.strip()
-        except subprocess.CalledProcessError:
-            print("Error: Could not determine current branch.", file=sys.stderr)
-            return ""
+    def push_branch(self, branch_name: Optional[str] = None, set_upstream: bool = True) -> bool:
+        if branch_name is None:
+            branch_name = self.current_branch() or "main"
+        args = ["push", "origin", branch_name]
+        if set_upstream:
+            args.insert(1, "-u")
+        rc, _, _ = self._git(*args)
+        return rc == 0
 
-if __name__ == '__main__':
-    # This example demonstrates the full local workflow.
-    
-    if len(sys.argv) != 5:
-        print("Usage: python3 git_manager.py <REPO_URL> <BRANCH_NAME> <COMMIT_MESSAGE> \"<PR_BODY>\"")
-        sys.exit(1)
-        
-    repo_url_arg = sys.argv[1]
-    branch_name_arg = sys.argv[2]
-    commit_message_arg = sys.argv[3]
-    pr_body_arg = sys.argv[4]
-    
-    manager = GitManager(repo_url=repo_url_arg)
-    
-    # Step 1: Setup repository and branch
-    if not manager.setup_repository(branch_name=branch_name_arg): sys.exit(1)
-        
-    # Step 2: In a real scenario, the agent would now modify files.
-    # For this example, we create a dummy file.
-    with open(os.path.join(manager.repo_path, "agent_test_file.txt"), "w") as f:
-        f.write(f"This is a test file for branch {branch_name_arg}.\n")
+    def tag(self, tag_name: str, message: Optional[str] = None) -> bool:
+        if message:
+            rc, _, _ = self._git("tag", "-a", tag_name, "-m", message)
+        else:
+            rc, _, _ = self._git("tag", tag_name)
+        return rc == 0
 
-    # Step 3: Commit and push changes
-    if not manager.commit_and_push(commit_message=commit_message_arg): sys.exit(1)
+    def push_tags(self) -> bool:
+        rc, _, _ = self._git("push", "--tags")
+        return rc == 0
 
-    # Step 4: Create pull request
-    if not manager.create_pull_request(title=commit_message_arg, body=pr_body_arg): sys.exit(1)
+    def pull_rebase(self) -> bool:
+        rc, _, _ = self._git("pull", "--rebase")
+        return rc == 0
 
-    print("\nGit and GitHub operations completed successfully.")
+    def merge(self, source_branch: str) -> bool:
+        rc, _, _ = self._git("merge", source_branch)
+        return rc == 0
+
+    def get_repo_url(self) -> str:
+        rc, out, _ = self._git("config", "--get", "remote.origin.url")
+        return out if rc == 0 else self.repo_url
+
+    # Optional: Provide a no-op PR creation to satisfy tool interfaces without external deps
+    def create_pull_request(self, title: str, body: str = "", base: str = "main", head: Optional[str] = None) -> str:
+        """
+        Best-effort PR creation. If GitHub CLI `gh` is available and a token is configured,
+        it will attempt to create a PR. Otherwise, it returns a message describing what would happen.
+        Returns a string message/URL when possible.
+        """
+        head = head or (self.current_branch() or "")
+        # Try GitHub CLI
+        rc, _, _ = self._run("gh", "--version")
+        if rc == 0 and head:
+            args = [
+                "gh", "pr", "create",
+                "--title", title,
+                "--body", body or title,
+                "--base", base,
+                "--head", head,
+            ]
+            rc2, out2, err2 = self._run(*args)
+            if rc2 == 0 and out2:
+                return out2
+            return f"Failed to create PR via gh: {err2 or 'unknown error'}"
+        return f"PR requested (base={base}, head={head}) - gh CLI not available; skipping creation."
+
+    # Backwards-compatible alias some tools might expect
+    open_pull_request = create_pull_request
