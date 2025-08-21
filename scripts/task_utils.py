@@ -271,15 +271,26 @@ def create_feature(task_id: int, feature: Feature) -> Feature:
     save_task(task)
     return feature
 
-def update_feature_plan(task_id: int, feature_id: str, plan: str) -> Optional[Feature]:
+def update_feature_plan(task_id: int, feature_id: str, plan: any) -> Optional[Feature]:
     """
     Updates the 'plan' field of a specific feature. This is the primary tool for the Planner agent.
+    It gracefully handles the plan being passed as a list of strings.
     """
+    plan_str = ""
+
+    if isinstance(plan, list):
+        plan_str = "\n".join(map(str, plan))
+    elif isinstance(plan, str):
+        plan_str = plan
+    else:
+        print(f"Warning: Plan received with unexpected type '{type(plan)}'. Converting to string.")
+        plan_str = str(plan)
+
     task = get_task(task_id)
     updated_feature = None
     for feature in task["features"]:
         if feature["id"] == feature_id:
-            feature["plan"] = plan
+            feature["plan"] = plan_str
             updated_feature = feature
             break
     if updated_feature:
