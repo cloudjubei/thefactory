@@ -1,106 +1,63 @@
-# Local Agent Setup and Usage Guide (macOS)
+# Local Setup Guide
 
-This guide provides step-by-step instructions to set up and run the autonomous AI agent. The agent is highly flexible and can use various Large Language Models (LLMs) as its "brain."
+This document provides step-by-step instructions for setting up the local development environment and running the AI agent orchestrator.
 
-## I. Core Setup (Required for All Modes)
+## 1. Prerequisites
 
-1.  **Install Prerequisites via Homebrew:**
-    ```bash
-    brew install git python gh ollama
-    ```
+Before you begin, ensure you have the following installed on your system:
 
-2.  **Authenticate with GitHub (Crucial Step):**
-    This step authorizes the agent to push branches and create pull requests on your behalf. You must ensure you grant the correct permissions.
+-   **Python 3.8 or higher**: [Download Python](https://www.python.org/downloads/)
+-   **Git**: [Download Git](https://git-scm.com/downloads)
 
-    **First, if you have logged in before, log out to be safe:**
-    ```bash
-    gh auth logout
-    ```
+## 2. Setup Instructions
 
-    **Now, log in with the required permission scopes:**
-    ```bash
-    gh auth login --scopes repo,workflow
-    ```
-    -   When prompted, choose `HTTPS` as your preferred protocol.
-    -   Follow the web browser authentication flow.
-    -   **The `--scopes repo,workflow` part is essential.** It grants the token permission to push code and interact with repositories. Without this, the agent will fail with a "permission denied" error.
+Follow these steps to get the project running.
 
-3.  **Install Python Libraries:**
-    Navigate to the project's root directory and run:
-    ```bash
-    pip3 install -r requirements.txt
-    ```
+### Step 2.1: Clone the Repository
 
-## II. Configuring LLM Providers (Choose one or more)
+First, clone the project repository to your local machine using Git.
 
-### Option A: Local LLM with Ollama (Recommended)
-This method is free, private, and works offline. **Requires a Mac with 16GB+ RAM.**
+```bash
+git clone <your_repository_url>
+cd <repository_directory>
+```
 
-1.  **Start the Ollama Service:** This command ensures Ollama is always running in the background.
-    ```bash
-    brew services start ollama
-    ```
-2.  **Download a Model:**
-    ```bash
-    ollama pull llama3 # Downloads the Llama 3 8B model (~4.7GB)
-    ```
-3.  **Model String for Agent:** `ollama/llama3`
+### Step 2.2: Create a Python Virtual Environment
+It is highly recommended to use a virtual environment to manage project dependencies and avoid conflicts with other Python projects.
+# Create the virtual environment
+`python3 -m venv venv`
 
-### Option B: Cloud LLMs (OpenAI, Groq, Gemini)
-These methods use powerful cloud APIs. They require API keys.
+# Activate the virtual environment
+# On macOS and Linux:
+source venv/bin/activate
 
-1.  **Create your `.env` file:**
-    In the project root, copy the example file:
-    ```bash
-    cp .env.example .env
-    ```
-2.  **Get API Keys and Edit `.env`:**
-    Open the new `.env` file and add your keys. You only need to add keys for the services you want to use.
-    -   **OpenAI:** Get a key from [platform.openai.com/api-keys](https://platform.openai.com/api-keys).
-        -   **Model String for Agent:** `gpt-4o` or `gpt-3.5-turbo`
-    -   **Groq (for high-speed Llama 3 70B):** Get a key from [console.groq.com/keys](https://console.groq.com/keys).
-        -   **Model String for Agent:** `groq/llama3-70b-8192`
-    -   **Google Gemini:** Get a key from [aistudio.google.com](https://aistudio.google.com).
-        -   **Model String for Agent:** `gemini/gemini-1.5-flash`
+# On Windows:
+`.\venv\Scripts\activate`
 
-## III. Running the Agent
+You will know the environment is active when you see (venv) at the beginning of your command prompt.
 
-The agent is designed to be safe by default and does not have the ability to run arbitrary commands on your computer.
+### Step 2.3: Install Dependencies
+With the virtual environment active, install the required Python packages using the requirements.txt file.
+```pip install -r requirements.txt```
 
-### Key Arguments:
--   `--model MODEL`: Specifies which LLM to use (e.g., `gpt-4o`). Defaults to `ollama/llama3`.
--   `--mode MODE`: `single` (runs one task cycle) or `continuous`. Defaults to `single`.
+### Step 2.4: Configure Environment Variables
+The agent requires API keys to connect to LLM services. These are managed through a .env file.
+1. Copy the example file to create your own configuration:
+```cp .env.example .env```
+2. Open the newly created .env file in a text editor.
+3. Add your API key for the LLM provider you intend to use. For example, to use OpenAI's models, you would set:
+```OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"```
 
-### Examples:
+### Step 3. Running the Agent
 
--   **Run one task with the default local model:**
-    ```bash
-    python3 scripts/run_local_agent.py
-    ```
-
--   **Run one task with OpenAI's GPT-5:**
-    ```bash
-    python3 scripts/run_local_agent.py --model gpt-5 --task 1
-    ```
-
--   **Run continuously with Google's Gemini:**
-    ```bash
-    python3 scripts/run_local_agent.py --model gemini/gemini-2.5-pro --task 1
-    ```
-
--   **Run continuously with Groq's high-speed Llama 3:**
-    ```bash
-    python3 scripts/run_local_agent.py --model groq/llama3-70b-8192 --task 1 --mode continuous
-    ```
-
--   **Run one task with Anthropic's Claude 4 Sonnet:**
-    ```bash
-    python3 scripts/run_local_agent.py --model claude-sonnet-4-20250514 --task 1
-    ```
-
--   **Run one task with Xai's Grok 4:**
-    ```bash
-    python3 scripts/run_local_agent.py --model xai/grok-4 --task 1
-    ```
-
-    
+The primary script for running the agent is scripts/run_local_agent.py. It orchestrates the interaction between the LLM and the project's tools.
+Command-Line Arguments
+The script accepts the following arguments:
+Argument	Required	Description	Example
+--model	No	The model name to use, as recognized by litellm.	gpt-4-turbo
+--agent	Yes	The agent persona to activate (planner, tester, or developer).	developer
+--task	Yes	The numeric ID of the task to work on, corresponding to a directory in tasks/.	2
+--feature	No	The specific feature ID to work on. If omitted, the script automatically picks the next pending feature.	2.3
+--mode	No	The execution mode: single (runs until finish_feature) or continuous (runs until finish).	single
+Example Command
+To run the developer agent on task 2, using the gpt-4-turbo model, and have it automatically pick the next pending feature:

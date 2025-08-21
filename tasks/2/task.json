@@ -25,9 +25,9 @@
       "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
       "context": [
         "docs/tasks/task_format.py",
-        "docs/AGENT_PERSONAS_PLANNER.md",
-        "docs/AGENT_PERSONAS_TESTER.md",
-        "docs/AGENT_PERSONAS_DEVELOPER.md",
+        "docs/AGENT_PLANNER.md",
+        "docs/AGENT_TESTER.md",
+        "docs/AGENT_DEVELOPER.md",
         "docs/FILE_ORGANISATION.md",
         "scripts/task_utils.py"
       ],
@@ -35,9 +35,9 @@
         "`scripts/task_utils.py` exists.",
         "it directly references the interface schema from `task_format.py`",
         "it directly uses a reference to `GitManager` from `scripts/git_manager.py` inside function parameters whenever necessary",
-        "it has all the tools specified in `AGENT_PERSONAS_PLANNER.md`",
-        "it has all the tools specified in `AGENT_PERSONAS_TESTER.md`",
-        "it has all the tools specified in `AGENT_PERSONAS_DEVELOPER.md`",
+        "it has all the tools specified in `AGENT_PLANNER.md`",
+        "it has all the tools specified in `AGENT_TESTER.md`",
+        "it has all the tools specified in `AGENT_DEVELOPER.md`",
         "all tools respect the file format defined in `docs/FILE_ORGANISATION.md`"
       ],
       "dependencies": [
