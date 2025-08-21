@@ -288,6 +288,7 @@ class Agent:
                 'docs/scripts/git_manager.py',
                 'docs/scripts/task_utils.py',
                 'docs/scripts/run_local_agent.py',
+                'docs/FILE_ORGANISATION.md',
                 'docs/docs/AGENT_PERSONAS_TESTER.md',
                 'docs/docs/AGENT_PERSONAS_DEVELOPER.md',
                 'docs/docs/AGENT_PERSONAS_PLANNER.md',
