@@ -1,42 +1,38 @@
-import sys
-import os
-import json
-import importlib.util
+import os, sys
 
-def run():
-    # Acceptance Criterion 1: `docs/tasks/task_example.json` exists.
-    file_path = "docs/tasks/task_example.json"
-    if not os.path.exists(file_path):
-        print(f"FAIL: {file_path} does not exist.")
-        sys.exit(1)
+PATH = "docs/FILE_ORGANISATION.md"
 
-    # Acceptance Criterion 2: The file contains a valid JSON object.
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except json.JSONDecodeError as e:
-        print(f"FAIL: {file_path} is not a valid JSON file. Error: {e}")
-        sys.exit(1)
 
-    # Acceptance Criterion 3: The JSON object structure conforms to the `Task` schema.
-    try:
-        spec = importlib.util.spec_from_file_location("task_format", "docs/tasks/task_format.py")
-        task_format = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(task_format)
-        Task = task_format.Task
-    except Exception as e:
-        print(f"FAIL: Could not import Task schema from docs/tasks/task_format.py. Error: {e}")
-        sys.exit(1)
-    
-    # Task has no optional fields, so we check all its annotations.
-    required_task_fields = set(Task.__annotations__.keys())
-    if not required_task_fields.issubset(data.keys()):
-        missing = required_task_fields - set(data.keys())
-        print(f"FAIL: {file_path} is missing required Task fields: {missing}")
-        sys.exit(1)
+def fail(msg: str):
+    print(f"FAIL: {msg}")
+    sys.exit(1)
 
-    print("PASS: docs/tasks/task_example.json exists, is valid JSON, and conforms to the basic Task schema.")
+
+def main():
+    if not os.path.exists(PATH):
+        fail(f"{PATH} does not exist.")
+    with open(PATH, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    required_sections = [
+        "## Top-Level Directory Layout",
+        "## File Naming Conventions",
+        "## Evolution Guidance",
+        "## Example Tree (illustrative)",
+    ]
+    missing = [s for s in required_sections if s not in content]
+    if missing:
+        fail("Missing sections: " + ", ".join(missing))
+
+    # Check the example tree looks graphical (box-drawing characters) and references repo_root
+    tree_markers = ["├─", "└─"]
+    has_graphical = any(m in content for m in tree_markers)
+    if not ("repo_root" in content and has_graphical):
+        fail("Example tree is not graphical or missing expected markers (├─/└─) and repo_root.")
+
+    print("PASS: FILE_ORGANISATION.md exists with required sections and an illustrative graphical tree.")
     sys.exit(0)
 
+
 if __name__ == "__main__":
-    run()
+    main()

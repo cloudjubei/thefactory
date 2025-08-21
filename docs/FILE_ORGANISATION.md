@@ -1,61 +1,62 @@
 # File Organisation
 
-This document outlines the file and directory structure for the project, providing a clear scheme for organising all artifacts.
+This document describes how files and directories are organised in this repository to keep the project navigable, consistent, and easy to evolve.
 
 ## Top-Level Directory Layout
+- docs/: Project documentation and specifications.
+  - docs/tasks/: Canonical task schema and examples.
+- scripts/: Executables and tools used by the agent and CI.
+  - scripts/tools/: Tool implementations callable by the agent.
+- tasks/: Per-task workspaces containing task metadata and tests.
+  - tasks/{id}/task.json: Canonical task definition for a single task.
+  - tasks/{id}/tests/: Deterministic tests validating each feature in the task.
+- .github/, .env, and other setup files may exist as needed.
 
-The repository is structured to separate documentation, application source code, scripts, and task-specific files.
-
--   `/docs`: Contains all project documentation, including specifications, guidance, and architectural documents.
--   `/scripts`: Holds utility scripts for development, testing, and automation.
-    -   `/scripts/tools`: Contains Python modules that implement the tools available to the agent.
--   `/src`: Reserved for the primary source code of the application (if any). *Currently unused.*
--   `/tasks`: The core directory for all task-related artifacts. Each task has its own subdirectory.
-    -   `/tasks/{task_id}/`: A directory for a specific task.
-        -   `task.json`: The canonical definition of the task and its features.
-        -   `/tests/`: Contains test files for the features of this task.
+Notes:
+- All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
+- Documentation in docs/ is the single source of truth for specs and formats.
 
 ## File Naming Conventions
-
--   **Task Definition Files**: `tasks/{task_id}/task.json`
--   **Test Files**: `tasks/{task_id}/tests/test_{task_id}_{feature_number}.py` (e.g., `test_1_5.py` for feature 1.5).
--   **Documentation**: Markdown files should use `UPPERCASE_SNAKE_CASE.md` (e.g., `FILE_ORGANISATION.md`).
--   **Python Scripts**: Python files should use `lowercase_snake_case.py`.
+- Tasks and features:
+  - Task directories are numeric IDs: tasks/{id}/ (e.g., tasks/1/).
+  - Tests are named per-feature: tasks/{task_id}/tests/test_{task_id}_{feature_number}.py (e.g., tasks/15/tests/test_15_3.py).
+- Python modules: snake_case.py (e.g., task_format.py, run_local_agent.py).
+- Documentation files: UPPERCASE or Title_Case for project-wide specs (e.g., TESTING.md, FILE_ORGANISATION.md). Place task-related docs under docs/tasks/.
+- JSON examples/templates: Use .json with clear, descriptive names (e.g., task_example.json).
 
 ## Evolution Guidance
+- Make minimal, incremental changes that are easy to review and test.
+- Keep documentation authoritative: update docs first when changing schemas or protocols.
+- Introduce shared utilities only when multiple tasks need them; otherwise keep helpers local to a task.
+- Deprecate gradually: create new files/specs alongside old ones, migrate, then remove deprecated artifacts when tests prove stability.
+- Each feature must have deterministic tests; do not mark features complete until tests pass.
 
-This structure is designed to be extensible.
--   New top-level directories should be added only for entirely new categories of artifacts (e.g., a `/data` directory for datasets).
--   Changes to the core structure, especially within `/tasks`, must be reflected in the project's documentation (`docs/tasks/TASKS_GUIDANCE.md`) and tooling (`scripts/tools/task_utils.py`).
--   The principle is to keep related items co-located, especially for tasks, where the definition and its tests live under the same parent directory.
-
-## Example Tree
-
-Here is an illustrative tree of the repository structure:
+## Example Tree (illustrative)
+The following tree is graphical and illustrative of a typical repository layout:
 
 ```
-.
-├── docs
-│   ├── AGENT_PRINCIPLES.md
-│   ├── FILE_ORGANISATION.md
-│   ├── PLAN_SPECIFICATION.md
-│   ├── TESTING.md
-│   ├── TOOL_ARCHITECTURE.md
-│   └── tasks
-│       ├── TASKS_GUIDANCE.md
-│       ├── task_example.json
-│       └── task_format.py
-├── scripts
-│   ├── run_local_agent.py
-│   ├── run_tests.py
-│   └── tools
-│       ├── ask_question.py
-│       ├── ...
-│       └── write_file.py
-├── tasks
-│   └── 1
-│       ├── task.json
-│       └── tests
-│           └── test_1_5.py
-└── .gitignore
+repo_root/
+├─ docs/
+│  ├─ FILE_ORGANISATION.md
+│  ├─ TESTING.md
+│  ├─ AGENT_COMMUNICATION_PROTOCOL.md
+│  └─ tasks/
+│     ├─ task_format.py
+│     └─ task_example.json
+├─ scripts/
+│  ├─ run_local_agent.py
+│  └─ tools/
+│     ├─ write_file.py
+│     ├─ run_tests.py
+│     └─ finish_feature.py
+└─ tasks/
+   ├─ 1/
+   │  ├─ task.json
+   │  └─ tests/
+   │     └─ test_1_3.py
+   └─ 2/
+      ├─ task.json
+      └─ tests/
 ```
+
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including where tests for each feature live.
