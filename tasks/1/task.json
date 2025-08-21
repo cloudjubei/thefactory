@@ -117,7 +117,7 @@
       ]
     },
     {
-      "id": "1.9",
+      ``id``: "1.9",
       "status": "+",
       "title": "Agent personas",
       "action": "Create 3 personas that will serve different purposes:",
@@ -132,7 +132,7 @@
     },
     {
       "id": "1.10",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Planner",
       "action": "Create a specification for the planner task that describes how to create a task with features that clearly describe the full scope of the task, and how to create a plan for each feature.",
       "context": [
