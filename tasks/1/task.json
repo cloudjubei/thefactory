@@ -70,7 +70,7 @@
     },
     {
       "id": "1.5",
-      "status": "-",
+      "status": "+",
       "title": "File Organisation specification",
       "action": "Create a scheme for organising files within the repository.",
       "plan": "1. Create the file `docs/FILE_ORGANISATION.md`. 2. Add the required sections: `Top-Level Directory Layout`, `File Naming Conventions`, and `Evolution Guidance`. 3. Populate each section with clear, concise guidelines and examples relevant to this project structure.",
@@ -118,9 +118,9 @@
       "plan": "",
       "acceptance": [
         "`docs/AGENT_PERSONAS.md` exists and describes agent personas",
-         "Persona 1: Planner - An agent that looks at the task description and creates a plan for completing a task following the given specifications. This agent is the one that can edit the plan descriptions.",
-         "Persona 2: Tester - An agent that looks at the task description, and then for each feature creates the most appropriate acceptance criteria. Based on that criteria the agent creates a test case for each feature. This agent is the one that can edit the tests - no one else can.",
-         "Persona 3: Developer - An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria. They can never edit tests or acceptance criteria, only run them to confirm whether they've satisfied the acceptance criteria."
+        "Persona 1: Planner - An agent that looks at the task description and creates a plan for completing a task following the given specifications. This agent is the one that can edit the plan descriptions.",
+        "Persona 2: Tester - An agent that looks at the task description, and then for each feature creates the most appropriate acceptance criteria. Based on that criteria the agent creates a test case for each feature. This agent is the one that can edit the tests - no one else can.",
+        "Persona 3: Developer - An agent that looks at the task description, and for each feature, looks at the acceptance criteria, and develops the necesary result that satisfies the acceptance criteria. They can never edit tests or acceptance criteria, only run them to confirm whether they've satisfied the acceptance criteria."
       ]
     },
     {
