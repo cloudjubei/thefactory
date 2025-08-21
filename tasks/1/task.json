@@ -62,7 +62,19 @@
     },
     {
       "id": "1.5",
-      "status": "+",
+      "status": "-",
+      "title": "Agent communication porotocol",
+      "action": "Create a file that specifies the json format that an agent needs to return so that it's possible to  have a multi-step conversation and an agent can call tools",
+      "plan": "",
+      "context": [],
+      "acceptance": [
+        "A document `docs/AGENT_COMMUNICATION_PROTOCOL.md` exists explaining the protocol",
+        "A file exists containg a valid JSON object defining the format for agent responses."
+      ]
+    },
+    {
+      "id": "1.6",
+      "status": "-",
       "title": "Plan specification for Planner",
       "action": "Create a specification for the Planner task that describes how to create a task with features that clearly describe the full scope of the task, and how to create a plan for each feature. This document is meant to be directly passed to a planner agent and alongside `docs/AGENT_PERSONAS_PLANNER.md` serve as their starting point and guide.",
       "context": [
@@ -75,12 +87,13 @@
         "The document describes an agent that looks at the task description and creates a plan for completing a task following the given specifications.",
         "The document references `docs/tasks/task_format.py` for the task schema",
         "The document references `docs/tasks/task_example.json` for the task example",
-        "The document has a section `Tools` that list and describe all tools this agent can use: `create_task(task:Task)->Task`, `create_feature(feature:Feature)->Feature`, `update_task(id:int,title:str,action:str,plan:str)->Task`, `update_feature(task_id:int,feature_id:str,title:str,action:str,context:[str],plan:str)->Feature`",
+        "The document has a section `Tools` that list and describe all tools this agent can use: `create_task(task:Task)->Task`, `create_feature(feature:Feature)->Feature`, `update_task(id:int,title:str,action:str,plan:str)->Task`, `update_feature(task_id:int,feature_id:str,title:str,action:str,context:[str],plan:str)->Feature`, `update_agent_question(task_id:int,feature_id:str?,question:str)`",
         "The document explains that creating a task with features that clearly describe the full scope of the task is mandatory - `create_task` tool is used for this",
         "The document explains that creating features that are missing for the task to be complete is mandatory - `create_feature` tool is used for this",
         "The document explains that the task requires a generic high level plan - `update_task` tool is used for this",
         "The document explains that each feature requires a step-by-step plan that should make it easy to implement for an LLM - `update_feature` tool is used for this",
-        "The document explains that each feature requires gathering a minimal context that is required per feature - `update_feature` tool is used for this"
+        "The document explains that each feature requires gathering a minimal context that is required per feature - `update_feature` tool is used for this",
+        "The document explains that if there's any unresolved issue - the `update_agent_question` tool is used for this"
       ],
       "dependencies": [
         "1.1",
@@ -89,7 +102,7 @@
       ]
     },
     {
-      "id": "1.6",
+      "id": "1.7",
       "status": "-",
       "title": "Plan specification for Tester",
       "action": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_TESTER.md` serve as their starting point and guide.",
@@ -101,44 +114,14 @@
         "`docs/AGENT_TESTER.md` exists",
         "The document references `docs/AGENT_PERSONAS_TESTER.md` for agent tester guidance",
         "The document references `docs/TESTING.md` for testing guidance",
-        "The document has a section `Tools` that list and describe all tools this agent can use: `get_test(task_id:int,feature_id:str)->str?`, `update_acceptance_criteria(task_id:int,feature_id:str,acceptance_criteria:[str])->Feature`, `update_test(task_id:int,feature_id:str,test:str)`, `delete_test(task_id:int,feature_id:str)`, `run_test(task_id:int,feature_id:str)->TestResult`, `update_task_status(task_id:int,status:Status)->Task`, `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`",
+        "The document has a section `Tools` that list and describe all tools this agent can use: `get_test(task_id:int,feature_id:str)->str?`, `update_acceptance_criteria(task_id:int,feature_id:str,acceptance_criteria:[str])->Feature`, `update_test(task_id:int,feature_id:str,test:str)`, `delete_test(task_id:int,feature_id:str)`, `run_test(task_id:int,feature_id:str)->TestResult`, `update_task_status(task_id:int,status:Status)->Task`, `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`, `update_agent_question(task_id:int,feature_id:str?,question:str)`",
         "The document explains that for each feature the required context needs to be gathered, for this persona it means the test for that feature - `get_test` tool is used for this, but this should be directly passed in the initial context",
         "The document explains that each feature requires rigorous and atomic acceptance criteria - `update_acceptance_criteria` tool is used for this",
         "The document explains that each feature requires tests written that match each acceptance criteria - `update_test`, `delete_test` tools are used for this",
         "The document explains that the tester can run tests - `run_test` tool is used for this",
         "The document explains that the task status needs to be updated when work is not finished - `update_task_status` tool is used for this",
-        "The document explains that each feature status needs to be updated when work is not finished - `update_feature_status` tool is used for this"
-      ],
-      "dependencies": [
-        "1.1",
-        "1.2",
-        "1.3",
-        "1.4"
-      ]
-    },
-    {
-      "id": "1.7",
-      "status": "-",
-      "title": "Plan specification for Developer",
-      "action": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_DEVELOPER.md` serve as their starting point and guide.",
-      "context": [
-        "docs/AGENT_PERSONAS_DEVELOPER.md",
-        "docs/FILE_ORGANISATION.md"
-      ],
-      "acceptance": [
-        "`docs/AGENT_DEVELOPER.md` exists",
-        "The document references `docs/AGENT_PERSONAS_DEVELOPER.md` for agent developer guidance",
-        "The document references `docs/FILE_ORGANISATION.md` for file structure guidance",
-        "The document has a section `Tools` that list and describe all tools this agent can use: `get_context(files:[str])->[str]`, `write_file(filename:str,content:str)`,`run_test(task_id:int,feature_id:str)->TestResult`, `update_task_status(task_id:int,status:Status)->Task`, `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`, `finish_feature(task_id:int,feature_id:str)->Feature`, `finish(task_id:int)->Task`",
-        "The document explains that the task status is updated to in progress - `update_task_status` tool is used for this",
-        "The document explains that for each feature that is worked on the status is updated to in progress - `update_feature_status` tool is used for this",
-        "The document explains that for each feature the context needs to be gathered - `get_context` tool is used for this, but this should be directly passed in the initial context and should only be used in very rare cases",
-        "The document explains that for each feature the plan needs to be carried out - `write_file` tool is used for writing any files",
-        "The document explains that for each feature the task isn't deemed done until all tests pass - `run_test` tool is used for this",
-        "The document explains that for each feature the status needs to be updated when work is finished - `update_feature_status` tool is used for this",
-        "The document explains that the task status needs to be updated when work is finished - `update_task_status` tool is used for this",
-        "The document explains that if the work for the agent is done on a feature the `finish_feature` MUST BE USED",
-        "The document explains that if the work for the agent is done on a task the `finish` MUST BE USED"
+        "The document explains that each feature status needs to be updated when work is not finished - `update_feature_status` tool is used for this",
+        "The document explains that if there's any unresolved issue - the `update_agent_question` tool is used for this"
       ],
       "dependencies": [
         "1.1",
@@ -150,29 +133,33 @@
     {
       "id": "1.8",
       "status": "-",
-      "title": "Task Utility Tooling",
-      "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/tools/task_utils.py`.",
+      "title": "Plan specification for Developer",
+      "action": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_PERSONAS_DEVELOPER.md` serve as their starting point and guide.",
       "context": [
-        "docs/tasks/task_format.py",
-        "docs/AGENT_PERSONAS_PLANNER.md",
-        "docs/AGENT_PERSONAS_TESTER.md",
         "docs/AGENT_PERSONAS_DEVELOPER.md",
         "docs/FILE_ORGANISATION.md"
       ],
       "acceptance": [
-        "`scripts/tools/task_utils.py` exists.",
-        "it directly references the interface schema from `task_format.py`",
-        "it has all the tools specified in `AGENT_PERSONAS_PLANNER.md`",
-        "it has all the tools specified in t`AGENT_PERSONAS_TESTER.md`",
-        "it has all the tools specified in `AGENT_PERSONAS_DEVELOPER.md`",
-        "all tools respect the file format defined in `docs/FILE_ORGANISATION.md`"
+        "`docs/AGENT_DEVELOPER.md` exists",
+        "The document references `docs/AGENT_PERSONAS_DEVELOPER.md` for agent developer guidance",
+        "The document references `docs/FILE_ORGANISATION.md` for file structure guidance",
+        "The document has a section `Tools` that list and describe all tools this agent can use: `get_context(files:[str])->[str]`, `write_file(filename:str,content:str)`,`run_test(task_id:int,feature_id:str)->TestResult`, `update_task_status(task_id:int,status:Status)->Task`, `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`, `finish_feature(task_id:int,feature_id:str)->Feature`, `finish(task_id:int)->Task`, `update_agent_question(task_id:int,feature_id:str?,question:str)`,`update_agent_question(task_id:int,feature_id:str?,question:str)`",
+        "The document explains that the task status is updated to in progress - `update_task_status` tool is used for this",
+        "The document explains that for each feature that is worked on the status is updated to in progress - `update_feature_status` tool is used for this",
+        "The document explains that for each feature the context needs to be gathered - `get_context` tool is used for this, but this should be directly passed in the initial context and should only be used in very rare cases",
+        "The document explains that for each feature the plan needs to be carried out - `write_file` tool is used for writing any files",
+        "The document explains that for each feature the task isn't deemed done until all tests pass - `run_test` tool is used for this",
+        "The document explains that for each feature the status needs to be updated when work is finished - `update_feature_status` tool is used for this",
+        "The document explains that the task status needs to be updated when work is finished - `update_task_status` tool is used for this",
+        "The document explains that if the work for the agent is done on a feature the `finish_feature` MUST BE USED",
+        "The document explains that if the work for the agent is done on a task the `finish` MUST BE USED",
+        "The document explains that if there's any unresolved issue - the `update_agent_question` tool is used for this"
       ],
       "dependencies": [
         "1.1",
+        "1.2",
         "1.3",
-        "1.5",
-        "1.6",
-        "1.7"
+        "1.4"
       ]
     }
   ]

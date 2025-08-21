@@ -1,27 +1,59 @@
 {
   "id": 2,
   "status": "-",
-  "title": "Define Core Agent Terminology and Principles",
-  "action": "Create the specification that defines the agent's high-level principles and establishes the key terms \"Orchestrator\" and \"Agent\". The agent uses a tool-based architecture.",
-  "plan": "1. Formulate detailed plans for each feature: the orchestrator script, dependencies, environment template, and setup guide. 2. Implement the orchestrator script (`run_local_agent.py`) with all specified tools and CLI arguments. 3. Create the `requirements.txt` file with all necessary libraries. 4. Create the `.env.example` file for environment configuration. 5. Write the `docs/LOCAL_SETUP.md` guide. 6. Ensure all features meet acceptance criteria before submission.",
+  "title": "Agent tools and scripts",
+  "action": "",
+  "plan": "",
   "features": [
     {
       "id": "2.1",
       "status": "-",
+      "title": "Git manager",
+      "action": "implement the git manager scripts",
+      "acceptance": [
+        "`scripts/git_manager.py` exists all necessary git related functions"
+      ]
+    },
+    {
+      "id": "2.2",
+      "status": "-",
+      "title": "Task Utility Tooling",
+      "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/tools/task_utils.py`.",
+      "context": [
+        "docs/tasks/task_format.py",
+        "docs/AGENT_PERSONAS_PLANNER.md",
+        "docs/AGENT_PERSONAS_TESTER.md",
+        "docs/AGENT_PERSONAS_DEVELOPER.md",
+        "docs/FILE_ORGANISATION.md"
+      ],
+      "acceptance": [
+        "`scripts/tools/task_utils.py` exists.",
+        "it directly references the interface schema from `task_format.py`",
+        "it directly uses a reference to `GitManager` from `scripts/git_manager.py` inside function parameters whenever necessary",
+        "it has all the tools specified in `AGENT_PERSONAS_PLANNER.md`",
+        "it has all the tools specified in `AGENT_PERSONAS_TESTER.md`",
+        "it has all the tools specified in `AGENT_PERSONAS_DEVELOPER.md`",
+        "all tools respect the file format defined in `docs/FILE_ORGANISATION.md`"
+      ],
+      "dependencies": [
+        "2.1"
+      ]
+    },
+    {
+      "id": "2.3",
+      "status": "-",
       "title": "Orchestrator script",
-      "action": "Implement the local orchestrator script and setup, fully compliant with AGENT_PRINCIPLES and TOOL_ARCHITECTURE, including CLI options to run specific tasks/features and supporting local setup.",
-      "plan": "1. Create the main script file `scripts/run_local_agent.py`. 2. Implement command-line argument parsing for `--mode`, `--task`, `--feature`, and `--persona`. 3. Implement an `Agent` class to manage the execution lifecycle. 4. Implement an `AgentTools` class to provide tool functionalities like `write_file`, `retrieve_context_files`, `rename_files`, `run_tests`, `submit_for_review`, `ask_question`, `finish`, and `finish_feature`. 5. Implement a `UnifiedEngine` class to handle prompt construction and LLM API calls. 6. Structure the main execution loop to gather context, call the LLM, parse the response, and execute tool calls. 7. Ensure tool implementations are modularized into the `scripts/tools/` directory.",
+      "action": "Implement the local orchestrator script and setup, fully compliant with all the spec. It allows running an LLM agent to have conversations back and forth with tool calls.",
+      "plan": "",
       "acceptance": [
         "`scripts/run_local_agent.py` exists and implements the orchestrator script.",
+        "a json format exists that specifies how each agent should return the response to the orchestrator script",
         "The script has CLI options `--mode {mode_type}` where `mode_type` is either `single` (running just once) or `continuous` (running until there are no more tasks to work on)",
         "The script has the CLI required argument `--task {task_id}` and the optional one `--feature {feature_id}` to run specific tasks/features via prompt construction referencing `tasks/{task_id}/task.json`.",
-        "Create a tool called `write_file` to write files.",
-        "Create a tool called `retrieve_context_files` to return wanted files.",
-        "Create a tool called `rename_files` to rename and move files.",
-        "Create a tool called `submit_for_review` to create Git Pull Requests, where the branch naming follows `features/{task_id}`",
-        "Create a tool called `ask_question` to indicate an agent wanting to ask a question about a feature being worked on. Calls the corresponding `scripts/task_utils.py` function",
-        "Create a tool called `finish` to finish a task.",
-        "Create a tool called `finish_feature` to finish a feature."
+        "The script has the CLI required argument `--agent {agent_type}` where `agent_type` is one of the following: `planner`, `tester`, or `developer`.",
+        "The script "
+        "`AGENT_PERSONAS_PLANNER.md`, `AGENT_PERSONAS_TESTER.md`, and `AGENT_PERSONAS_DEVELOPER.md` are referenced in the script and an agent can call any of the tools specified by returning an appropriate message",
+
       ]
     },
     {
