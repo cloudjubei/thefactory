@@ -33,13 +33,6 @@ The Planner uses the following tools to author and refine the task and its featu
 5) Keep the task and feature JSON strictly aligned with the canonical schema in docs/tasks/task_format.py.
 6) Keep examples aligned with docs/tasks/task_example.json.
 
-## Mandatory Requirements
-- The document explains that creating a task with features that clearly describe the full scope of the task is mandatory - `create_task` tool is used for this
-- The document explains that creating features that are missing for the task to be complete is mandatory - `create_feature` tool is used for this
-- The document explains that the task requires a generic high level plan - `update_task` tool is used for this
-- The document explains that each feature requires a step-by-step plan that should make it easy to implement for an LLM - `update_feature` tool is used for this
-- The document explains that each feature requires gathering a minimal context that is required per feature - `update_feature` tool is used for this
-
 ## Quality Bar
 - Plans must be concise, logically ordered, and implementation-agnostic.
 - Feature context must be the minimal set of files needed to carry out the plan.
