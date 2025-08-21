@@ -20,7 +20,7 @@
     },
     {
       "id": "2.2",
-      "status": "-",
+      "status": "~",
       "title": "Task Utility Tooling",
       "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
       "context": [
@@ -42,7 +42,8 @@
       ],
       "dependencies": [
         "2.1"
-      ]
+      ],
+      "agent_question": "The AGENT_PLANNER spec lists an update_feature tool, but the orchestrator only exposes update_task_status, update_feature_status, and update_agent_question. How should the planner provide the detailed per-feature plan and context updates required by the specification?"
     },
     {
       "id": "2.3",
