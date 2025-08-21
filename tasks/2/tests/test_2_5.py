@@ -3,15 +3,24 @@ import re
 
 def test_env_example():
     file_path = '.env.example'
-    assert os.path.exists(file_path), "'.env.example' does not exist"
+    assert os.path.exists(file_path), 'File .env.example does not exist'
     
     with open(file_path, 'r') as f:
-        lines = [line.rstrip() for line in f.readlines()]  # rstrip to handle trailing spaces
+        lines = f.readlines()
     
-    variables = []
-    for i, line in enumerate(lines):
-        if re.match(r'^\w+=$', line.strip()):  # Check for VARIABLE=
-            assert i > 0 and lines[i-1].strip().startswith('#'), f"Variable '{line.strip()}' lacks immediately preceding comment"
-            variables.append(line.strip())
+    documented_vars = 0
+    prev_line = None
+    for line in lines:
+        stripped = line.strip()
+        if stripped == '' or stripped.startswith('#'):
+            prev_line = stripped
+            continue
+        if '=' in stripped and not stripped.startswith('#'):
+            assert prev_line is not None and prev_line.startswith('#'), f'Variable line "{line.strip()}" lacks a preceding comment'
+            assert stripped.endswith('='), f'Placeholder "{stripped}" should be in the form VARIABLE='
+            documented_vars += 1
+            prev_line = stripped
+        else:
+            prev_line = stripped
     
-    assert len(variables) >= 1, "No documented environment variables found"
+    assert documented_vars >= 1, 'There should be at least one documented environment variable'
