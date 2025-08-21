@@ -6,7 +6,6 @@ This document describes how files and directories are organised in this reposito
 - docs/: Project documentation and specifications.
   - docs/tasks/: Canonical task schema and examples.
 - scripts/: Executables and tools used by the agent and CI.
-  - scripts/tools/: Tool implementations callable by the agent.
 - tasks/: Per-task workspaces containing task metadata and tests.
   - tasks/{id}/task.json: Canonical task definition for a single task.
   - tasks/{id}/tests/: Deterministic tests validating each feature in the task.
@@ -45,10 +44,8 @@ repo_root/
 │     └─ task_example.json
 ├─ scripts/
 │  ├─ run_local_agent.py
-│  └─ tools/
-│     ├─ write_file.py
-│     ├─ run_tests.py
-│     └─ finish_feature.py
+│  ├─ task_utils.py
+│  └─ git_manager.py
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
