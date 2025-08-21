@@ -78,7 +78,7 @@
     },
     {
       "id": "2.4",
-      "status": "-",
+      "status": "?",
       "title": "Dependency specification",
       "description": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`, `scripts/git_manager.py, `scripts/task_utils.py",
       "plan": "",
@@ -93,7 +93,7 @@
     },
     {
       "id": "2.5",
-      "status": "-",
+      "status": "?",
       "title": "Environment variables template",
       "description": "Provide `.env.example` containing placeholders for required API keys and settings.",
       "plan": "1. Create the `.env.example` file in the project root. 2. Add placeholder variables for API keys needed by `litellm` (e.g., `OPENAI_API_KEY=your_key_here`). 3. Include comments to explain each variable's purpose.",
@@ -102,8 +102,7 @@
       ],
       "dependencies": [
         "2.1"
-      ],
-      "rejection": "Deferred: Agent loop failed: litellm.BadRequestError: VertexAIException BadRequestError - {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"* GenerateContentRequest.contents: contents is not specified\\n\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n"
+      ]
     },
     {
       "id": "2.6",

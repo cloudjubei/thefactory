@@ -75,8 +75,8 @@ DESCRIPTION: {feature.get('description', 'No description specified.')}
     # --- Agent-specific instructions ---
     if agent_type == 'planner':
         prompt += """
-Your **ONLY** job is to create a detailed, step-by-step implementation feature_plan for the assigned feature.
-Analyze the feature and use the `update_feature_plan` tool to save your feature_plan. Do not perform any other actions.
+Your **ONLY** job is to create a detailed, step-by-step implementation plan for the assigned feature.
+Analyze the feature and use the `update_feature_plan` tool to save your plan. Do not perform any other actions.
 """
     elif agent_type == 'tester':
         prompt += """
@@ -94,7 +94,7 @@ When you are finished and the tests pass, you MUST call 'finish_feature'.
 """
 
     prompt += f"""
-You must respond in JSON format with a "action_plan" and a list of "tool_calls". Make sure all tool calls have valid parameters.
+You must respond in JSON format with a "thoughts" and a list of "tool_calls". Make sure all tool calls have valid parameters.
 
 AVAILABLE TOOLS:
 {json.dumps(list(available_tools.keys()), indent=2)}
@@ -125,9 +125,9 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
             
             response_json = json.loads(assistant_message.content)
             print(f"RAW RESPONSE: {response_json}")
-            plan = response_json.get("action_plan", "No plan provided.")
+            thoughts = response_json.get("thoughts", "No thoughts provided.")
             tool_calls = response_json.get("tool_calls", [])
-            print(f"Agent Plan: {plan}")
+            print(f"Agent Thoughts: {thoughts}")
 
             if not tool_calls: continue
 

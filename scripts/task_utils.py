@@ -227,7 +227,7 @@ def create_feature(task_id: int, feature: Feature) -> Feature:
     save_task(task)
     return feature
 
-def update_feature_plan(task_id: int, feature_id: str, feature_plan: str) -> Optional[Feature]:
+def update_feature_plan(task_id: int, feature_id: str, plan: str) -> Optional[Feature]:
     """
     Updates the 'plan' field of a specific feature. This is the primary tool for the Planner agent.
     """
@@ -235,7 +235,7 @@ def update_feature_plan(task_id: int, feature_id: str, feature_plan: str) -> Opt
     updated_feature = None
     for feature in task["features"]:
         if feature["id"] == feature_id:
-            feature["plan"] = feature_plan
+            feature["plan"] = plan
             updated_feature = feature
             break
     if updated_feature:

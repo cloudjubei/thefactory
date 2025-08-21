@@ -3,7 +3,7 @@
   "title": "Agent-Orchestrator JSON Contract",
   "type": "object",
   "properties": {
-    "action_plan": { "type": "string" },
+    "thoughts": { "type": "string" },
     "tool_calls": {
       "type": "array",
       "items": {
@@ -17,6 +17,6 @@
       }
     }
   },
-  "required": ["action_plan", "tool_calls"],
+  "required": ["thoughts", "tool_calls"],
   "additionalProperties": false
 }
