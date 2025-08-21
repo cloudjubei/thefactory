@@ -11,11 +11,12 @@ The `plan` is the agent's strategy for completing a task, formulated before exec
 - **Clarity and Brevity**: The plan should be concise and human-readable, focusing on the 'what' and 'why,' not the low-level 'how.'
 
 ## 3. Structure
-Each task's definition, including its high-level plan and detailed features, is located at `tasks/{task_id}/task.json`.
+Each task's definition is located at `tasks/{task_id}/task.json`. This is the single source of truth for the task's scope and execution strategy.
 
-- The top-level `plan` field contains the overall strategy for the task.
-- Each object in the `features` array contains its own `plan` field, which should be a step-by-step guide for the LLM to implement that specific feature.
-- Each feature must have rigorous `acceptance` criteria, which form the basis for writing tests.
+- **Mandatory Scope**: A task must be created with features that clearly describe its full scope.
+- **High-Level Plan**: The top-level `plan` field in the task must contain a generic, high-level plan for the entire task.
+- **Feature Plan**: Each feature must have its own `plan` field containing a step-by-step guide that is easy for an LLM to implement.
+- **Acceptance Criteria**: Each feature must have rigorous `acceptance` criteria, which form the basis for writing deterministic tests.
 
 ## 4. Task and Feature Lifecycle
 
@@ -31,3 +32,6 @@ Each task's definition, including its high-level plan and detailed features, is 
 - **Task Example**: `docs/tasks/task_example.json`
 - **Task Guidance**: `docs/tasks/TASKS_GUIDANCE.md`
 - **Testing Guidance**: `docs/TESTING.md`
+- **Tooling Guidance**: `docs/TOOL_ARCHITECTURE.md`
+- **Agent Principles**: `docs/AGENT_PRINCIPLES.md`
+- **Agent Personas**: `docs/AGENT_PERSONAS.md`
