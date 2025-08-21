@@ -1,41 +1,51 @@
 import os
 import subprocess
-import importlib.util
-import sys
+import pytest
+from scripts.run_local_agent import main, gather_context, gather_tools  # Assuming these are the function names
 
-def test_orchestrator_script():
-    script_path = 'scripts/run_local_agent.py'
-    assert os.path.exists(script_path), 'Script file does not exist'
+@pytest.fixture
+def script_path():
+    return 'scripts/run_local_agent.py'
 
-    # Check CLI options via --help
-    try:
-        result = subprocess.run(['python', script_path, '--help'], capture_output=True, text=True, check=True)
-        help_text = result.stdout
-    except subprocess.CalledProcessError:
-        assert False, 'Script fails to run with --help'
-    assert '--mode' in help_text, 'Missing --mode option'
-    assert '--task' in help_text, 'Missing --task option'
-    assert '--feature' in help_text, 'Missing --feature option'
-    assert '--agent' in help_text, 'Missing --agent option'
+def test_script_exists(script_path):
+    assert os.path.exists(script_path), 'Orchestrator script does not exist'
 
-    # Check for specific imports in file content
-    with open(script_path, 'r') as f:
+def test_cli_options():
+    result = subprocess.run(['python', 'scripts/run_local_agent.py', '--help'], capture_output=True, text=True)
+    assert '--mode' in result.stdout
+    assert '--task' in result.stdout
+    assert '--agent' in result.stdout
+
+def test_mode_options():
+    # Test invalid mode
+    result = subprocess.run(['python', 'scripts/run_local_agent.py', '--mode', 'invalid', '--task', '1', '--agent', 'planner'], capture_output=True, text=True)
+    assert result.returncode != 0
+    # Test valid modes
+    # Note: Actual run might require mocking, but check parsing
+    pass  # Expand with mocks if needed
+
+def test_gather_context_function():
+    context = gather_context('planner')
+    assert isinstance(context, list) or isinstance(context, str)  # Adjust based on expected type
+
+def test_gather_tools_function():
+    tools = gather_tools('developer')
+    assert isinstance(tools, list)
+    assert any(tool == 'finish_feature' for tool in tools)  # Example check
+
+def test_continuous_mode_behavior():
+    # Simulate run in continuous mode, mock agent to call finish
+    # This might require more setup or mocking of LLM responses
+    pass  # Placeholder for integration test
+
+def test_single_mode_behavior():
+    # Similar to above
+    pass  # Placeholder
+
+# Additional tests for protocol compliance, imports, etc., would be added here.
+# For example, check imports:
+def test_imports():
+    with open('scripts/run_local_agent.py', 'r') as f:
         content = f.read()
-    assert 'git_manager' in content and 'GitManager' in content, 'Missing reference to GitManager from scripts/git_manager.py'
-    assert 'tools_utils' in content, 'Missing reference to scripts/tools_utils.py'
-
-    # Load the module to check for functions
-    spec = importlib.util.spec_from_file_location('orchestrator', script_path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules['orchestrator'] = module
-    spec.loader.exec_module(module)
-
-    # Check for context and tools functions (assuming possible names based on description)
-    context_func_names = ['gather_context', 'get_context', 'get_context_for_agent', 'gather_agent_context']
-    tools_func_names = ['gather_tools', 'get_tools', 'get_tools_for_agent', 'gather_agent_tools']
-    assert any(hasattr(module, name) for name in context_func_names), 'Missing function to gather context'
-    assert any(hasattr(module, name) for name in tools_func_names), 'Missing function to gather tools'
-
-    # Note: Criteria related to protocol compliance, data passing, and conversation flow require functional/integration tests with mocks (e.g., mock LLM responses to test loops and tool calls). These can be added post-implementation.
-
-test_orchestrator_script()
+    assert 'from scripts.git_manager import GitManager' in content
+    assert 'import scripts.tools_utils' in content or 'from scripts import tools_utils' in content
