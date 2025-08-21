@@ -273,26 +273,24 @@ class Agent:
             ]
         elif persona == 'planner':
             files = [
-                'docs/tasks/TASKS_GUIDANCE.md',
                 'docs/tasks/task_example.json',
                 'docs/tasks/task_format.py',
-                'docs/PLAN_SPECIFICATION.md',
-                'docs/TOOL_ARCHITECTURE.md',
+                'docs/docs/AGENT_PERSONAS_PLANNER.md',
             ]
         elif persona == 'tester':
             files = [
-                'docs/tasks/TASKS_GUIDANCE.md',
                 'docs/TESTING.md',
-                'docs/PLAN_SPECIFICATION.md',
-                'docs/TOOL_ARCHITECTURE.md',
+                'docs/docs/AGENT_PERSONAS_TESTER.md',
             ]
         elif persona == 'developer':
             files = [
-                'docs/tasks/TASKS_GUIDANCE.md',
-                'docs/tasks/task_example.json',
                 'docs/tasks/task_format.py',
-                'docs/PLAN_SPECIFICATION.md',
-                'docs/TOOL_ARCHITECTURE.md',
+                'docs/scripts/git_manager.py',
+                'docs/scripts/task_utils.py',
+                'docs/scripts/run_local_agent.py',
+                'docs/docs/AGENT_PERSONAS_TESTER.md',
+                'docs/docs/AGENT_PERSONAS_DEVELOPER.md',
+                'docs/docs/AGENT_PERSONAS_PLANNER.md',
             ]
         else:
             # Generic mode: broader context
