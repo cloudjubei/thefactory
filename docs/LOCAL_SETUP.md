@@ -80,20 +80,27 @@ The agent is designed to be safe by default and does not have the ability to run
 
 -   **Run one task with OpenAI's GPT-5:**
     ```bash
-    python3 scripts/run_local_agent.py --model gpt-5
+    python3 scripts/run_local_agent.py --model gpt-5 --task 1
     ```
 
 -   **Run continuously with Google's Gemini:**
     ```bash
-    python3 scripts/run_local_agent.py --model gemini/gemini-2.5-pro
+    python3 scripts/run_local_agent.py --model gemini/gemini-2.5-pro --task 1
     ```
 
 -   **Run continuously with Groq's high-speed Llama 3:**
     ```bash
-    python3 scripts/run_local_agent.py --model groq/llama3-70b-8192 --mode continuous
+    python3 scripts/run_local_agent.py --model groq/llama3-70b-8192 --task 1 --mode continuous
     ```
 
 -   **Run one task with Anthropic's Claude 4 Sonnet:**
     ```bash
-    python3 scripts/run_local_agent.py --model claude-sonnet-4-20250514
+    python3 scripts/run_local_agent.py --model claude-sonnet-4-20250514 --task 1
     ```
+
+-   **Run one task with Xai's Grok 4:**
+    ```bash
+    python3 scripts/run_local_agent.py --model xai/grok-4-0709 --task 1
+    ```
+
+    
