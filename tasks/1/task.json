@@ -62,7 +62,7 @@
     },
     {
       "id": "1.5",
-      "status": "-",
+      "status": "+",
       "title": "Agent communication porotocol",
       "action": "Create a file that specifies the json format that an agent needs to return so that it's possible to  have a multi-step conversation and an agent can call tools",
       "plan": "",

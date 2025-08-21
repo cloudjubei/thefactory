@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent-Orchestrator JSON Contract",
+  "type": "object",
+  "properties": {
+    "plan": { "type": "string" },
+    "tool_calls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tool_name": { "type": "string" },
+          "arguments": { "type": "object" }
+        },
+        "required": ["tool_name", "arguments"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["plan", "tool_calls"],
+  "additionalProperties": false
+}

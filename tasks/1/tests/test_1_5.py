@@ -1,34 +1,59 @@
-import os, sys
+import os, sys, json
+
+def fail(msg):
+    print(f"FAIL: {msg}")
+    sys.exit(1)
+
+def pass_msg(msg):
+    print(f"PASS: {msg}")
+    sys.exit(0)
 
 def run():
-    path = "docs/AGENT_PLANNER.md"
-    if not os.path.exists(path):
-        print(f"FAIL: {path} does not exist.")
-        sys.exit(1)
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
+    md_path = "docs/AGENT_COMMUNICATION_PROTOCOL.md"
+    json_path = "docs/AGENT_COMMUNICATION_PROTOCOL.json"
 
-    required_strings = [
-        "docs/tasks/task_format.py",
-        "docs/tasks/task_example.json",
-        "create_task(task:Task)->Task",
-        "create_feature(feature:Feature)->Feature",
-        "update_task(id:int,title:str,action:str,plan:str)->Task",
-        "update_feature(task_id:int,feature_id:str,title:str,action:str,context:[str],plan:str)->Feature",
-        "The document explains that creating a task with features that clearly describe the full scope of the task is mandatory - `create_task` tool is used for this",
-        "The document explains that creating features that are missing for the task to be complete is mandatory - `create_feature` tool is used for this",
-        "The document explains that the task requires a generic high level plan - `update_task` tool is used for this",
-        "The document explains that each feature requires a step-by-step plan that should make it easy to implement for an LLM - `update_feature` tool is used for this",
-        "The document explains that each feature requires gathering a minimal context that is required per feature - `update_feature` tool is used for this",
+    # Check MD file exists and contains key phrases
+    if not os.path.exists(md_path):
+        fail(f"{md_path} does not exist")
+    with open(md_path, "r", encoding="utf-8") as f:
+        md = f.read()
+    required_phrases = [
+        "JSON Response Schema",
+        "tool_calls",
+        "arguments",
+        "plan"
     ]
-
-    missing = [s for s in required_strings if s not in content]
+    missing = [p for p in required_phrases if p not in md]
     if missing:
-        print("FAIL: Missing required content: " + ", ".join(missing))
-        sys.exit(1)
+        fail("MD missing required phrases: " + ", ".join(missing))
 
-    print("PASS: AGENT_PLANNER.md meets the acceptance criteria for feature 1.5.")
-    sys.exit(0)
+    # Check JSON file exists and is a valid JSON object defining the format
+    if not os.path.exists(json_path):
+        fail(f"{json_path} does not exist")
+    try:
+        with open(json_path, "r", encoding="utf-8") as f:
+            schema = json.load(f)
+    except Exception as e:
+        fail(f"Invalid JSON in {json_path}: {e}")
+
+    if not isinstance(schema, dict):
+        fail("Protocol JSON is not an object")
+
+    # Minimal structural checks
+    props = schema.get("properties", {})
+    if not isinstance(props, dict):
+        fail("Schema 'properties' must be an object")
+    if "plan" not in props or "tool_calls" not in props:
+        fail("Schema must define 'plan' and 'tool_calls' properties")
+
+    tool_calls = props.get("tool_calls", {})
+    items = tool_calls.get("items", {}) if isinstance(tool_calls, dict) else {}
+    item_props = items.get("properties", {}) if isinstance(items, dict) else {}
+    if "tool_name" not in item_props or "arguments" not in item_props:
+        fail("Schema must define 'tool_name' and 'arguments' for each tool call item")
+
+    # If we reached here, all checks passed
+    pass_msg("Agent Communication Protocol docs and JSON schema are present and well-formed.")
 
 if __name__ == "__main__":
     run()
