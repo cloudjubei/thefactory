@@ -4,7 +4,7 @@ import os
 import sys
 from dotenv import load_dotenv
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Callable
+from typing import Dict, Any, List, Optional, Callable, Tuple
 
 # Add project root to sys.path
 project_root = Path(__file__).resolve().parent.parent
