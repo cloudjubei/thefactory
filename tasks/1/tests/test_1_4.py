@@ -10,7 +10,7 @@ if str(project_root) not in sys.path:
     sys.path.append(str(project_root))
 
 try:
-    from scripts.tools import task_utils
+    from scripts import task_utils
 except ImportError as e:
     print(f"FAIL: Could not import task_utils.py. Error: {e}")
     sys.exit(1)

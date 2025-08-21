@@ -100,7 +100,7 @@ The agent is designed to be safe by default and does not have the ability to run
 
 -   **Run one task with Xai's Grok 4:**
     ```bash
-    python3 scripts/run_local_agent.py --model xai/grok-4-0709 --task 1
+    python3 scripts/run_local_agent.py --model xai/grok-4 --task 1
     ```
 
     
