@@ -2,21 +2,23 @@ import os
 import sys
 
 def run():
-    file_path = "docs/FILE_ORGANISATION.md"
-    print(f"--- Running Test for Feature 1.5: File Organisation Specification ---")
+    file_path = "docs/TOOL_ARCHITECTURE.md"
+    print(f"--- Running Test for Feature 1.7: Tools Guide ---")
 
     if not os.path.exists(file_path):
         print(f"FAIL: File '{file_path}' does not exist.")
         sys.exit(1)
-
+        
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     required_sections = [
-        "Top-Level Directory Layout",
-        "File Naming Conventions",
-        "Evolution Guidance",
-        "Example tree"
+        "Core Principle",
+        "Agent-Orchestrator Contract",
+        "JSON Response Schema",
+        "Available Tools",
+        "Execution Modes",
+        "Mandatory Task Completion Workflow"
     ]
 
     missing_sections = [s for s in required_sections if s not in content]
@@ -25,7 +27,7 @@ def run():
         print(f"FAIL: Missing sections in '{file_path}': {', '.join(missing_sections)}")
         sys.exit(1)
 
-    print(f"PASS: '{file_path}' exists and contains all required sections.")
+    print(f"PASS: '{file_path}' exists and seems to have the required sections.")
     sys.exit(0)
 
 if __name__ == "__main__":
