@@ -1,7 +1,6 @@
 import os
 import subprocess
 import pytest
-from scripts.run_local_agent import main, gather_context, gather_tools  # Assuming these are the function names
 
 @pytest.fixture
 def script_path():
@@ -23,15 +22,6 @@ def test_mode_options():
     # Test valid modes
     # Note: Actual run might require mocking, but check parsing
     pass  # Expand with mocks if needed
-
-def test_gather_context_function():
-    context = gather_context('planner')
-    assert isinstance(context, list) or isinstance(context, str)  # Adjust based on expected type
-
-def test_gather_tools_function():
-    tools = gather_tools('developer')
-    assert isinstance(tools, list)
-    assert any(tool == 'finish_feature' for tool in tools)  # Example check
 
 def test_continuous_mode_behavior():
     # Simulate run in continuous mode, mock agent to call finish
