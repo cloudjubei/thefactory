@@ -7,7 +7,7 @@
   "features": [
     {
       "id": "2.1",
-      "status": "-",
+      "status": "+",
       "title": "Git manager",
       "action": "implement the git manager scripts",
       "acceptance": [
