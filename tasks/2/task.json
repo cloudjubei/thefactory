@@ -110,9 +110,7 @@
       "status": "-",
       "title": "Local setup guide",
       "description": "Author `docs/LOCAL_SETUP.md` with setup and execution instructions.",
-      "acceptance": [
-        "`docs/LOCAL_SETUP.md` exists and is accurate."
-      ],
+      "acceptance": "1. The file `docs/LOCAL_SETUP.md` exists.\n2. The file contains Markdown content with sections including 'Prerequisites', 'Installation', and 'Running' or 'Execution'.\n3. The instructions provide accurate steps for local setup and execution (manual verification may be needed for full accuracy).",
       "dependencies": [
         "2.3",
         "2.4",
