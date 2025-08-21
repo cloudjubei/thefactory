@@ -15,7 +15,7 @@ from scripts.tools.ask_question import ask_question_tool
 from scripts.tools.finish import finish_tool
 from scripts.tools.finish_feature import finish_feature_tool
 from scripts.tools.run_tests import run_tests_tool
-from scripts.tools.task_utils import get_task
+from scripts.task_utils import get_task
 
 class AgentTools:
     def __init__(self, repo_path: str, git_manager: GitManager):
