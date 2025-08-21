@@ -64,7 +64,7 @@ def construct_system_prompt(agent_type: str, task: Task, feature: Feature, conte
 
 CURRENT TASK: {task['title']} (ID: {task['id']})
 ASSIGNED FEATURE: {feature['title']} (ID: {feature['id']})
-DESCRIPTION: {feature.get('action', 'No action specified.')}
+DESCRIPTION: {feature.get('description', 'No description specified.')}
 """
     # Acceptance criteria are relevant for developers and testers, but not planners who might be creating them.
     if agent_type in ['developer', 'tester']:
@@ -124,7 +124,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
             messages.append(assistant_message)
             
             response_json = json.loads(assistant_message.content)
-            plan = response_json.get("plan", "No plan provided.")
+            plan = response_json.get("action_plan", "No plan provided.")
             tool_calls = response_json.get("tool_calls", [])
             print(f"Agent Plan: {plan}")
 

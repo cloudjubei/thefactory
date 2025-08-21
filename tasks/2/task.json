@@ -2,14 +2,13 @@
   "id": 2,
   "status": "-",
   "title": "Agent tools and scripts",
-  "action": "",
-  "plan": "",
+  "description": "",
   "features": [
     {
       "id": "2.1",
       "status": "+",
       "title": "Git manager",
-      "action": "implement the git manager scripts",
+      "description": "implement the git manager scripts",
       "context": [
         "scripts/git_manager.py"
       ],
@@ -22,7 +21,7 @@
       "id": "2.2",
       "status": "+",
       "title": "Task Utility Tooling",
-      "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
+      "description": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
       "context": [
         "docs/tasks/task_format.py",
         "docs/AGENT_PLANNER.md",
@@ -49,7 +48,7 @@
       "id": "2.3",
       "status": "+",
       "title": "Orchestrator script",
-      "action": "Implement the local orchestrator script and setup, fully compliant with all the spec. It allows running an LLM agent to have conversations back and forth with tool calls.",
+      "description": "Implement the local orchestrator script and setup, fully compliant with all the spec. It allows running an LLM agent to have conversations back and forth with tool calls.",
       "plan": "",
       "context": [
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
@@ -81,7 +80,7 @@
       "id": "2.4",
       "status": "-",
       "title": "Dependency specification",
-      "action": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`, `scripts/git_manager.py, `scripts/task_utils.py",
+      "description": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`, `scripts/git_manager.py, `scripts/task_utils.py",
       "plan": "",
       "acceptance": [
         "`requirements.txt` exists"
@@ -96,7 +95,7 @@
       "id": "2.5",
       "status": "-",
       "title": "Environment variables template",
-      "action": "Provide `.env.example` containing placeholders for required API keys and settings.",
+      "description": "Provide `.env.example` containing placeholders for required API keys and settings.",
       "plan": "1. Create the `.env.example` file in the project root. 2. Add placeholder variables for API keys needed by `litellm` (e.g., `OPENAI_API_KEY=your_key_here`). 3. Include comments to explain each variable's purpose.",
       "acceptance": [
         "`.env.example` exists and documents each variable."
@@ -110,7 +109,7 @@
       "id": "2.6",
       "status": "-",
       "title": "Local setup guide",
-      "action": "Author `docs/LOCAL_SETUP.md` with setup and execution instructions.",
+      "description": "Author `docs/LOCAL_SETUP.md` with setup and execution instructions.",
       "plan": "",
       "acceptance": [
         "`docs/LOCAL_SETUP.md` exists and is accurate."

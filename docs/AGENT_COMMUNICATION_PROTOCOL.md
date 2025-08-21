@@ -4,7 +4,7 @@ This document defines the JSON contract between the Agent (LLM) and the Orchestr
 
 ## Overview
 - The Agent must always respond with a single JSON object containing:
-  - plan: A short, high-level, human-readable plan of intended actions.
+  - action_plan: A short, high-level, human-readable plan of intended actions.
   - tool_calls: An ordered list of tool invocations. Each item specifies the tool name and its arguments.
 - The orchestrator executes tool_calls in order and returns execution results to the Agent on the next turn.
 - The Agent then returns another JSON object following the same schema for subsequent steps until completion.
@@ -12,7 +12,7 @@ This document defines the JSON contract between the Agent (LLM) and the Orchestr
 ## JSON Response Schema
 The required structure is:
 
-- plan (string): High-level intent of the step.
+- action_plan (string): High-level intent of the step.
 - tool_calls (array): A sequence of tool invocations.
   - tool_name (string): The exact tool identifier exposed by the orchestrator.
   - arguments (object): A JSON object containing the tool's parameters. The key must be exactly "arguments".
@@ -20,7 +20,7 @@ The required structure is:
 Example shape:
 ```json
 {
-  "plan": "Create files, run tests, and finish the feature.",
+  "action_plan": "Create files, run tests, and finish the feature.",
   "tool_calls": [
     {
       "tool_name": "write_file",
@@ -44,7 +44,7 @@ Example shape:
 - To conclude a feature, the Agent calls finish_feature. To conclude the task (all features complete), the Agent calls submit_for_review followed by finish.
 
 ## Validation Rules
-- The JSON must be a single object with required keys: plan (string) and tool_calls (array).
+- The JSON must be a single object with required keys: action_plan (string) and tool_calls (array).
 - Each item in tool_calls must be an object containing tool_name (string) and arguments (object).
 - The key for tool parameters must be named exactly "arguments" to ensure deterministic parsing.
 

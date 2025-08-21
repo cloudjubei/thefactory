@@ -9,7 +9,7 @@ This guide describes how to author and maintain tasks using the JSON-based forma
 ## Required top-level fields in task.json
 - `id` (int): Unique task identifier.
 - `status` (str): Workflow status. Suggested values:
-  - `-` Pending, `~` In Progress, `+` Done, `?` Blocked, `/` Skipped, `=` Deferred.
+  - `-` Pending, `~` In Progress, `+` Done, `?` Blocked,  `=` Deferred.
 - `title` (str): Short, human-readable title.
 - `action` (str): High-level description of the task’s purpose.
 - `plan` (str, Markdown): LLM-friendly overview of how to execute the task.

@@ -2,7 +2,7 @@
   "id": 4,
   "status": "-",
   "title": "Running in docker",
-  "action": "Create a workflow to running the project in docker, i.e. isolated environment.",
+  "description": "Create a workflow to running the project in docker, i.e. isolated environment.",
   "acceptance": [
     "The file `docs/docker/RUNNING_DOCKER_README.md` exists detailing the steps involved in running the project in a container environment.",
     "A `docs/docker/Dockerfile` exists that a user can copy and use. ",

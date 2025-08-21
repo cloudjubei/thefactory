@@ -5,13 +5,19 @@ try:
 except ImportError:
     from typing_extensions import NotRequired
 
-Status = Literal["+", "~", "-", "?", "/", "="]
+Status = Literal[
+    "+", # Done
+    "~", # In Progress
+    "-", # Pending
+    "?", # Blocked
+    "=" # Deferred
+]
 
 class Feature(TypedDict):
     id: str
     status: Status
     title: str
-    action: str
+    description: str
     plan: str
     context: List[str]
     acceptance: List[str]
@@ -24,6 +30,5 @@ class Task(TypedDict):
     id: int
     status: Status
     title: str
-    action: str
-    plan: str
+    description: str
     features: List[Feature]
