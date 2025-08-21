@@ -42,7 +42,7 @@ repo_root/
 │  ├─ AGENT_TESTER.md
 │  ├─ LOCAL_SETUP.md
 │  ├─ AGENT_COMMUNICATION_PROTOCOL.md
-│  ├─ agent_protocol_format.json
+│  ├─ agent_protocol_example.json
 │  └─ tasks/
 │     ├─ task_format.py
 │     └─ task_example.json

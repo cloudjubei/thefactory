@@ -52,14 +52,14 @@
       "description": "Implement the local orchestrator script and setup, fully compliant with all the spec. It allows running an LLM agent to have conversations back and forth with tool calls.",
       "context": [
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
-        "docs/agent_protocol_format.json",
+        "docs/agent_protocol_example.json",
         "scripts/git_manager.py",
         "scripts/tools_utils.py",
         "scripts/run_local_agent.py"
       ],
       "acceptance": [
         "`scripts/run_local_agent.py` exists and implements the orchestrator script.",
-        "it abides to `docs/AGENT_COMMUNICATION_PROTOCOL.md` and implements the protocol format defined in `docs/agent_protocol_format.json`",
+        "it abides to `docs/AGENT_COMMUNICATION_PROTOCOL.md` and implements the protocol format shown in `docs/agent_protocol_example.json`",
         "it directly uses a reference to `GitManager` from `scripts/git_manager.py` to perform git operations",
         "it directly uses `scripts/tools_utils.py` to call all appropriate tools",
         "The script has CLI options `--mode {mode_type}` where `mode_type` is either `single` (running just once) or `continuous` (running until there are no more tasks to work on)",

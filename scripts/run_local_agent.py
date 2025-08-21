@@ -19,6 +19,17 @@ load_dotenv()
 
 # --- Constants ---
 MAX_TURNS_PER_FEATURE = 10
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+try:
+    PROTOCOL_EXAMPLE_PATH = PROJECT_ROOT / "docs" / "agent_protocol_example.json"
+    with open(PROTOCOL_EXAMPLE_PATH, "r") as f:
+        # Load and then dump with indentation to create a nicely formatted string for the prompt
+        PROTOCOL_EXAMPLE_STR = json.dumps(json.load(f), indent=2)
+except (FileNotFoundError, json.JSONDecodeError) as e:
+    print(f"FATAL: Could not load or parse agent_protocol_example.json: {e}")
+    # Provide a safe fallback if the file is missing or corrupt
+    PROTOCOL_EXAMPLE_STR = '{\n  "thoughts": "Your reasoning here...",\n  "tool_calls": [ ... ]\n}'
 
 # --- Tool Mapping ---
 
@@ -86,7 +97,12 @@ When you are finished and the tests pass, you **MUST** call `finish_feature`.
 """
 
     prompt += f"""
-You must respond in JSON format with a "thoughts" and a list of "tool_calls". Make sure all tool calls have valid parameters.
+You **MUST** respond in a single, valid JSON object. This object must adhere to the following structure:
+```json
+{PROTOCOL_EXAMPLE_STR}
+```
+The thoughts field is for your reasoning, and tool_calls is a list of actions to execute.
+Your response will be parsed as JSON. Do not include any text outside of this JSON object.
 
 AVAILABLE TOOLS:
 {json.dumps(list(available_tools.keys()), indent=2)}

@@ -23,7 +23,7 @@ def test_agent_planner_md_exists_and_content():
         'docs/tasks/task_format.py',
         'docs/tasks/task_example.json',
         'docs/AGENT_COMMUNICATION_PROTOCOL.md',
-        'docs/agent_protocol_format.json',
+        'docs/agent_protocol_example.json',
     ]:
         assert needed in content, f'Missing required reference: {needed}'
 
