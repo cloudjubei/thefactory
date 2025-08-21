@@ -118,10 +118,12 @@
     },
     {
       "id": "1.9",
-      "status": "-",
+      "status": "+",
       "title": "Agent personas",
       "action": "Create 3 personas that will serve different purposes:",
-      "context": ["docs/AGENT_PRINCIPLES.md"],
+      "context": [
+        "docs/AGENT_PRINCIPLES.md"
+      ],
       "acceptance": [
         "`docs/AGENT_PERSONAS_PLANNER.md` exists - Describes an agent that looks at the task description and creates a plan for completing a task following the given specifications. This agent is the one that can edit the plan descriptions.",
         "`docs/AGENT_PERSONAS_TESTER.md` exists - Describes an agent that looks at the task description, and then for each feature creates the most appropriate acceptance criteria. Based on that criteria the agent creates a test case for each feature. This agent is the one that can edit the tests - no one else can.",
@@ -133,7 +135,14 @@
       "status": "-",
       "title": "Plan specification for Planner",
       "action": "Create a specification for the planner task that describes how to create a task with features that clearly describe the full scope of the task, and how to create a plan for each feature.",
-      "context": ["docs/tasks/task_format.py", "docs/tasks/task_example.json", "docs/tasks/TASKS_GUIDANCE.md", "docs/TOOL_ARCHITECTURE.md", "docs/AGENT_PRINCIPLES.md", "docs/AGENT_PERSONAS_PLANNER.md"],
+      "context": [
+        "docs/tasks/task_format.py",
+        "docs/tasks/task_example.json",
+        "docs/tasks/TASKS_GUIDANCE.md",
+        "docs/TOOL_ARCHITECTURE.md",
+        "docs/AGENT_PRINCIPLES.md",
+        "docs/AGENT_PERSONAS_PLANNER.md"
+      ],
       "acceptance": [
         "`docs/PLAN_SPECIFICATION_PLANNER.md` exists",
         "The document references `docs/tasks/task_format.py` for the task schema",
@@ -164,7 +173,15 @@
       "status": "-",
       "title": "Plan specification for Tester",
       "action": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria.",
-      "context": ["docs/tasks/task_format.py", "docs/tasks/task_example.json", "docs/tasks/TASKS_GUIDANCE.md", "docs/TOOL_ARCHITECTURE.md", "docs/AGENT_PRINCIPLES.md", "docs/AGENT_PERSONAS_TESTER.md", "docs/TESTING.md"],
+      "context": [
+        "docs/tasks/task_format.py",
+        "docs/tasks/task_example.json",
+        "docs/tasks/TASKS_GUIDANCE.md",
+        "docs/TOOL_ARCHITECTURE.md",
+        "docs/AGENT_PRINCIPLES.md",
+        "docs/AGENT_PERSONAS_TESTER.md",
+        "docs/TESTING.md"
+      ],
       "acceptance": [
         "`docs/PLAN_SPECIFICATION_TESTER.md` exists",
         "The document references `docs/tasks/task_format.py` for the task schema",
@@ -196,7 +213,15 @@
       "status": "-",
       "title": "Plan specification for Developer",
       "action": "Create a specification for the developer task that describes how to implement each feature.",
-      "context": ["docs/tasks/task_format.py", "docs/tasks/task_example.json", "docs/tasks/TASKS_GUIDANCE.md", "docs/TOOL_ARCHITECTURE.md", "docs/AGENT_PRINCIPLES.md", "docs/AGENT_PERSONAS_DEVELOPER.md", "docs/TESTING.md"],
+      "context": [
+        "docs/tasks/task_format.py",
+        "docs/tasks/task_example.json",
+        "docs/tasks/TASKS_GUIDANCE.md",
+        "docs/TOOL_ARCHITECTURE.md",
+        "docs/AGENT_PRINCIPLES.md",
+        "docs/AGENT_PERSONAS_DEVELOPER.md",
+        "docs/TESTING.md"
+      ],
       "acceptance": [
         "`docs/PLAN_SPECIFICATION_TESTER.md` exists",
         "The document references `docs/tasks/task_format.py` for the task schema",
