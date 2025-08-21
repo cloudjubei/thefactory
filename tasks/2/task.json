@@ -11,14 +11,15 @@
       "title": "Git manager",
       "action": "implement the git manager scripts",
       "acceptance": [
-        "`scripts/git_manager.py` exists all necessary git related functions"
+        "`scripts/git_manager.py` exists",
+        "inside the script a class `GitManager` is implemented with all the necessary methods to interact with git repositories"
       ]
     },
     {
       "id": "2.2",
       "status": "-",
       "title": "Task Utility Tooling",
-      "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/tools/task_utils.py`.",
+      "action": "Provide and maintain utility functions for programmatic interaction with task files in `scripts/task_utils.py`.",
       "context": [
         "docs/tasks/task_format.py",
         "docs/AGENT_PERSONAS_PLANNER.md",
@@ -27,7 +28,7 @@
         "docs/FILE_ORGANISATION.md"
       ],
       "acceptance": [
-        "`scripts/tools/task_utils.py` exists.",
+        "`scripts/task_utils.py` exists.",
         "it directly references the interface schema from `task_format.py`",
         "it directly uses a reference to `GitManager` from `scripts/git_manager.py` inside function parameters whenever necessary",
         "it has all the tools specified in `AGENT_PERSONAS_PLANNER.md`",
@@ -47,30 +48,39 @@
       "plan": "",
       "acceptance": [
         "`scripts/run_local_agent.py` exists and implements the orchestrator script.",
-        "a json format exists that specifies how each agent should return the response to the orchestrator script",
+        "it directly uses a reference to `GitManager` from `scripts/git_manager.py` to perform git operations",
+        "it directly uses `scripts/tools_utils.py` to call all appropriate tools",
         "The script has CLI options `--mode {mode_type}` where `mode_type` is either `single` (running just once) or `continuous` (running until there are no more tasks to work on)",
         "The script has the CLI required argument `--task {task_id}` and the optional one `--feature {feature_id}` to run specific tasks/features via prompt construction referencing `tasks/{task_id}/task.json`.",
         "The script has the CLI required argument `--agent {agent_type}` where `agent_type` is one of the following: `planner`, `tester`, or `developer`.",
-        "The script "
-        "`AGENT_PERSONAS_PLANNER.md`, `AGENT_PERSONAS_TESTER.md`, and `AGENT_PERSONAS_DEVELOPER.md` are referenced in the script and an agent can call any of the tools specified by returning an appropriate message",
-
+        "The script has a function to gather context for each agent type in a clean way",
+        "The script has a function to gather all available tools for each agent type in a clean way",
+        "The script passes all the relevant data, and especially context and tools available, to the agent type to start a multi-way conversation that will result in tool calls",
+        "The conversation continues for a given task in continuous mode until the agent decides to finish calling the `finish` tool.",
+        "The conversation continues for a given task in single mode until the agent decides to finish a feature calling the `finish_feature` tool."
+      ],
+      "dependencies": [
+        "2.1",
+        "2.2"
       ]
     },
     {
-      "id": "2.2",
+      "id": "2.4",
       "status": "-",
       "title": "Dependency specification",
-      "action": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`",
-      "plan": "1. Identify all external dependencies, such as `litellm`, `python-dotenv`, and `GitPython`. 2. Create a `requirements.txt` file in the project root. 3. Add each dependency to the file on a new line.",
+      "action": "Create `requirements.txt` listing all external libraries used by `scripts/run_local_agent.py`, `scripts/git_manager.py, `scripts/task_utils.py",
+      "plan": "",
       "acceptance": [
         "`requirements.txt` exists"
       ],
       "dependencies": [
-        "2.1"
+        "2.1",
+        "2.2",
+        "2.3"
       ]
     },
     {
-      "id": "2.3",
+      "id": "2.5",
       "status": "-",
       "title": "Environment variables template",
       "action": "Provide `.env.example` containing placeholders for required API keys and settings.",
@@ -83,18 +93,18 @@
       ]
     },
     {
-      "id": "2.4",
+      "id": "2.6",
       "status": "-",
       "title": "Local setup guide",
       "action": "Author `docs/LOCAL_SETUP.md` with setup and execution instructions.",
-      "plan": "1. Create the file `docs/LOCAL_SETUP.md`. 2. Add a 'Setup Instructions' section detailing repository cloning, virtual environment setup, dependency installation from `requirements.txt`, and `.env` file configuration. 3. Add an 'Execution' section with example commands for running `scripts/run_local_agent.py`.",
+      "plan": "",
       "acceptance": [
         "`docs/LOCAL_SETUP.md` exists and is accurate."
       ],
       "dependencies": [
-        "2.1",
-        "2.2",
-        "2.3"
+        "2.3",
+        "2.4",
+        "2.5"
       ]
     }
   ]
