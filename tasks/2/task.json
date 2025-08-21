@@ -6,7 +6,7 @@
   "features": [
     {
       "id": "2.1",
-      "status": "-",
+      "status": "+",
       "title": "Git manager",
       "description": "implement the git manager scripts",
       "context": [

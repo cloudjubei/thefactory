@@ -226,13 +226,11 @@ def find_next_pending_task() -> Optional[Task]:
     return None
 
 
-def find_next_available_feature(task: Task, exclude_ids: Optional[set] = None) -> Optional[Feature]:
+def find_next_available_feature(task: Task, exclude_ids: set = set()) -> Optional[Feature]:
     """
     Finds the first pending feature in a task whose dependencies are all met,
     EXCLUDING any feature IDs passed in the `exclude_ids` set.
     """
-    if exclude_ids is None:
-        exclude_ids = set()
 
     completed_feature_ids = {f["id"] for f in task["features"] if f["status"] == "+"}
     
