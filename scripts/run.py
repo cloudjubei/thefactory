@@ -5,8 +5,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-IGNORE_PATTERNS = shutil.ignore_patterns('.git', 'venv', '__pycache__', '*.pyc', '.idea')
-
+IGNORE_PATTERNS = shutil.ignore_patterns('.git', 'venv', '__pycache__', '*.pyc', '.idea', 'docs')
 def main():
     """
     This is the main launcher for the AI agent.
@@ -21,14 +20,15 @@ def main():
 
     project_root = Path(__file__).resolve().parent
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_project_root = Path(temp_dir)
-        print(f"--- Created temporary directory for agent run: {temp_project_root} ---")
-
-        print("Copying repository to temporary directory...")
-        shutil.copytree(project_root, temp_project_root, dirs_exist_ok=True, ignore=IGNORE_PATTERNS)
-
-        orchestrator_script_path = temp_project_root / "scripts" / "run_local_agent.py"
+    with tempfile.TemporaryDirectory() as temp_dir_str:
+        temp_dir = Path(temp_dir_str)
+        
+        workspace_path = temp_dir / "workspace"
+        
+        print(f"Copying repository to temporary workspace: {workspace_path}")
+        shutil.copytree(project_root, workspace_path, ignore=IGNORE_PATTERNS)
+        
+        orchestrator_script_path = workspace_path / "scripts" / "run_local_agent.py"
         command = [
             "python3",
             str(orchestrator_script_path),
@@ -41,7 +41,7 @@ def main():
         print(f"Executing command: {' '.join(command)}")
 
         try:
-            subprocess.run(command, cwd=temp_project_root, check=True)
+            subprocess.run(command, cwd=workspace_path, check=True)
         except subprocess.CalledProcessError as e:
             print(f"\n--- An error occurred while running the agent orchestrator: {e} ---")
         except KeyboardInterrupt:
