@@ -9,7 +9,7 @@
       "id": "3.0",
       "status": "-",
       "title": "Create all the  missing features for this using `create_feature`",
-      "description": "The file `docs/CHILD_PROJECTS_SPECIFICATION.md` exists detailing the structure of child projects stemming from this project. There is a folder called `projects` where all the child projects are stored. Each child project has its own repository and is linked to this one via git submodules. This project's `.gitignore` needs to be updated so it ignores the `projects` folder and all the files inside it.",
+      "description": "There is a folder called `projects` where all the child projects are stored. Each child project has its own repository and is linked to this one via git submodules. This project's `.gitignore` needs to be updated so it ignores the `projects` folder and all the files inside it.",
       "context": [
         "docs/FILE_ORGANISATION.md",
         "docs/tasks/task_format.py",

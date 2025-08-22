@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import inspect
+import traceback
 from dotenv import load_dotenv
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Callable, Tuple
@@ -256,6 +257,9 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
 
     except Exception as e:
         print(f"\n--- A critical error occurred during the orchestrator run: {e} ---")
+        print("\n--- Full Stack Trace ---")
+        traceback.print_exc()  # This will print the full traceback to the console.
+        print("------------------------\n")
 
 def main():
     parser = argparse.ArgumentParser(description="Run an autonomous AI agent.")
