@@ -90,10 +90,33 @@ class GitManager:
 
         :param branch_name: The name of the branch to create.
         """
-        self._run_command(["checkout", "-b", branch_name])
+
+        self._run_command(["git", "checkout", "main"])
+        self._run_command(["git", "pull"])
+
+        self._run_command(["git", "checkout", "-b", branch_name])
+            if not self._run_command(["git", "checkout", "-b", branch_name]): return False
+            self._run_command(["git", "pull", "origin", branch_name]) # this can fail as this could be a fresh branch
         
         try:
             self._run_command(["pull", remote, branch_name])
         except Exception:
                 print(f"Branch {branch_name} does not exist on remote {remote}. Continuing without pulling.")
         
+
+
+        if os.path.exists(self.working_dir):
+            print(f"Cleaning up existing working directory: {self.working_dir}")
+            if not self._run_command(["rm", "-rf", self.working_dir], cwd="/"):
+                return False
+        
+        if not self._run_command(["git", "clone", self.repo_url, self.repo_path], cwd="/"):
+            return False
+            
+        if not self._run_command(["git", "checkout", "main"]): return False
+        if not self._run_command(["git", "pull"]): return False
+        if (branch_name != "main"):
+            if not self._run_command(["git", "checkout", "-b", branch_name]): return False
+            self._run_command(["git", "pull", "origin", branch_name]) # this can fail as this could be a fresh branch
+            
+        print(f"Successfully created and checked out branch '{branch_name}' in '{self.repo_path}'")
