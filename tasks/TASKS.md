@@ -1,6 +1,8 @@
 # Tasks
 
-0) planner must also provide/work out context for the developer/tester
+# git manager configure
+# make sure the new branch pulls if it exists
+
 
 1) - New child projects structure
    Action: Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. This project will only oversee their specification correctness.
