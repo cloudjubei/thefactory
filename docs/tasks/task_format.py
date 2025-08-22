@@ -31,3 +31,4 @@ class Task(TypedDict):
     title: str
     description: str
     features: List[Feature]
+    rejection: NotRequired[str]

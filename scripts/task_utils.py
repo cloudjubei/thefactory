@@ -113,6 +113,17 @@ def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Featur
     print(f"Feature {feature_id} blocked. Reason: {reason}")
     return deferred_feature
 
+def block_task(task_id: int, reason: str) -> Task:
+    """Sets a task's status to '?' Blocked when it's blocked."""
+    task = get_task(task_id)
+    
+    task["status"] = "?"
+    task["rejection"] = f"Blocked: {reason}"
+    save_task(task)
+
+    print(f"Task {task_id} blocked. Reason: {reason}")
+    return task
+
 def _check_and_update_task_completion(task_id: int):
     """Checks if all features in a task are done, and if so, marks the task as done."""
     task = get_task(task_id)
@@ -169,6 +180,28 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
         print(f"Warning: Git commit failed. Error: {e}")
         
     return f"Feature {feature_id} finished by {agent_type} and changes committed."
+
+def finish_spec(task_id: int, agent_type: str, git_manager: GitManager):
+    """
+    Handles the finishing logic for any agent. It stages all current changes.
+    """
+    try:
+        git_manager.stage_files(['.'])
+    except Exception as e:
+        print(f"Warning: Could not stage files. Git error: {e}")
+
+    if agent_type == 'speccer':
+        commit_message = f"spec: Added spec for task: {task_id}"
+    else:
+        raise ValueError(f"Unknown agent_type '{agent_type}' called finish_spec.")
+
+    try:
+        git_manager.commit(commit_message)
+        print(f"Committed changes with message: '{commit_message}'")
+    except Exception as e:
+        print(f"Warning: Git commit failed. Error: {e}")
+        
+    return f"Task {task_id} finished spec by {agent_type} and changes committed."
 
 # --- Tester Agent Tools ---
 

@@ -19,7 +19,7 @@ assert issubclass(Task, dict), "Task is not a subclass of dict"
 assert hasattr(Task, '__annotations__'), "Task has no __annotations__"
 
 task_annotations = Task.__annotations__
-assert set(task_annotations.keys()) == {'id', 'title', 'features', 'status', 'description'}, "Task fields mismatch"
+assert set(task_annotations.keys()) == {'id', 'title', 'features', 'status', 'description', 'rejection'}, "Task fields mismatch"
 assert task_annotations['id'] is int, "id not int"
 assert task_annotations['title'] is str, "title not str"
 

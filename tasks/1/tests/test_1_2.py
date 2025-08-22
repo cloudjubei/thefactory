@@ -15,10 +15,10 @@ def test_example_task_file():
         'id': str,
         'name': str,
         'description': str,
-        'acceptance_criteria': list
+        'acceptance': list
     }
     for field, field_type in required_fields.items():
         assert field in data, f"Missing required field: {field}"
         assert isinstance(data[field], field_type), f"Field {field} has incorrect type: expected {field_type.__name__}, got {type(data[field]).__name__}"
-    for item in data['acceptance_criteria']:
+    for item in data['acceptance']:
         assert isinstance(item, str), "Acceptance criteria items must be strings"

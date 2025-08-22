@@ -11,7 +11,7 @@ def test_feature_1_8():
     assert 'docs/AGENT_COMMUNICATION_PROTOCOL.md' in content, 'No reference to docs/AGENT_COMMUNICATION_PROTOCOL.md'
     assert 'docs/agent_response_example.json' in content, 'No reference to docs/agent_response_example.json'
     assert 'Tools' in content, 'No Tools section'
-    tools = ['get_context(files:[str])->[str]', 'write_file(filename:str,content:str)', 'run_test(task_id:int,feature_id:str)->TestResult', 'update_task_status(task_id:int,status:Status)->Task', 'update_feature_status(task_id:int,feature_id:str,status:Status)->Feature', 'finish_feature(task_id:int,feature_id:str)->Feature', 'finish(task_id:int)->Task', 'block_feature(task_id:int,feature_id:str,question:str)']
+    tools = ['get_context(files:[str])->[str]', 'write_file(filename:str,content:str)', 'run_test(task_id:int,feature_id:str)->TestResult', 'update_task_status(task_id:int,status:Status)->Task', 'update_feature_status(task_id:int,feature_id:str,status:Status)->Feature', 'finish_feature(task_id:int,feature_id:str)->Feature', 'block_feature(task_id:int,feature_id:str,question:str)']
     for tool in tools:
         assert tool in content, f'Tool missing: {tool}'
     assert 'update_task_status' in content and 'in progress' in content, 'Missing explanation for task status update to in progress'

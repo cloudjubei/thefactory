@@ -51,15 +51,20 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
 
     agent_tools = {}
     # The signatures are simplified for the agent. The orchestrator handles the rest.
-    if agent_type == 'developer':
+    if agent_type == 'speccer':
+        agent_tools = {
+            "create_feature": (task_utils.create_feature, "create_feature(title: str, description: str, plan: str)"),
+            "finish_spec": (lambda task_id: task_utils.finish_spec(task_id, agent_type, git_manager), "finish_spec()"),
+            "block_task": (task_utils.block_task, "block_task()"),
+        }
+    elif agent_type == 'developer':
         agent_tools = {
             "write_file": (task_utils.write_file, "write_file(filename: str, content: str)"),
             "run_test": (task_utils.run_test, "run_test() -> str"),
         }
     elif agent_type == 'planner':
         agent_tools = {
-            "update_feature_plan": (task_utils.update_feature_plan, "update_feature_plan(plan: str)"),
-            "create_feature": (task_utils.create_feature, "create_feature(title: str, description: str, plan: str)"),
+            "update_feature_plan": (task_utils.update_feature_plan, "update_feature_plan(plan: str)")
         }
     elif agent_type == 'tester':
         agent_tools = {
@@ -83,42 +88,16 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
 def construct_system_prompt(agent_type: str, task: Task, feature: Feature, context: str, tool_signatures: List[str]) -> str:
     """Constructs the detailed system prompt, specialized for the agent type."""
     prompt = f"""You are the '{agent_type}' agent.
-CURRENT TASK: {task['title']} (ID: {task['id']})
-ASSIGNED FEATURE: {feature['title']} (ID: {feature['id']})
+CURRENT TASK: {task.get('title')} (ID: {task.get('id')})
+ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')})
 DESCRIPTION: {feature.get('description', 'No description specified.')}
+The following context files have been provided:
+{context}
 """
     if agent_type in ['developer', 'tester']:
         prompt += "ACCEPTANCE CRITERIA:\n"
         for i, criterion in enumerate(feature.get('acceptance', []), 1):
             prompt += f"{i}. {criterion}\n"
-
-    # --- Agent-specific instructions ---
-    if agent_type == 'planner':
-        prompt += """
-Your **ONLY** job is to create a detailed, step-by-step implementation plan for the assigned feature.
-Analyze the feature and use the `update_feature_plan` tool to save your plan.
-When you are done, you **MUST** call `finish_feature` to mark it as ready for the next stage.
-"""
-    elif agent_type == 'tester':
-        prompt += """
-Your job is to write the acceptance criteria and a corresponding Python test for this feature.
-1. First, use the `update_acceptance_criteria` tool to define the success conditions.
-2. Second, use the `update_test` tool to write a test that verifies those criteria.
-When you are done, you **MUST** call `finish_feature` to mark it as ready for development.
-"""
-    elif agent_type == 'contexter':
-        prompt += """
-Your **ONLY** job is to analyze the feature and set its `context` field to the minimal list of files a developer would need.
-The `docs/FILE_ORGANISATION.md` file has been provided in your context to help you.
-Use the `update_feature_context` tool to set the list, and then call `finish_feature`.
-"""
-    else: # Developer prompt
-        prompt += f"""
-The following context files have been provided:
-{context}
-Your job is to execute the feature's plan and meet all acceptance criteria.
-When you are finished and the tests pass, you **MUST** call `finish_feature`.
-"""
 
     prompt += f"""
 You **MUST** respond in a single, valid JSON object. This object must adhere to the following structure:
@@ -139,11 +118,21 @@ Your available tools are defined below. Call them with the exact function and ar
     prompt += "\nBegin now."
     return prompt
 
+def run_agent_on_task(model: str, agent_type: str, task: Task, git_manager: GitManager):
+    print(f"\n--- Activating Agent for task: [{task.get('id')}] {task.get('title')} ---")
+
+    context_files = [f"docs/AGENT_{agent_type.upper()}.md", "docs/FILE_ORGANISATION.md"]
+    available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
+    context = task_utils.get_context(context_files)
+    system_prompt = construct_system_prompt(agent_type, task, None, context, tool_signatures)
+
+    return _run_agent_conversation(model, available_tools, system_prompt, task)
+
 def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Feature, git_manager: GitManager):
-    print(f"\n--- Activating Agent for Feature: [{feature['id']}] {feature['title']} ---")
+    print(f"\n--- Activating Agent for Feature: [{feature.get('id')}] {feature['title']} ---")
 
     if agent_type == 'developer':
-        task_utils.update_feature_status(task['id'], feature['id'], '~')
+        task_utils.update_feature_status(task.get('id'), feature.get('id'), '~')
 
     feature_context_files = [f"docs/AGENT_{agent_type.upper()}.md"] + feature.get("context", [])
     if agent_type == 'contexter':
@@ -154,10 +143,13 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     context = task_utils.get_context(feature_context_files)
     system_prompt = construct_system_prompt(agent_type, task, feature, context, tool_signatures)
 
-    messages = [{"role": "user", "content": system_prompt}]
-    
     if agent_type == 'developer':
-        task_utils.update_feature_status(task['id'], feature['id'], '~')
+        task_utils.update_feature_status(task.get('id'), feature.get('id'), '~')
+
+    return _run_agent_conversation(model, available_tools, system_prompt, task, feature)
+
+def _run_agent_conversation(model: str, available_tools: Dict[str, Callable], system_prompt: str, task: Task, feature: Feature | None) -> bool:
+    messages = [{"role": "user", "content": system_prompt}]
 
     for i in range(MAX_TURNS_PER_FEATURE):
         print(f"\n--- Feature Turn {i+1}/{MAX_TURNS_PER_FEATURE} ---")
@@ -187,21 +179,18 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
                     params = sig.parameters
                     
                     if 'task_id' in params:
-                        tool_args.setdefault('task_id', task['id'])
-                    if 'feature_id' in params:
-                        tool_args.setdefault('feature_id', feature['id'])
+                        tool_args.setdefault('task_id', task.get('id'))
+                    if (not (feature is None)) and ('feature_id' in params):
+                        tool_args.setdefault('feature_id', feature.get('id'))
 
                     result = available_tools[tool_name](**tool_args)
                     tool_outputs.append(f"Tool {tool_name} returned: {result}")
                 else:
                     tool_outputs.append(f"Error: Tool '{tool_name}' not found.")
 
-                if tool_name in ['finish_feature', 'block_feature']:
-                    print(f"Agent called '{tool_name}'. Concluding work on this feature.")
+                if tool_name in ['finish_feature', 'block_feature', 'finish_spec', 'block_task']:
+                    print(f"Agent called '{tool_name}'. Concluding work on this.")
                     return True
-                if tool_name == 'finish':
-                    print("Agent called 'finish'. Terminating orchestrator.")
-                    return False
 
             messages.append({"role": "user", "content": "--- TOOL RESULTS ---\n" + "\n".join(tool_outputs)})
 
@@ -210,11 +199,19 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
             print("\n--- Full Stack Trace ---")
             traceback.print_exc()
             print("------------------------\n")
-            task_utils.block_feature(task['id'], feature['id'], f"Agent loop failed: {e}")
+            if (not (feature is None)):
+                task_utils.block_feature(task.get('id'), feature.get('id'), f"Agent loop failed: {e}")
+            else:
+                task_utils.block_task(task.get('id'), f"Agent loop failed: {e}")
+                
             return True
             
-    print(f"Max turns reached for feature {feature['id']}. Deferring.")
-    task_utils.block_feature(task['id'], feature['id'], "Max conversation turns reached.")
+    if (not (feature is None)):
+        print(f"Max turns reached for feature {feature.get('id')}. Blocking.")
+        task_utils.block_feature(task.get('id'), feature.get('id'), f"Agent loop failed: {e}")
+    else:
+        print(f"Max turns reached for task {task.get('id')}. Blocking.")
+        task_utils.block_task(task.get('id'), f"Agent loop failed: {e}")
     return True
 
 
@@ -235,8 +232,8 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
             print("No available tasks to work on in the repository.")
             return
         
-        task_id = current_task['id']
-        print(f"Selected Task: [{task_id}] {current_task['title']}")
+        task_id = current_task.get('id')
+        print(f"Selected Task: [{task_id}] {current_task.get('title')}")
         
         git_manager = GitManager(str(PROJECT_ROOT))
         
@@ -250,18 +247,20 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
         except Exception as e:
             print(f"Could not pull branch '{branch_name}': {e}")
 
-        # --- Main Loop ---
+        current_task = task_utils.get_task(task_id)
         processed_feature_ids = set()
-        while True:
-            current_task = task_utils.get_task(task_id)
-            next_feature = task_utils.find_next_available_feature(current_task, exclude_ids=processed_feature_ids)
-            
-            if not next_feature:
-                print(f"\nNo more available features for task {task_id}.")
-                break
-            
-            run_agent_on_feature(model, agent_type, current_task, next_feature, git_manager)
-            processed_feature_ids.add(next_feature['id'])
+        if agent_type == "speccer":
+            run_agent_on_task(model, agent_type, current_task, git_manager)
+        else:
+            while True:
+                next_feature = task_utils.find_next_available_feature(current_task, exclude_ids=processed_feature_ids)
+                
+                if not next_feature:
+                    print(f"\nNo more available features for task {task_id}.")
+                    break
+                
+                run_agent_on_feature(model, agent_type, current_task, next_feature, git_manager)
+                processed_feature_ids.add(next_feature.get('id'))
         
         git_manager.push(branch_name)
 

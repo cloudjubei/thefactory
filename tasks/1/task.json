@@ -17,8 +17,8 @@
         "The file 'docs/tasks/task_format.py' exists.",
         "The file defines a TypedDict named 'Task'.",
         "The file defines a TypedDict named 'Feature'.",
-        "The 'Task' TypedDict has exactly the following fields: 'id' of type str, 'title' of type str, 'features' of type list[Feature].",
-        "The 'Feature' TypedDict has exactly the following fields: 'id' of type str, 'title' of type str, 'description' of type str, 'acceptance_criteria' of type list[str]."
+        "The 'Task' TypedDict has exactly the following fields: 'id' of type str, 'title' of type str, 'description' of type str, 'features' of type list[Feature], optional 'rejection' of type str.",
+        "The 'Feature' TypedDict has exactly the following fields: 'id' of type str, 'title' of type str, 'description' of type str, 'plan' of type str, 'acceptance' of type list[str], optional 'dependencies' of type list[str], optional 'rejection' of type str."
       ]
     },
     {
@@ -220,7 +220,7 @@
         "The document has a section `Tools` that list and describe all tools this agent can use: `get_context(files:[str])->[str]`, `create_feature(task_id:int,feature_id:str,title:string,description:string)->Feature`, `finish_spec(task_id:int)->Feature`, `block_spec(task_id:int,question:str)`",
         "The document explains that if the work for the agent is done on a feature the `finish_spec` MUST BE USED",
         "The document explains that creating features that are missing for the task to be complete is mandatory - `create_feature` tool is used for this",
-        "The document explains that if there's any unresolved issue - the `block_spec` tool is used for this"
+        "The document explains that if there's any unresolved issue - the `block_task` tool is used for this"
         
       ],
       "dependencies": [
