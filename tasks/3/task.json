@@ -68,7 +68,16 @@
         "src/cli/__init__.py",
         "src/cli/common.py"
       ],
-      "acceptance": []
+      "acceptance": [
+        "CLI interface: The script is executable as `python -m child_projects_structure` and accepts at minimum the following flags: --config <path to JSON or YAML config>, --backend <backend name>, --dsn <connection string or file path>, --dry-run (no mutations), --metrics-out <path to write JSON metrics>, and --log-level <level>. It returns exit code 0 on success and non-zero on error.",
+        "Backend support: The script must support at least the 'sqlite' backend for persistence. For sqlite, the --dsn must point to a file path for the database. Structures must be created in that database.",
+        "Schema application: Given a valid configuration describing entities, relationships, and indexes, the script creates the corresponding structures in the target backend. For sqlite, this includes creating tables for entities, a join table for many-to-many relationships, and indexes as defined in the config.",
+        "Dry-run mode: When invoked with --dry-run, the script performs validation and planning only; no changes are applied to the backend. The metrics must reflect planned operations with zero applied changes. Exit code must be 0.",
+        "Idempotency: Applying the same configuration to the same target more than once must be safe and result in zero new changes on subsequent runs. The second run must complete successfully (exit code 0) and metrics must report zero created/updated items and non-zero skipped counts corresponding to already existing structures.",
+        "Metrics: When --metrics-out is provided, the script writes a JSON file containing at least: backend (string), dry_run (boolean), config_hash (SHA-256 hex of the config content), duration_ms (number), and a counts object with entities, relationships, and indexes, each providing at least planned, created, updated, and skipped integer counters. The counters must accurately reflect the operations planned/applied in that execution.",
+        "Logging: At log level INFO (default), the script logs a summary of operations performed. At DEBUG level, the script logs planned operations. While tests will primarily validate metrics, the implementation must provide comprehensive logging consistent with these expectations.",
+        "Error handling: With an invalid or unreadable config file, the script exits with a non-zero exit code and logs an error. (Test focus remains on the happy path; this criterion guides implementation behavior.)"
+      ]
     },
     {
       "id": "3.4",
