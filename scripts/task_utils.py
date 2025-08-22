@@ -246,15 +246,43 @@ def find_next_available_feature(task: Task, exclude_ids: set = set()) -> Optiona
                 return feature
     return None
 
+
 def create_feature(task_id: int, title: str, description: str, plan: str) -> Feature:
-    """Adds a new feature to an existing task. (For rare cases where a feature must be split)."""
+    """
+    Creates a new feature with a given title, description, and plan, and adds it to the specified task.
+    This tool automatically generates a new feature ID.
+    """
     task = get_task(task_id)
-    existing_ids = {f["id"] for f in task["features"]}
-    if feature["id"] in existing_ids:
-        raise ValueError(f"Feature with ID {feature['id']} already exists in task {task_id}.")
-    task["features"].append(feature)
+    features = task.get("features", [])
+    
+    highest_sub_id = 0
+    for f in features:
+        try:
+            sub_id = int(f['id'].split('.')[-1])
+            if sub_id > highest_sub_id:
+                highest_sub_id = sub_id
+        except (ValueError, IndexError):
+            continue
+    
+    new_sub_id = highest_sub_id + 1
+    new_id = f"{task_id}.{new_sub_id}"
+
+    new_feature: Feature = {
+        "id": new_id,
+        "status": "-",
+        "title": title,
+        "action": description,
+        "plan": plan,
+        "context": [],
+        "acceptance": [],
+    }
+    
+    features.append(new_feature)
+    task["features"] = features
     save_task(task)
-    return feature
+    
+    print(f"New feature '{new_id}' created in task {task_id}.")
+    return new_feature
 
 def update_feature_plan(task_id: int, feature_id: str, plan: any) -> Optional[Feature]:
     """

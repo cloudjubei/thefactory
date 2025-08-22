@@ -56,7 +56,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
     elif agent_type == 'planner':
         agent_tools = {
             "update_feature_plan": (task_utils.update_feature_plan, "update_feature_plan(plan: str)"),
-            "create_feature": (task_utils.create_feature, "create_feature(feature: dict)"),
+            "create_feature": (task_utils.create_feature, "create_feature(title: str, description: str, plan: str)"),
         }
     elif agent_type == 'tester':
         agent_tools = {

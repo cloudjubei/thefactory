@@ -34,7 +34,12 @@
       "id": "4.2",
       "status": "-",
       "title": "Create README for running in Docker",
-      "description": "Create a file at docs/docker/RUNNING_DOCKER_README.md detailing the steps to build and run the project in Docker, including how to prepare .env, use the build script, and run the container periodically."
+      "description": "Create a file at docs/docker/RUNNING_DOCKER_README.md detailing the steps to build and run the project in Docker, including how to prepare .env, use the build script, and run the container periodically.",
+      "context": [
+        "docs/LOCAL_SETUP.md",
+        "docs/FILE_ORGANISATION.md",
+        "scripts/run_local_agent.py"
+      ]
     },
     {
       "id": "4.3",
