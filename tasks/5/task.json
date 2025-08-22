@@ -1,18 +1,18 @@
 {
-  "id": 5,
+  "id": 4,
   "status": "-",
-  "title": "iOS app",
-  "action": "Develop an iOS application that allows users to interact with the project and thus the agents it runs. This is the iOS equivalent of the local app project specified in task 4",
-  "acceptance": [],
-  "features": [{
-      "id": "5.0",
+  "title": "Local app",
+  "description": "Create a local Electron+React app to handle project management, see tasks and feature status, update task fields/notes, see all the documents in a nice Markdown display, be able to launch/manage agents running locally and overview status in git (i.e. being able to see if an agent is working on something or not), getting notifications when work is done etc., see all child projects and manage them in the future. Ideally this app is the go-to place for anyone to use THIS project (the factory) and wouldn't have to run any scripts or code manually. A big feature of this should also be access to some sort of chat interface so that it should be possible to talk with a chosen LLM about the whole project. It should be possible to give the LLM chat access to the same tools that the agents use but in a restricted manner, so only the ones that are read-only. It should also be possible to configure further ways of connecting to LLMS for chat and for agents other than the currently chosen litellm. For instance, there's an app LM Studio that allows connecting to a locally running LLM via API calls.",
+  "features": [
+    {
+      "id": "4.0",
       "status": "-",
       "title": "Create all the  missing features for this using `create_feature`",
-      "description": "",
+      "description": "The project for the local app exists detailing the steps involved in creating a local app for project management. This will be the first project to stem from this one. It should follow the same exact principles as this project, but it will live in its own separate repository. This project is just meant to kickstart the whole scaffolding and specification. If any extra functionality comes into this project, it should be easy to adapt this Local app project to use the exact same ideas. Notes: Currently I'm using VSCode to view the project, run everything, see tasks etc. It would be ideal to have a dedicated app for managing the project, viewing tasks, seeing progress etc. For being able to see how the agents fares etc. Cline the plugin for VSCode does something like this and maybe it makes sense to even built upon a fork on this. One thing to keep in mind is that we want to be really third-party independent. If we can create something ourselves we should. The only question is how it integrates with the project. If maintaining such a service/dependency is too heavy, then using a third party solution makes sense. Each third party solution should be its own tasks, with documented features and explanations as to why it was chosen etc.",
       "context": [
         "docs/FILE_ORGANISATION.md",
         "docs/LOCAL_SETUP.md",
-        "tasks/4/task.json"
+        "docs/PROJECTS_GUIDE.md"
       ],
       "acceptance": [],
       "plan": ""

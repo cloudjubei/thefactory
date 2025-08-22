@@ -1,0 +1,21 @@
+{
+  "id": 6,
+  "status": "-",
+  "title": "iOS app",
+  "action": "Develop an iOS application that allows users to interact with the project and thus the agents it runs. This is the iOS equivalent of the local app project specified in task 4",
+  "acceptance": [],
+  "features": [{
+      "id": "6.0",
+      "status": "-",
+      "title": "Create all the  missing features for this using `create_feature`",
+      "description": "",
+      "context": [
+        "docs/FILE_ORGANISATION.md",
+        "docs/LOCAL_SETUP.md",
+        "tasks/4/task.json"
+      ],
+      "acceptance": [],
+      "plan": ""
+    }
+  ]
+}
