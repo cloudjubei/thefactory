@@ -146,6 +146,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     if agent_type == 'contexter':
         if "docs/FILE_ORGANISATION.md" not in feature_context_files:
             feature_context_files.append("docs/FILE_ORGANISATION.md")
+    print("Using context files:", feature_context_files)
 
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
     context = task_utils.get_context(feature_context_files)

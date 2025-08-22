@@ -5,19 +5,6 @@
   "description": "Create a workflow to running the project in docker, i.e. isolated environment.",
   "features": [
     {
-      "id": "4.0",
-      "status": "+",
-      "title": "Create all the  missing features for this using `create_feature`",
-      "description": "The file docs/docker/RUNNING_DOCKER_README.md exists detailing the steps involved in running the project in a container environment. A docs/docker/Dockerfile exists that a user can copy and use. A script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in a prepare .env file that the script will look into and set everything up. The purpose is to have an agent periodically run in a container and not affect the host machine. Whenever an agent is run on a task - at the beginning a feature branch features/{task_id} needs to be created and all code is pushed to it",
-      "context": [
-        "docs/FILE_ORGANISATION.md",
-        "docs/tasks/task_format.py",
-        "docs/tasks/task_example.py"
-      ],
-      "acceptance": [],
-      "plan": "Step-by-step implementation plan for feature 4.0:\n1. Create sub-feature 4.1 to develop the Dockerfile.\n2. Create sub-feature 4.2 to write the README documentation.\n3. Create sub-feature 4.3 to implement the build script.\n4. Create sub-feature 4.4 to handle .env and API keys integration.\n5. Create sub-feature 4.5 to ensure container isolation and periodic running.\n6. Create sub-feature 4.6 to integrate the git feature branch workflow.\n7. Once all sub-features are implemented, test the entire Docker setup to ensure the agent runs periodically in isolation, handles API keys securely, and manages git branches correctly."
-    },
-    {
       "id": "4.1",
       "status": "-",
       "title": "Create Dockerfile for the project",
@@ -59,7 +46,12 @@
       "id": "4.4",
       "status": "-",
       "title": "Handle API keys via .env in Docker setup",
-      "description": "Ensure the Dockerfile and build script handle a .env file for API keys, copying it into the container during build or mounting it at runtime to avoid exposing keys on the host."
+      "description": "Ensure the Dockerfile and build script handle a .env file for API keys, copying it into the container during build or mounting it at runtime to avoid exposing keys on the host.",
+      "context": [
+        "docs/LOCAL_SETUP.md",
+        "requirements.txt",
+        "scripts/run_local_agent.py"
+      ]
     },
     {
       "id": "4.5",
