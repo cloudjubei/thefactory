@@ -67,7 +67,7 @@
     },
     {
       "id": "4.4",
-      "status": "~",
+      "status": "+",
       "title": "Handle API keys via .env in Docker setup",
       "description": "Ensure the Dockerfile and build script handle a .env file for API keys, copying it into the container during build or mounting it at runtime to avoid exposing keys on the host.",
       "context": [
@@ -86,7 +86,7 @@
     },
     {
       "id": "4.5",
-      "status": "-",
+      "status": "~",
       "title": "Ensure container isolation for periodic agent runs",
       "description": "Configure the Docker setup so that the agent can run periodically inside the container without affecting the host machine, possibly using cron or a loop in the entrypoint script.",
       "context": [

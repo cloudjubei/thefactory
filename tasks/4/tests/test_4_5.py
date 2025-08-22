@@ -1,34 +1,48 @@
-import unittest
 import subprocess
 import time
-import json
+import re
+from pathlib import Path
 
-class TestContainerIsolationPeriodic(unittest.TestCase):
-    def test_periodic_isolated_run(self):
-        # Build the Docker image
-        subprocess.check_call(['docker', 'build', '-t', 'test-agent', '.'])
+def run_command(cmd):
+    return subprocess.run(cmd, capture_output=True, text=True)
 
-        # Run the container in detached mode
-        container = subprocess.check_output(['docker', 'run', '-d', '--name', 'test-agent-container', 'test-agent']).decode().strip()
+def test_periodic_execution():
+    # Cleanup existing container and image if any
+    run_command(['docker', 'stop', 'test-container'])
+    run_command(['docker', 'rm', 'test-container'])
+    run_command(['docker', 'rmi', 'test-agent'])
+    dockerfile_path = Path('docs/docker/Dockerfile')
+    entrypoint_path = Path('entrypoint.sh')
+    assert dockerfile_path.exists()
+    assert entrypoint_path.exists()
+    docker_content = dockerfile_path.read_text()
+    entrypoint_content = entrypoint_path.read_text()
+    # Check mechanism: loop in entrypoint
+    assert 'while true' in entrypoint_content
+    assert 'sleep' in entrypoint_content
+    # Check isolation: USER in Dockerfile, no VOLUME
+    assert 'USER appuser' in docker_content
+    assert 'VOLUME' not in docker_content
+    # Build image
+    build_result = run_command(['docker', 'build', '-t', 'test-agent', '-f', 'docs/docker/Dockerfile', '.'])
+    assert build_result.returncode == 0, build_result.stderr
+    # Run container with short interval and test mode
+    run_result = run_command(['docker', 'run', '-d', '--name', 'test-container', '-e', 'SLEEP_INTERVAL=1', '-e', 'TEST_MODE=1', 'test-agent'])
+    assert run_result.returncode == 0, run_result.stderr
+    # Wait for at least 3 runs (1s sleep, wait 5s)
+    time.sleep(5)
+    # Get logs
+    logs_result = run_command(['docker', 'logs', 'test-container'])
+    assert logs_result.returncode == 0
+    logs = logs_result.stdout
+    # Count executions
+    count = len(re.findall(r'Test run at', logs))
+    assert count >= 3, f"Expected at least 3 executions, found {count}"
+    # Cleanup
+    run_command(['docker', 'stop', 'test-container'])
+    run_command(['docker', 'rm', 'test-container'])
+    run_command(['docker', 'rmi', 'test-agent'])
+    print("All tests passed!")
 
-        try:
-            # Wait for 70 seconds (assuming runs every 30s, expect at least 2 runs)
-            time.sleep(70)
-
-            # Get logs
-            logs = subprocess.check_output(['docker', 'logs', container]).decode()
-
-            # Check for multiple agent runs (assume agent logs 'Agent running' each time)
-            run_count = logs.count('Agent running')
-            self.assertGreaterEqual(run_count, 2, 'Agent did not run periodically')
-
-            # Inspect container for isolation
-            inspect_output = subprocess.check_output(['docker', 'inspect', container]).decode()
-            inspect_data = json.loads(inspect_output)[0]
-            self.assertFalse(inspect_data['HostConfig']['Privileged'], 'Container should not run in privileged mode')
-            self.assertEqual(inspect_data['HostConfig']['Binds'], [], 'No host binds should be present')
-
-        finally:
-            # Cleanup
-            subprocess.call(['docker', 'stop', container])
-            subprocess.call(['docker', 'rm', container])
+if __name__ == "__main__":
+    test_periodic_execution()
