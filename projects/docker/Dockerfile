@@ -1,25 +1,21 @@
+# Use an official Python runtime as a parent image
 FROM python:3.11-slim
 
-RUN apt-get update \
-    && apt-get install -y git \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
+# Set the working directory in the container
 WORKDIR /app
 
-RUN useradd -m appuser && chown -R appuser /app
+# Copy the requirements file into the container at /app
+COPY requirements.txt .
 
-COPY requirements.txt /app/
+# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . /app/
+# Copy the entire project into the container
+COPY . .
 
-RUN chmod +x entrypoint.sh
+# Copy the entrypoint script and make it executable
+COPY projects/docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-# .env is copied if present in the build context. For sensitive API keys, consider mounting as a volume during runtime, e.g., docker run -v /host/.env:/app/.env
-
-ENV PYTHONUNBUFFERED=1
-
-USER appuser
-
-ENTRYPOINT ["./entrypoint.sh"]
+# Set the entrypoint for the container
+ENTRYPOINT ["/app/entrypoint.sh"]
