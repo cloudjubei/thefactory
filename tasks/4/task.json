@@ -55,7 +55,12 @@
       "id": "4.5",
       "status": "-",
       "title": "Ensure container isolation for periodic agent runs",
-      "description": "Configure the Docker setup so that the agent can run periodically inside the container without affecting the host machine, possibly using cron or a loop in the entrypoint script."
+      "description": "Configure the Docker setup so that the agent can run periodically inside the container without affecting the host machine, possibly using cron or a loop in the entrypoint script.",
+      "context": [
+        "Dockerfile",
+        "entrypoint.sh",
+        "scripts/run_local_agent.py"
+      ]
     },
     {
       "id": "4.6",
