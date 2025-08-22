@@ -68,7 +68,16 @@
         "src/cli/__init__.py",
         "src/cli/common.py"
       ],
-      "acceptance": []
+      "acceptance": [
+        "CLI interface: The script is executable as `python -m child_projects_structure` and accepts at minimum the following flags: --config <path to JSON or YAML config>, --backend <backend name>, --dsn <connection string or file path>, --dry-run (no mutations), --metrics-out <path to write JSON metrics>, and --log-level <level>. It returns exit code 0 on success and non-zero on error.",
+        "Backend support: The script must support at least the 'sqlite' backend for persistence. For sqlite, the --dsn must point to a file path for the database. Structures must be created in that database.",
+        "Schema application: Given a valid configuration describing entities, relationships, and indexes, the script creates the corresponding structures in the target backend. For sqlite, this includes creating tables for entities, a join table for many-to-many relationships, and indexes as defined in the config.",
+        "Dry-run mode: When invoked with --dry-run, the script performs validation and planning only; no changes are applied to the backend. The metrics must reflect planned operations with zero applied changes. Exit code must be 0.",
+        "Idempotency: Applying the same configuration to the same target more than once must be safe and result in zero new changes on subsequent runs. The second run must complete successfully (exit code 0) and metrics must report zero created/updated items and non-zero skipped counts corresponding to already existing structures.",
+        "Metrics: When --metrics-out is provided, the script writes a JSON file containing at least: backend (string), dry_run (boolean), config_hash (SHA-256 hex of the config content), duration_ms (number), and a counts object with entities, relationships, and indexes, each providing at least planned, created, updated, and skipped integer counters. The counters must accurately reflect the operations planned/applied in that execution.",
+        "Logging: At log level INFO (default), the script logs a summary of operations performed. At DEBUG level, the script logs planned operations. While tests will primarily validate metrics, the implementation must provide comprehensive logging consistent with these expectations.",
+        "Error handling: With an invalid or unreadable config file, the script exits with a non-zero exit code and logs an error. (Test focus remains on the happy path; this criterion guides implementation behavior.)"
+      ]
     },
     {
       "id": "3.4",
@@ -82,7 +91,21 @@
         "tasks/3/tests/test_3_1.py",
         "tasks/3/tests/test_3_4.py"
       ],
-      "acceptance": []
+      "acceptance": [
+        "A Python migration/backfill script exists at module path 'scripts.migrate_child_projects' exposing a callable 'migrate(fetcher, writer, auditor, batch_size=1000, dry_run=False, resume_from=None, logger=None)'.",
+        "The migrate function consumes legacy project records from 'fetcher(resume_from, batch_size)' which yields batches (lists) of dicts with keys: 'id' (int) and 'legacy_parent_id' (int or None).",
+        "For each record where 'legacy_parent_id' is not None, the script writes a single parent->child relation into the new child projects structure via 'writer.create_relation(parent_id, child_id)'.",
+        "Before creating a relation, the script verifies both the parent and child exist using 'writer.exists_project(project_id)' and skips with error logging if either is missing.",
+        "The script prevents invalid relations: self-parenting (parent_id == child_id) must be skipped and counted as failures; such cases must log an error.",
+        "Idempotency: if 'writer.relation_exists(parent_id, child_id)' returns True, the script must not create a duplicate relation. A second run on the same data creates no duplicates and reports the correct number of skipped existing relations.",
+        "Dry-run mode: when 'dry_run=True', no calls to 'writer.create_relation' are made, but processing, logging, and summary counts still reflect what would be processed (created reported as 0).",
+        "Batch processing: the script processes records in batches based on 'batch_size'. If the 'writer' implements optional 'begin_batch()' and 'commit_batch()' methods, the script calls them once per processed batch.",
+        "Resume support: the script accepts 'resume_from' (an integer checkpoint). It must pass 'resume_from' through to 'fetcher'. The script returns a 'checkpoint' value equal to the highest 'id' seen during processing, allowing subsequent runs to resume from that point.",
+        "Audit logging: for each successfully created relation, the script calls 'auditor.log(\"child_project_backfill\", details)', where details includes at least 'parent_id', 'child_id', and 'source' set to 'legacy'.",
+        "Progress and error logging: the script logs batch progress and totals via 'logger.info' and invalid cases via 'logger.error'.",
+        "Summary: the migrate function returns a dict with keys: 'processed' (number of candidate records with non-null legacy_parent_id examined), 'created', 'skipped_existing', 'failed', 'dry_run', and 'checkpoint'. It must satisfy: processed == created + skipped_existing + failed.",
+        "Minimal downtime expectation: the script's batch processing and resume capability allow for online/rolling execution without full-table locks (validated indirectly via batch and resume behavior in tests)."
+      ]
     },
     {
       "id": "3.5",
@@ -96,7 +119,18 @@
         "tasks/3/task.json",
         "tasks/3/tests/test_3_5.py"
       ],
-      "acceptance": []
+      "acceptance": [
+        "Validation: The script verifies referential integrity between parent projects and child projects. After cleanup, no orphan child projects remain (every child.parent_id references an existing parent).",
+        "Uniqueness: For each parent, child project codes are unique. Duplicate child projects (e.g., same parent_id and code or same legacy_id) are detected and remediated by consolidating to a single surviving record according to a deterministic rule (e.g., lowest id or earliest created_at retained). All consolidations are listed in the report.",
+        "Counts reconciliation: When an expected counts mapping is provided (expected child count per parent), deviations are reported. After cleanup, actual counts match expected counts for all parents; any remaining mismatches are flagged as errors in the report.",
+        "Dry-run safety: By default (no --apply), the script performs no data mutations. The report includes planned actions (what would be changed) and executed actions is empty. The dataset remains unchanged.",
+        "Apply mode transactional safety: With --apply, data modifications (e.g., removing duplicates, removing/archiving orphans) are executed within a transaction. On any error, the transaction is rolled back and no partial changes persist. The report clearly indicates rollback and the exit code is non-zero.",
+        "Idempotency: After a successful apply run on a dataset, re-running the script (apply or dry-run) yields zero planned and zero executed actions, and exit code 0.",
+        "Reporting artifacts: The script produces comprehensive reports in both machine-readable JSON and human-readable Markdown in a specified directory. The JSON report includes at minimum: timestamp, summary metrics (total_parents, total_children, errors_count, warnings_count), issues breakdown (orphans, duplicates, count mismatches), planned_actions, executed_actions, and status. The report also references a log file path.",
+        "Audit logging: A detailed log file is generated per run (timestamped) that records validations performed and actions taken (or planned) with stable identifiers. The report contains the absolute path to this log.",
+        "Configuration and policies: The script accepts configuration via CLI flags and/or a config file, including: fail_on severity (errors|warnings|never), duplicate remediation policy (archive or delete duplicates), and report output directory. Missing required confirmation for destructive actions must prevent execution unless explicitly confirmed.",
+        "Exit codes: The script exits with code 0 when no errors are present post-validation/cleanup; 1 when errors remain or a transactional failure occurs; and 2 when only warnings are present (unless fail_on is set to 'never', in which case 0 is returned even if issues are detected)."
+      ]
     }
   ]
 }
