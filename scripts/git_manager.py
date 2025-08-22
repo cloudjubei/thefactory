@@ -92,5 +92,8 @@ class GitManager:
         """
         self._run_command(["checkout", "-b", branch_name])
         
-        self._run_command(["pull", remote, branch_name])
+        try:
+            self._run_command(["pull", remote, branch_name])
+        except Exception:
+                print(f"Branch {branch_name} does not exist on remote {remote}. Continuing without pulling.")
         
