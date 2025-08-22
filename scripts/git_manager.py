@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from typing import List
 
 class GitManager:
@@ -17,23 +18,33 @@ class GitManager:
         self._run_command(["config", "--local", "user.name", "AI Agent"])
         self._run_command(["config", "--local", "user.email", "ai@agent.com"])
 
-    def _run_command(self, command: List[str]) -> str:
+    
+    def _run_command(self, command: list[str], cwd: str = None):
         """
-        Runs a git command and returns the output.
+        Runs a shell command and handles errors.
 
-        :param command: The command to run as a list of strings.
-        :return: The output of the command.
+        Args:
+            command (list[str]): The command to run as a list of strings.
+            cwd (str, optional): The directory to run the command in. Defaults to None.
+
+        Returns:
+            bool: True if the command was successful, False otherwise.
         """
+        print(f"Executing command: {' '.join(command)}")
         try:
-            result = subprocess.run(
-                ["git", "-C", self.repo_path] + command,
+            subprocess.run(
+                ["git"] + command,
+                check=True,
                 capture_output=True,
                 text=True,
-                check=True
+                cwd=cwd or self.repo_path
             )
-            return result.stdout.strip()
+            return True
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Git command failed: {e.stderr.strip()} (stdout: {e.stdout.strip()})") from e
+            print(f"Error executing command: {' '.join(command)}", file=sys.stderr)
+            print(f"Stderr: {e.stderr}", file=sys.stderr)
+            print(f"Stdout: {e.stdout}", file=sys.stderr)
+            return False
 
     def stage_files(self, files: List[str]):
         """
@@ -91,32 +102,30 @@ class GitManager:
         :param branch_name: The name of the branch to create.
         """
 
-        self._run_command(["git", "checkout", "main"])
-        self._run_command(["git", "pull"])
+        self._run_command(["checkout", "main"])
+        self._run_command(["pull"])
 
-        self._run_command(["git", "checkout", "-b", branch_name])
-            if not self._run_command(["git", "checkout", "-b", branch_name]): return False
-            self._run_command(["git", "pull", "origin", branch_name]) # this can fail as this could be a fresh branch
+        self._run_command(["checkout", "-b", branch_name])
         
         try:
             self._run_command(["pull", remote, branch_name])
         except Exception:
                 print(f"Branch {branch_name} does not exist on remote {remote}. Continuing without pulling.")
         
-
-
-        if os.path.exists(self.working_dir):
-            print(f"Cleaning up existing working directory: {self.working_dir}")
-            if not self._run_command(["rm", "-rf", self.working_dir], cwd="/"):
-                return False
-        
-        if not self._run_command(["git", "clone", self.repo_url, self.repo_path], cwd="/"):
-            return False
-            
-        if not self._run_command(["git", "checkout", "main"]): return False
-        if not self._run_command(["git", "pull"]): return False
-        if (branch_name != "main"):
-            if not self._run_command(["git", "checkout", "-b", branch_name]): return False
-            self._run_command(["git", "pull", "origin", branch_name]) # this can fail as this could be a fresh branch
-            
         print(f"Successfully created and checked out branch '{branch_name}' in '{self.repo_path}'")
+
+
+        # if os.path.exists(self.working_dir):
+        #     print(f"Cleaning up existing working directory: {self.working_dir}")
+        #     if not self._run_command(["rm", "-rf", self.working_dir], cwd="/"):
+        #         return False
+        
+        # if not self._run_command(["git", "clone", self.repo_url, self.repo_path], cwd="/"):
+        #     return False
+            
+        # if not self._run_command(["git", "checkout", "main"]): return False
+        # if not self._run_command(["git", "pull"]): return False
+        # if (branch_name != "main"):
+        #     if not self._run_command(["git", "checkout", "-b", branch_name]): return False
+        #     self._run_command(["git", "pull", "origin", branch_name]) # this can fail as this could be a fresh branch
+            
