@@ -215,12 +215,13 @@
         "docs/AGENT_SPECCER.md"
       ],
       "acceptance": [
-        "`docs/AGENT_SPECCER.md` exists",
-        "The document references `docs/FILE_ORGANISATION.md` for file structure guidance",
-        "The document has a section `Tools` that list and describe all tools this agent can use: `get_context(files:[str])->[str]`, `create_feature(task_id:int,feature_id:str,title:string,description:string)->Feature`, `finish_spec(task_id:int)->Feature`, `block_spec(task_id:int,question:str)`",
-        "The document explains that if the work for the agent is done on a feature the `finish_spec` MUST BE USED",
-        "The document explains that creating features that are missing for the task to be complete is mandatory - `create_feature` tool is used for this",
-        "The document explains that if there's any unresolved issue - the `block_task` tool is used for this"
+        "The specification file `docs/AGENT_SPECCER.md` is created or updated.",
+        "The document outlines a clear workflow for the Speccer agent: 1. Analyze the task, 2. Create atomic features, 3. Finish the specification.",
+        "The document contains a 'Tools Reference' section detailing the agent's tools.",
+        "The 'Tools Reference' section defines the `create_feature(title: str, description: str)` tool and its purpose.",
+        "The 'Tools Reference' section defines the `finish_spec()` tool and mandates its use upon completion.",
+        "The 'Tools Reference' section defines the `block_task(reason: str)` tool and mandates its use when blocked.",
+        "The document explicitly references `docs/FILE_ORGANISATION.md` for context on project structure."
       ],
       "dependencies": [
         "1.1",
