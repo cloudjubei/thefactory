@@ -82,6 +82,6 @@ Use the main launcher script, `run.py`, from the root of the repository.
 To run the **developer** agent on **task 2**:
 
 ```bash
-python run.py --agent developer --task 2
+python run.py --agent developer --model gpt-5 --task 2
 ```
 The launcher will handle creating a secure, temporary workspace, copying the project, and then executing the agent logic inside it. All commits will be made on a dedicated `features/2` branch and pushed to the remote repository upon completion.

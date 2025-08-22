@@ -2,7 +2,8 @@
   "id": 3,
   "status": "-",
   "title": "New child projects structure",
-  "description": "Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. This project will only oversee their specification correctness.",
+  "description": "Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work. The first project is `Docker`. We want to be able to run any project (including this + any child project) in a docker environment. It needs to be extremely easy to launch this - ideally a single function call to get it launched and then whatever function call needs to be called inside the running container. As a first example we should be able to launch this project in docker and call `run.py` to launch an agent exactly as defined in `LOCAL_SETUP.md`. There needs to be a step-by-step guide for this that exactly explains it.",
+
   "features": [
     {
       "id": "3.0",
@@ -12,7 +13,8 @@
       "context": [
         "docs/FILE_ORGANISATION.md",
         "docs/tasks/task_format.py",
-        "docs/tasks/task_example.py"
+        "docs/tasks/task_example.py",
+        "docs/LOCAL_SETUP.md"
       ],
       "acceptance": [],
       "plan": ""

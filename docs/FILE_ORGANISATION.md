@@ -49,6 +49,8 @@ repo_root/
 ├─ scripts/
 │  ├─ run_local_agent.py
 │  ├─ task_utils.py
+│  ├─ run_tests.py
+│  ├─ run.py
 │  └─ git_manager.py
 └─ tasks/
    ├─ 1/
