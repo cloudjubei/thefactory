@@ -277,7 +277,7 @@ def create_feature(task_id: int, title: str, description: str, plan: str) -> Fea
         "id": new_id,
         "status": "-",
         "title": title,
-        "action": description,
+        "description": description,
         "plan": plan,
         "context": [],
         "acceptance": [],
