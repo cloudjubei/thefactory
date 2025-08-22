@@ -10,5 +10,16 @@
     "The purpose is to have an agent periodically run in a container and not affect the host machine.",
     "whenever an agent is run on a task - at the beginning a feature branch `features/{task_id}` needs to be created and all code is pushed to it"
   ],
-  "features": []
+  "features": [
+    {
+      "id": "4.0",
+      "status": "-",
+      "title": "Write the features for this",
+      "description": "",
+      "context": [],
+      "acceptance": [
+      ],
+      "plan": ""
+    }
+  ]
 }
