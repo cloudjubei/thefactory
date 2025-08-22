@@ -23,7 +23,7 @@
     },
     {
       "id": "1.2",
-      "status": "-",
+      "status": "+",
       "title": "Example Task File",
       "description": "Maintain a complete and valid example task file at `docs/tasks/task_example.json`.",
       "plan": "1. This file serves as a practical, copy-pasteable template for new tasks. 2. It must always be kept in sync with the canonical schema defined in `task_format.py`.",
