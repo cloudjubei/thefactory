@@ -84,10 +84,13 @@ class GitManager:
         """
         return self._run_command(["rev-parse", "--abbrev-ref", "HEAD"])
 
-    def create_branch_and_checkout(self, branch_name: str):
+    def create_branch_and_checkout(self, branch_name: str, remote: str = "origin"):
         """
         Creates and checks out a new branch.
 
         :param branch_name: The name of the branch to create.
         """
         self._run_command(["checkout", "-b", branch_name])
+        
+        self._run_command(["pull", remote, branch_name])
+        

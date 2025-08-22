@@ -1,6 +1,6 @@
 {
   "id": 4,
-  "status": "-",
+  "status": "+",
   "title": "Running in docker",
   "description": "Create a workflow to running the project in docker, i.e. isolated environment.",
   "features": [
@@ -104,7 +104,7 @@
     },
     {
       "id": "4.6",
-      "status": "~",
+      "status": "+",
       "title": "Integrate git workflow for feature branches in agent runs",
       "description": "Modify the agent execution logic to create a feature branch named features/{task_id} at the start of each task and push all code changes to it, ensuring this works within the Docker container.",
       "context": [
