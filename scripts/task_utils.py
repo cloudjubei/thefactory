@@ -264,9 +264,9 @@ def find_next_available_feature(task: Task, exclude_ids: set = set()) -> Optiona
     return None
 
 
-def create_feature(task_id: int, title: str, description: str, plan: str) -> Feature:
+def create_feature(task_id: int, title: str, description: str) -> Feature:
     """
-    Creates a new feature with a given title, description, and plan, and adds it to the specified task.
+    Creates a new feature with a given title, description, and adds it to the specified task.
     This tool automatically generates a new feature ID.
     """
     task = get_task(task_id)
@@ -289,7 +289,7 @@ def create_feature(task_id: int, title: str, description: str, plan: str) -> Fea
         "status": "-",
         "title": title,
         "description": description,
-        "plan": plan,
+        "plan": "",
         "context": [],
         "acceptance": [],
     }
