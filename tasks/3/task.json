@@ -119,7 +119,18 @@
         "tasks/3/task.json",
         "tasks/3/tests/test_3_5.py"
       ],
-      "acceptance": []
+      "acceptance": [
+        "Validation: The script verifies referential integrity between parent projects and child projects. After cleanup, no orphan child projects remain (every child.parent_id references an existing parent).",
+        "Uniqueness: For each parent, child project codes are unique. Duplicate child projects (e.g., same parent_id and code or same legacy_id) are detected and remediated by consolidating to a single surviving record according to a deterministic rule (e.g., lowest id or earliest created_at retained). All consolidations are listed in the report.",
+        "Counts reconciliation: When an expected counts mapping is provided (expected child count per parent), deviations are reported. After cleanup, actual counts match expected counts for all parents; any remaining mismatches are flagged as errors in the report.",
+        "Dry-run safety: By default (no --apply), the script performs no data mutations. The report includes planned actions (what would be changed) and executed actions is empty. The dataset remains unchanged.",
+        "Apply mode transactional safety: With --apply, data modifications (e.g., removing duplicates, removing/archiving orphans) are executed within a transaction. On any error, the transaction is rolled back and no partial changes persist. The report clearly indicates rollback and the exit code is non-zero.",
+        "Idempotency: After a successful apply run on a dataset, re-running the script (apply or dry-run) yields zero planned and zero executed actions, and exit code 0.",
+        "Reporting artifacts: The script produces comprehensive reports in both machine-readable JSON and human-readable Markdown in a specified directory. The JSON report includes at minimum: timestamp, summary metrics (total_parents, total_children, errors_count, warnings_count), issues breakdown (orphans, duplicates, count mismatches), planned_actions, executed_actions, and status. The report also references a log file path.",
+        "Audit logging: A detailed log file is generated per run (timestamped) that records validations performed and actions taken (or planned) with stable identifiers. The report contains the absolute path to this log.",
+        "Configuration and policies: The script accepts configuration via CLI flags and/or a config file, including: fail_on severity (errors|warnings|never), duplicate remediation policy (archive or delete duplicates), and report output directory. Missing required confirmation for destructive actions must prevent execution unless explicitly confirmed.",
+        "Exit codes: The script exits with code 0 when no errors are present post-validation/cleanup; 1 when errors remain or a transactional failure occurs; and 2 when only warnings are present (unless fail_on is set to 'never', in which case 0 is returned even if issues are detected)."
+      ]
     }
   ]
 }
