@@ -1,6 +1,6 @@
 {
   "id": 1,
-  "status": "+",
+  "status": "-",
   "title": "Task Management System Definition",
   "description": "Define and maintain the core components of the agent's task management system. This task serves as the canonical source of truth for task structure, guidance, and tooling.",
   "features": [
@@ -107,7 +107,7 @@
         "The document references `docs/tasks/task_format.py` for the task schema",
         "The document references `docs/tasks/task_example.json` for the task example",
         "The document references `docs/AGENT_COMMUNICATION_PROTOCOL.md` and `docs/agent_response_example.json` to explain how the communication protocol works and how to respond",
-        "The document has a section `Tools` that list and describe all tools this agent can use: `create_task(task:Task)->Task`, `create_feature(feature:Feature)->Feature`, `update_task(id:int,title:str,action:str,plan:str)->Task`, `update_feature(task_id:int,feature_id:str,title:str,action:str,context:[str],plan:str)->Feature`, `block_feature(task_id:int,feature_id:str,reason:str)`",
+        "The document has a section `Tools` that list and describe all tools this agent can use: `create_feature(feature:Feature)->Feature`, `update_plan(task_id:int,feature_id:str,plan:str)->Task`, `finish_feature(task_id:int,feature_id:str)->Feature`, `block_feature(task_id:int,feature_id:str,reason:str)`",
         "The document explains that creating a task with features that clearly describe the full scope of the task is mandatory - `create_task` tool is used for this",
         "The document explains that creating features that are missing for the task to be complete is mandatory - `create_feature` tool is used for this",
         "The document explains that the task requires a generic high level plan - `update_task` tool is used for this",
@@ -126,7 +126,7 @@
       "id": "1.7",
       "status": "+",
       "title": "Plan specification for Tester",
-      "description": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_TESTER.md` serve as their starting point and guide.",
+      "description": "Create a specification for the tester task that describes how to create acceptance criteria for each feature, and in turn the tests that verify the acceptance criteria. This document is meant to be directly passed to a tester agent to serve as their starting point and guide.",
       "context": [
         "docs/TESTING.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
@@ -136,14 +136,11 @@
       "acceptance": [
         "`docs/AGENT_TESTER.md` exists",
         "The document references `docs/TESTING.md` for testing guidance",
-        "The document references `docs/AGENT_COMMUNICATION_PROTOCOL.md` and `docs/agent_response_example.json` to explain how the communication protocol works and how to respond",
-        "The document has a section `Tools` that list and describe all tools this agent can use: `get_test(task_id:int,feature_id:str)->str?`, `update_acceptance_criteria(task_id:int,feature_id:str,criteria:[str])->Feature`, `update_test(task_id:int,feature_id:str,test:str)`, `delete_test(task_id:int,feature_id:str)`, `run_test(task_id:int,feature_id:str)->TestResult`, `update_task_status(task_id:int,status:Status)->Task`, `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`, `block_feature(task_id:int,feature_id:str,question:str)`",
+        "The document has a section `Tools` that list and describe all tools this agent can use: ` `update_acceptance_criteria(task_id:int,feature_id:str,criteria:[str])->Feature`, `update_test(task_id:int,feature_id:str,test:str)`, `delete_test(task_id:int,feature_id:str)`, `run_test(task_id:int,feature_id:str)->TestResult`, `finish_feature(task_id:int,feature_id:str)->Feature`, `block_feature(task_id:int,feature_id:str,question:str)`",
         "The document explains that for each feature the required context needs to be gathered, for this persona it means the test for that feature - `get_test` tool is used for this, but this should be directly passed in the initial context",
         "The document explains that each feature requires rigorous and atomic acceptance criteria - `update_acceptance_criteria` tool is used for this",
-        "The document explains that each feature requires tests written that match each acceptance criteria - `update_test`, `delete_test` tools are used for this",
+        "The document explains that each feature requires tests written that match each acceptance criteria - `update_test` tool is used for this",
         "The document explains that the tester can run tests - `run_test` tool is used for this",
-        "The document explains that the task status needs to be updated when work is not finished - `update_task_status` tool is used for this",
-        "The document explains that each feature status needs to be updated when work is not finished - `update_feature_status` tool is used for this",
         "The document explains that if there's any unresolved issue - the `block_feature` tool is used for this"
       ],
       "dependencies": [
@@ -158,7 +155,7 @@
       "id": "1.8",
       "status": "+",
       "title": "Plan specification for Developer",
-      "description": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a tester agent and alongside `docs/AGENT_DEVELOPER.md` serve as their starting point and guide.",
+      "description": "Create a specification for the developer task that describes how to implement each feature. This document is meant to be directly passed to a developer agent to serve as their starting point and guide.",
       "context": [
         "docs/FILE_ORGANISATION.md",
         "docs/AGENT_COMMUNICATION_PROTOCOL.md",
@@ -167,19 +164,11 @@
       ],
       "acceptance": [
         "`docs/AGENT_DEVELOPER.md` exists",
-        "The document references `docs/AGENT_DEVELOPER.md` for agent developer guidance",
         "The document references `docs/FILE_ORGANISATION.md` for file structure guidance",
-        "The document references `docs/AGENT_COMMUNICATION_PROTOCOL.md` and `docs/agent_response_example.json` to explain how the communication protocol works and how to respond",
-        "The document has a section `Tools` that list and describe all tools this agent can use: `get_context(files:[str])->[str]`, `write_file(filename:str,content:str)`,`run_test(task_id:int,feature_id:str)->TestResult`, `update_task_status(task_id:int,status:Status)->Task`, `update_feature_status(task_id:int,feature_id:str,status:Status)->Feature`, `finish_feature(task_id:int,feature_id:str)->Feature`, `finish(task_id:int)->Task`,`block_feature(task_id:int,feature_id:str,question:str)`",
-        "The document explains that the task status is updated to in progress - `update_task_status` tool is used for this",
-        "The document explains that for each feature that is worked on the status is updated to in progress - `update_feature_status` tool is used for this",
-        "The document explains that for each feature the context needs to be gathered - `get_context` tool is used for this, but this should be directly passed in the initial context and should only be used in very rare cases",
+        "The document has a section `Tools` that list and describe all tools this agent can use: `get_context(files:[str])->[str]`, `write_file(filename:str,content:str)`,`run_test(task_id:int,feature_id:str)->TestResult`, `finish_feature(task_id:int,feature_id:str)->Feature`, `block_feature(task_id:int,feature_id:str,question:str)`",
         "The document explains that for each feature the plan needs to be carried out - `write_file` tool is used for writing any files",
         "The document explains that for each feature the task isn't deemed done until all tests pass - `run_test` tool is used for this",
-        "The document explains that for each feature the status needs to be updated when work is finished - `update_feature_status` tool is used for this",
-        "The document explains that the task status needs to be updated when work is finished - `update_task_status` tool is used for this",
         "The document explains that if the work for the agent is done on a feature the `finish_feature` MUST BE USED",
-        "The document explains that if the work for the agent is done on a task the `finish` MUST BE USED",
         "The document explains that if there's any unresolved issue - the `block_feature` tool is used for this"
       ],
       "dependencies": [
@@ -189,6 +178,34 @@
         "1.4"
       ],
       "plan": "# Implementation Plan for Feature 1.8: Plan Specification for Developer\n\n**Objective**: Create a specification document that describes how developers should implement each feature in the system. This document will be passed to the tester agent along with `docs/AGENT_DEVELOPER.md` to serve as their starting point and guide for defining acceptance criteria and tests.\n\n**Step-by-Step Implementation Guide for the Developer**:\n\n1. **Analyze the Requirement**: Review the feature description. Understand that the specification must provide a general, reusable guide for implementing any feature, expanding on the workflow in `docs/AGENT_DEVELOPER.md`. It should be detailed enough for testers to base their criteria on it.\n\n2. **Determine File Location**: The document should be created as a new Markdown file named `docs/DEVELOPER_IMPLEMENTATION_SPEC.md`.\n\n3. **Craft the Content**: Use the `write_file` tool to create the file with the following structure and content:\n\n   ```markdown\n   # Specification for Developer Task: Implementing Features\n\n   This document provides a standardized specification for how developers should implement each assigned feature in the Task Management System. It serves as a guide for developers and is provided to tester agents alongside `docs/AGENT_DEVELOPER.md` to inform acceptance criteria and test creation.\n\n   ## Overview\n   For each feature, the developer receives a detailed implementation plan from the planner. The developer must follow the plan while adhering to the general workflow: implement changes, test, and complete or block.\n\n   ## Step-by-Step Process for Implementing a Feature\n   1. **Review Assignment**: Read the feature description, ID, and the provided implementation plan. Analyze requirements and use `get_context` to retrieve any necessary existing files or documentation if critical information is missing.\n   \n   2. **Plan Execution**: Break down the provided plan into actionable tasks. Identify files to create or modify.\n   \n   3. **Implement Changes**: Use the `write_file` tool to write or update code/files as specified in the plan. Ensure all changes align with the system's architecture.\n   \n   4. **Handle Dependencies**: If the feature requires new tools, agents, or integrations, implement them carefully, testing incrementally.\n   \n   5. **Testing**: Create or update the test script for the feature. Use `run_test` to execute it. Debug and iterate until all tests pass. Tests should verify that the implementation meets the plan's requirements.\n   \n   6. **Completion**: Once tests pass, call `finish_feature` to commit the work and mark the feature as done.\n   \n   7. **Blocking**: If stuck (e.g., unclear requirements, tool issues), call `block_feature` with a clear reason.\n\n   ## Best Practices\n   - Keep changes minimal and focused on the feature.\n   - Document code where necessary.\n   - Ensure compatibility with existing system components.\n\n   This specification ensures consistent implementations and enables testers to define verifiable criteria based on these steps.\n   ```\n\n4. **Validate**: After writing the file, use `get_context` to read it back and confirm the content is correct. If a test exists for this feature (e.g., checking file existence and content), use `run_test` to verify.\n\n5. **Complete the Feature**: If everything is correct and tests pass (or if no test is needed for this documentation task), call `finish_feature`. If blocked, use `block_feature` with the reason."
+    },
+    {
+      "id": "1.9",
+      "status": "-",
+      "title": "Plan specification for Contexter",
+      "description": "Create a specification for the contexter task that describes how to provide context to each feature. This document is meant to be directly passed to a contexter agent to serve as their starting point and guide.",
+      "context": [
+        "docs/FILE_ORGANISATION.md",
+        "docs/AGENT_COMMUNICATION_PROTOCOL.md",
+        "docs/agent_response_example.json",
+        "docs/AGENT_CONTEXTER.md"
+      ],
+      "acceptance": [
+        "`docs/AGENT_CONTEXTER.md` exists",
+        "The document references `docs/FILE_ORGANISATION.md` for file structure guidance",
+        "The document has a section `Tools` that list and describe all tools this agent can use: `get_context(files:[str])->[str]`, `update_feature_context(task_id:int,feature_id:str,context:[str])->Feature`, `finish_feature(task_id:int,feature_id:str)->Feature`, `block_feature(task_id:int,feature_id:str,question:str)`",
+        "The document explains that for each feature the minimal file context needs to be established - `update_feature_context` tool is used for this",
+        "The document explains that for each feature the `docs/FILE_ORGANISATION.md` should be enough, but if not then extra context needs to be gathered - `get_context` tool is used for this",
+        "The document explains that if the work for the agent is done on a feature the `finish_feature` MUST BE USED",
+        "The document explains that if there's any unresolved issue - the `block_feature` tool is used for this"
+      ],
+      "dependencies": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "1.4"
+      ],
+      "plan": "# Specification for Contexter Agent\n\n## Overview\nYou are the Contexter agent in a task management system development pipeline. Your primary role is to enrich each assigned feature with relevant context from the overall project, ensuring that subsequent agents (like planners, implementers, or reviewers) have the necessary background to perform their tasks effectively. This context helps avoid redundancy, ensures consistency, and provides insights into dependencies, architecture, and prior decisions.\n\nThe context you provide should be concise, relevant, and directly tied to the feature's requirements. Avoid overloading with unnecessary details.\n\n## Step-by-Step Process\nFollow these steps for each feature you receive:\n\n1. **Receive and Analyze the Feature**:\n   - Input: A feature object with fields like ID, name, description, and any existing plan or status.\n   - Analyze: Read the description carefully. Identify key elements such as functionalities, dependencies, user interactions, data flows, or integrations. Note any ambiguities or areas where context could clarify implementation.\n\n2. **Identify Required Context**:\n   - Determine what types of context are needed based on the feature. Common categories include:\n     - **Project Architecture**: High-level system design, modules, tech stack (e.g., if the project uses Python, Flask, SQL databases).\n     - **Related Features**: References to other features that this one depends on, extends, or interacts with (e.g., if this feature is about user authentication, reference the user management feature).\n     - **Previous Decisions**: Any design choices, patterns, or conventions established in the project (e.g., error handling standards, naming conventions).\n     - **External Dependencies**: APIs, libraries, or tools mentioned or implied.\n     - **Assumptions and Constraints**: Any project-wide assumptions (e.g., security requirements, performance goals).\n     - **Historical Context**: If applicable, notes from prior iterations or changes to similar features.\n   - Prioritize context that directly impacts the feature's implementation or planning.\n\n3. **Gather Context**:\n   - Use available tools or knowledge bases:\n     - Query project documentation, architecture diagrams, or feature lists.\n     - If tools like `get_context(files: list[str])` are available, use them to retrieve contents from relevant files (e.g., 'architecture.md', 'features.json').\n     - Cross-reference with the overall task management system goals (e.g., building a scalable system for task assignment and tracking).\n     - If context is missing or unclear, note it and suggest blocking the feature if critical (using tools like `block_feature`).\n\n4. **Compile and Synthesize Context**:\n   - Organize the gathered information into a clear, structured format.\n   - Make it concise: Aim for 200-500 words, using bullet points or sections for readability.\n   - Ensure neutrality and fact-based; do not add unsubstantiated opinions.\n   - Example Structure:\n     - **System Overview**: Brief summary.\n     - **Dependencies**: List of related features or components.\n     - **Key Guidelines**: Dos and don'ts for this feature.\n     - **References**: Links or pointers to documents/files.\n\n5. **Update the Feature**:\n   - Add a new field to the feature object, such as 'context', containing the compiled information.\n   - If the system allows, append to the description or create a separate document.\n   - Ensure the updated feature remains in a valid format (e.g., JSON).\n\n6. **Validate and Output**:\n   - Review: Does the context adequately support the feature? Is it relevant and complete?\n   - Output: Use appropriate tools to save or pass the updated feature (e.g., `update_feature` if available).\n   - If ready, mark the feature as contextualized and ready for the next stage (e.g., planning or implementation).\n\n## Guidelines\n- **Relevance**: Only include context that directly aids the feature. Irrelevant info wastes time.\n- **Accuracy**: Base context on verified project knowledge; if unsure, seek clarification.\n- **Consistency**: Use consistent formatting across features for easy reading.\n- **Edge Cases**: For foundational features, context might be minimal; for advanced ones, it could be extensive.\n- **Tools Usage**: Leverage tools efficiently; e.g., don't request unnecessary files.\n- **Blocking**: If critical context is missing (e.g., undefined dependencies), block the feature with a reason.\n\n## Example\nFor a feature 'Implement User Login (ID: 2.1)':\n- Context might include: 'This feature depends on User Model from Feature 1.2. Use JWT for authentication as per security guidelines in 'security.md'. Integrate with task assignment module.'\n\nFollow this specification strictly for each task. Respond in the required JSON format with thoughts and tool calls."
     }
   ]
 }
