@@ -3,22 +3,15 @@
   "status": "-",
   "title": "Running in docker",
   "description": "Create a workflow to running the project in docker, i.e. isolated environment.",
-  "acceptance": [
-    "The file `docs/docker/RUNNING_DOCKER_README.md` exists detailing the steps involved in running the project in a container environment.",
-    "A `docs/docker/Dockerfile` exists that a user can copy and use. ",
-    "A script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in a prepare `.env` file that the script will look into and set everything up.",
-    "The purpose is to have an agent periodically run in a container and not affect the host machine.",
-    "whenever an agent is run on a task - at the beginning a feature branch `features/{task_id}` needs to be created and all code is pushed to it"
-  ],
   "features": [
     {
       "id": "4.0",
       "status": "-",
       "title": "Create all the  missing features for this using `create_feature`",
-      "description": "",
+      "description": "The file docs/docker/RUNNING_DOCKER_README.md exists detailing the steps involved in running the project in a container environment. A docs/docker/Dockerfile exists that a user can copy and use. A script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in a prepare .env file that the script will look into and set everything up. The purpose is to have an agent periodically run in a container and not affect the host machine. Whenever an agent is run on a task - at the beginning a feature branch features/{task_id} needs to be created and all code is pushed to it",
       "context": [],
       "acceptance": [],
-      "plan": "Detailed Implementation Plan for Feature 4.0: Write the features for 'Running in docker'\n\nThe main task is to enable the application to run in Docker. To achieve this, we define the following sub-features with their implementation steps:\n\nSub-feature 4.1: Create Dockerfile\nDescription: Write a Dockerfile to build the application image.\nSteps:\n1. Start with a base image, e.g., FROM python:3.9-slim.\n2. Set the working directory, e.g., WORKDIR /app.\n3. Copy requirements.txt and install dependencies: COPY requirements.txt . then RUN pip install -r requirements.txt.\n4. Copy the application code: COPY . .\n5. Expose necessary ports, e.g., EXPOSE 80.\n6. Set the entrypoint, e.g., CMD ['python', 'app.py'].\n\nSub-feature 4.2: Create .dockerignore file\nDescription: Create a .dockerignore file to optimize the build context by excluding unnecessary files.\nSteps:\n1. Create a file named .dockerignore in the project root.\n2. Add patterns like: __pycache__ , *.pyc , .git , .env , etc.\n\nSub-feature 4.3: Document Docker usage\nDescription: Update the README.md with instructions for building and running the Docker image.\nSteps:\n1. Add a section 'Running in Docker' to README.md.\n2. Include commands: docker build -t myapp . \n3. docker run -d -p 80:80 --name myapp-container myapp\n4. Explain any environment variables or volume mounts needed.\n\nThis plan outlines the necessary sub-features and steps to fully implement running the application in Docker."
+      "plan": ""
     }
   ]
 }
