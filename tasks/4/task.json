@@ -66,7 +66,14 @@
       "id": "4.6",
       "status": "-",
       "title": "Integrate git workflow for feature branches in agent runs",
-      "description": "Modify the agent execution logic to create a feature branch named features/{task_id} at the start of each task and push all code changes to it, ensuring this works within the Docker container."
+      "description": "Modify the agent execution logic to create a feature branch named features/{task_id} at the start of each task and push all code changes to it, ensuring this works within the Docker container.",
+      "context": [
+        "scripts/run_local_agent.py",
+        "scripts/git_manager.py",
+        "scripts/task_utils.py",
+        "docs/LOCAL_SETUP.md",
+        "Dockerfile"
+      ]
     }
   ]
 }
