@@ -16,7 +16,7 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Launcher for the autonomous AI agent.")
     parser.add_argument("--model", type=str, default="gpt-4-turbo-preview", help="LLM model name.")
-    parser.add_argument("--agent", type=str, required=True, choices=['developer', 'tester', 'planner', 'contexter'], help="Agent persona.")
+    parser.add_argument("--agent", type=str, required=True, choices=['developer', 'tester', 'planner', 'contexter', 'speccer'], help="Agent persona.")
     parser.add_argument("--task", type=int, help="Optional: Specify a task ID to work on.")
     args = parser.parse_args()
 
