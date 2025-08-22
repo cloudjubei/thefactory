@@ -1,125 +1,23 @@
 {
   "id": 4,
-  "status": "+",
+  "status": "-",
   "title": "Running in docker",
-  "description": "Create a workflow to running the project in docker, i.e. isolated environment.",
+  "description": "Child project - workflow for running projects in docker, i.e. isolated environment.",
   "features": [
     {
-      "id": "4.1",
-      "status": "+",
-      "title": "Create Dockerfile for the project",
-      "description": "Create a file at docs/docker/Dockerfile that sets up the environment for running the project in a Docker container. It should include installing dependencies, copying necessary files, handling .env for API keys, and setting the entrypoint for running the agent periodically.",
-      "context": [
-        "requirements.txt",
-        ".env.example",
-        "scripts/run_local_agent.py"
-      ],
-      "plan": "Step 1: Ensure the directory docs/docker exists; if not, create it.\nStep 2: Create a new file named Dockerfile inside docs/docker.\nStep 3: Choose a base image. Use FROM python:3.10-slim as the base, assuming the project is Python-based. If the project requires a different version or base, adjust accordingly.\nStep 4: Set the working directory with WORKDIR /app.\nStep 5: Install system dependencies if needed (e.g., RUN apt-get update && apt-get install -y cron for periodic running if using cron).\nStep 6: Copy requirements.txt (assuming it exists at project root) with COPY requirements.txt . and install dependencies with RUN pip install --no-cache-dir -r requirements.txt.\nStep 7: Copy the necessary project files with COPY . . (excluding sensitive files via .dockerignore if needed).\nStep 8: Handle .env: Do not copy actual .env into the image for security. Instead, COPY .env.example .env.example if it exists, and add a comment in Dockerfile noting that API keys should be passed at runtime using docker run --env-file .env or -e flags.\nStep 9: For periodic running, create an entrypoint script (e.g., entrypoint.sh) that runs the agent (assuming main.py or similar) in a loop with sleep (e.g., while true; do python main.py; sleep 3600; done) for hourly runs. Alternatively, set up cron: ADD crontab /etc/cron.d/agent-cron, RUN chmod 0644 /etc/cron.d/agent-cron && crontab /etc/cron.d/agent-cron, and set CMD ['cron', '-f']. Choose the loop method for simplicity unless cron is required.\nStep 10: Set the entrypoint with ENTRYPOINT ['./entrypoint.sh'] or appropriate command.\nStep 11: Add any necessary EXPOSE for ports if the agent serves something, and VOLUME if persistent data is needed.\nStep 12: Test the Dockerfile by building and running the container locally, ensuring dependencies install, .env is handled via runtime, and the agent runs periodically.",
-      "acceptance": [
-        "The file 'docs/docker/Dockerfile' exists.",
-        "The Dockerfile uses a Python base image (e.g., FROM python:...).",
-        "The Dockerfile includes instructions to install dependencies from requirements.txt.",
-        "The Dockerfile copies the necessary project files into the container.",
-        "The Dockerfile handles the .env file for API keys (e.g., via COPY or volume).",
-        "The Dockerfile sets an ENTRYPOINT or CMD for running the agent periodically."
-      ]
-    },
-    {
-      "id": "4.2",
-      "status": "+",
-      "title": "Create README for running in Docker",
-      "description": "Create a file at docs/docker/RUNNING_DOCKER_README.md detailing the steps to build and run the project in Docker, including how to prepare .env, use the build script, and run the container periodically.",
-      "context": [
-        "docs/LOCAL_SETUP.md",
-        "docs/FILE_ORGANISATION.md",
-        "scripts/run_local_agent.py"
-      ],
-      "plan": "Detailed Implementation Plan for Feature ID 4.2: Create README for running in Docker\n\n1. Check if the directory 'docs/docker' exists in the project root. If it does not exist, create it to organize Docker-related documentation.\n\n2. Create a new Markdown file named 'RUNNING_DOCKER_README.md' inside the 'docs/docker' directory.\n\n3. Populate the file with the following structured content in Markdown format. Ensure the language is clear, concise, and user-friendly, using headings, bullet points, and code blocks for commands.\n\n   - **Title**: # Running the Project in Docker\n\n   - **Introduction Section**: Provide a brief overview of the purpose of this README, e.g., 'This document guides you through building and running the project inside a Docker container, including environment setup and periodic execution.'\n\n   - **Prerequisites Section**: List requirements such as:\n     - Docker installed on your system (version 20.10 or later recommended).\n     - Access to the project repository.\n     - Basic knowledge of command-line operations.\n     - Any other dependencies like Git if cloning is needed.\n\n   - **Preparing the .env File Section**:\n     - Explain the importance of the .env file for configuration (e.g., it holds environment variables like API keys, database URLs).\n     - Steps:\n       1. Locate or create '.env.example' in the project root (assume it exists or will be created in related features).\n       2. Copy '.env.example' to '.env' using command: `cp .env.example .env`.\n       3. Open '.env' in a text editor and fill in the required values (list example variables like DATABASE_URL, API_KEY, etc., based on project needs).\n       4. Save the file and ensure it's not committed to version control (add to .gitignore if needed).\n\n   - **Building the Docker Image Section**:\n     - Describe using the build script (assume it's at 'scripts/build_docker.sh' or similar; adjust if needed).\n     - Steps:\n       1. Make the script executable if necessary: `chmod +x scripts/build_docker.sh`.\n       2. Run the build script: `./scripts/build_docker.sh`.\n       3. Explain what the script does (e.g., builds the image using Dockerfile, tags it as 'project-name:latest').\n       4. Verify the image: `docker images` to check if it's listed.\n\n   - **Running the Container Section**:\n     - Provide commands to run the container once.\n     - Steps:\n       1. Run the container: `docker run -d --env-file .env --name project-container project-name:latest` (adjust flags as needed, e.g., -p for ports, -v for volumes).\n       2. Check logs: `docker logs project-container`.\n       3. Stop the container: `docker stop project-container`.\n\n   - **Running the Container Periodically Section**:\n     - Explain options for periodic execution, such as using host system's cron job or Docker's restart policies.\n     - Steps for cron job approach:\n       1. Create a script to start the container, e.g., 'run_periodic.sh' with `docker run ...` command.\n       2. Set up cron: `crontab -e` and add e.g., `0 * * * * /path/to/run_periodic.sh` for hourly runs.\n     - Alternative: Use Docker restart policy for always running, but note it's not truly periodic; for true periodicity, recommend cron or external schedulers like Kubernetes jobs.\n     - Warn about resource usage and logging for periodic runs.\n\n   - **Troubleshooting Section**: Add common issues and solutions, e.g., permission errors, image not found, .env issues.\n\n   - **Conclusion**: Encourage testing and provide links to official Docker docs if needed.\n\n4. Ensure the file is properly formatted, spell-checked, and saved.\n\n5. Commit the changes to the repository with a meaningful message, e.g., 'Add README for running in Docker (Feature 4.2)'.\n\nThis plan ensures the feature is implemented comprehensively and the README is informative.",
-      "acceptance": [
-        "The file 'docs/docker/RUNNING_DOCKER_README.md' exists.",
-        "The README includes instructions for preparing the .env file.",
-        "The README includes steps to use the build script.",
-        "The README includes instructions on running the container periodically."
-      ]
-    },
-    {
-      "id": "4.3",
-      "status": "+",
-      "title": "Create build script for Docker",
-      "description": "Create a script (e.g., scripts/build_docker.sh) that clones the repository, checks for a prepared .env file with API keys, builds the Docker image using the Dockerfile, and provides instructions for running the container.",
+      "id": "4.0",
+      "status": "-",
+      "title": "Docker workflow - use the `create_feature` tool to create atomic features for this task",
+      "description": "adhere to `docs/PROJECTS_GUIDE.md` to create all needed features for any project to be able to run in docker. It must be possible to do this with a minimal amount of steps and configuration. As much as possible should be configured for the user - if possible any data already present in THIS project should be reused.",
+      "plan": "",
       "context": [
         "docs/FILE_ORGANISATION.md",
-        "docs/docker/Dockerfile",
-        ".env.example",
-        "docs/docker/RUNNING_DOCKER_README.md",
-        "docs/LOCAL_SETUP.md",
-        "scripts/run_local_agent.py"
-      ],
-      "plan": "Detailed Implementation Plan for Feature 4.3: Create build script for Docker\n\n1. Create a directory named 'scripts' in the project root if it does not already exist.\n\n2. Create a new file named 'scripts/build_docker.sh' in the 'scripts' directory.\n\n3. Add the shebang line at the top of the script: #!/bin/bash\n\n4. Define variables in the script, such as REPO_URL (e.g., 'https://github.com/username/repo.git'), CLONE_DIR (e.g., 'project'), IMAGE_NAME (e.g., 'ai-agent-system').\n\n5. Add a section to clone the repository: Check if the CLONE_DIR exists; if yes, pull updates with 'git pull'; if not, clone using 'git clone $REPO_URL $CLONE_DIR'.\n\n6. Change directory into the cloned project: cd $CLONE_DIR\n\n7. Add a check for the .env file: If '.env' does not exist, echo instructions to create it (e.g., 'cp .env.example .env' and add API keys), and exit the script if missing.\n\n8. Build the Docker image: Use 'docker build -t $IMAGE_NAME .' to build using the Dockerfile in the project root.\n\n9. Add error handling: Check if docker build succeeds; if not, echo an error message and exit.\n\n10. Provide instructions for running the container: Echo commands like 'docker run -d -p 8000:8000 --env-file .env $IMAGE_NAME' and any additional options (e.g., volume mounts if needed).\n\n11. Make the script executable: Add 'chmod +x scripts/build_docker.sh' in the plan or handle via git permissions.\n\n12. Test the script: Ensure it handles cases like missing git/docker, existing clones, and missing .env.\n\n13. Commit the script to the repository with a meaningful commit message.",
-      "acceptance": [
-        "The script exists at scripts/build_docker.sh",
-        "The script is a bash script with a proper shebang",
-        "The script includes a command to clone the repository",
-        "The script checks for the presence of a .env file and handles its absence",
-        "The script includes a command to build the Docker image using the Dockerfile",
-        "The script outputs instructions for running the Docker container"
-      ]
-    },
-    {
-      "id": "4.4",
-      "status": "+",
-      "title": "Handle API keys via .env in Docker setup",
-      "description": "Ensure the Dockerfile and build script handle a .env file for API keys, copying it into the container during build or mounting it at runtime to avoid exposing keys on the host.",
-      "context": [
-        "docs/LOCAL_SETUP.md",
+        "run.py",
         "requirements.txt",
-        "scripts/run_local_agent.py"
-      ],
-      "plan": "Step 1: Create an .env.example file in the project root with placeholder values for API keys (e.g., OPENAI_API_KEY=your_key_here). This allows users to copy and fill in their own .env without committing secrets.\n\nStep 2: Ensure .gitignore includes .env and .env.* to prevent accidental commits (already present based on context).\n\nStep 3: Create a Dockerfile in the project root. The Dockerfile should:\n- Use a base image like python:3.10-slim.\n- Set the working directory to /app.\n- Copy requirements.txt and install dependencies with pip.\n- Copy the application code.\n- Set the entrypoint to run the main application (e.g., CMD ['python', 'main.py']).\n- Importantly, do NOT copy .env into the image to avoid embedding secrets.\n\nStep 4: Create a docker-compose.yml file in the project root for easier management. Configure it to:\n- Define a service for the app.\n- Build from the Dockerfile.\n- Mount the host's .env file to /app/.env inside the container (e.g., volumes: ['./.env:/app/.env']).\n- Set environment variables or use env_file if needed, but mounting allows the app to load dynamically.\n- Expose necessary ports if the app has a web interface.\n\nStep 5: If a build script is required (e.g., build.sh), create it to:\n- Build the Docker image using 'docker build -t myapp .' without including .env.\n- Optionally, include commands to run docker-compose up, which will handle mounting .env at runtime.\n- Make the script executable (chmod +x build.sh).\n\nStep 6: Update the application code (e.g., main.py or config.py) to load environment variables from .env using python-dotenv (install via requirements.txt if not already).\n- Example: from dotenv import load_dotenv; load_dotenv(); api_key = os.getenv('OPENAI_API_KEY')\n\nStep 7: Add instructions to README.md (create if not exists) on how to set up .env from .env.example, build the image, and run with docker-compose to ensure secure handling of API keys.\n\nStep 8: Test the setup locally: Create a .env with real keys, run docker-compose up, and verify the app loads the keys without them being exposed in the image or host beyond the mount.",
-      "acceptance": [
-        "Dockerfile exists and does not COPY .env or any secret files into the image to prevent baking API keys into the Docker image.",
-        "docker-compose.yml exists and uses 'env_file: .env' or an equivalent mechanism to load environment variables from .env at runtime.",
-        "A build or run script (e.g., build.sh or docker-compose up) handles .env without exposing keys in the image or repo.",
-        ".env is ignored by .gitignore to avoid committing API keys to the repository (already satisfied).",
-        "When the container is run, environment variables from .env are accessible inside the container, but .env is not present in the Docker image layers."
-      ]
-    },
-    {
-      "id": "4.5",
-      "status": "+",
-      "title": "Ensure container isolation for periodic agent runs",
-      "description": "Configure the Docker setup so that the agent can run periodically inside the container without affecting the host machine, possibly using cron or a loop in the entrypoint script.",
-      "context": [
-        "docs/docker/Dockerfile",
-        "entrypoint.sh",
-        "scripts/run_local_agent.py"
-      ],
-      "plan": "Step-by-step implementation plan for Feature 4.5: Ensure container isolation for periodic agent runs\n\n1. **Create Dockerfile:**\n   - Use a base image like python:3.10-slim for a lightweight Python environment.\n   - Set working directory to /app.\n   - Copy necessary files: requirements.txt, main.py (or the agent script), and entrypoint.sh.\n   - Install dependencies using pip install -r requirements.txt.\n   - Set the entrypoint to entrypoint.sh.\n   - To enhance isolation, run as a non-root user: add USER appuser instruction after creating a user.\n   - Avoid unnecessary volume mounts or privileged mode to prevent host impact.\n\n2. **Create entrypoint.sh script:**\n   - Make it executable (chmod +x entrypoint.sh in Dockerfile).\n   - Implement an infinite loop: while true; do python main.py; sleep 300; done (300 seconds = 5 minutes; make interval configurable via ENV var).\n   - Add logging to indicate each run, e.g., echo \"Running agent at $(date)\".\n   - Handle signals for graceful shutdown if needed (trap).\n\n3. **Integrate with agent logic:**\n   - Assume main.py contains the agent execution code.\n   - If main.py doesn't exist, create it with placeholder agent logic that can be run periodically.\n   - Ensure the script is idempotent and doesn't rely on host state.\n\n4. **Configure isolation:**\n   - In Docker run command or docker-compose, avoid --privileged, limit resources with --memory, --cpus.\n   - Do not mount host directories unless necessary; keep all data inside the container.\n   - Test by running the container and verifying no host files are modified and periodic runs occur.\n\n5. **Testing and verification:**\n   - Build and run the Docker image.\n   - Check container logs for periodic execution.\n   - Confirm isolation by attempting to access host resources from inside (should fail).\n\nThis setup ensures the agent runs every interval inside the container without host interference.",
-      "acceptance": [
-        "The Docker setup includes a mechanism (e.g., loop in entrypoint script or cron) for periodic execution of the agent inside the container.",
-        "The container can run indefinitely, executing the agent at regular intervals.",
-        "The container configuration avoids privileged mode and does not bind host directories by default, ensuring isolation.",
-        "Container logs demonstrate multiple executions of the agent over time, confirming periodic runs."
-      ]
-    },
-    {
-      "id": "4.6",
-      "status": "+",
-      "title": "Integrate git workflow for feature branches in agent runs",
-      "description": "Modify the agent execution logic to create a feature branch named features/{task_id} at the start of each task and push all code changes to it, ensuring this works within the Docker container.",
-      "context": [
         "scripts/run_local_agent.py",
-        "scripts/git_manager.py",
-        "scripts/task_utils.py",
-        "docs/LOCAL_SETUP.md",
-        "docs/docker/Dockerfile"
+        ".env"
       ],
-      "plan": "Detailed Implementation Plan for Feature 4.6: Integrate git workflow for feature branches in agent runs\n\n1. Update Dockerfile to install Git:\n   - Add 'RUN apt-get update && apt-get install -y git' to the Dockerfile to ensure Git is available in the container.\n\n2. Configure Git globally in the agent execution script:\n   - At the start of task processing, use subprocess or os.system to run:\n     git config --global user.name 'AI Agent'\n     git config --global user.email 'agent@ai.com'\n\n3. Create the feature branch:\n   - In the task initiation code:\n     - Run: git checkout main\n     - Run: git pull origin main\n     - Run: git checkout -b features/{task_id} (replace {task_id} with the actual task ID, e.g., 4.6)\n\n4. Allow agents to make file changes:\n   - No specific action needed; changes will be written to the filesystem in the repo.\n\n5. Commit and push at task completion:\n   - In the task completion code:\n     - Run: git add .\n     - Run: git commit -m 'Implemented feature {task_id}'\n     - To enable pushing, assume a GIT_TOKEN env var is passed to Docker.\n     - Run: git remote set-url origin https://${GIT_TOKEN}@github.com/<username>/<repo>.git (configure repo URL as needed)\n     - Run: git push -u origin features/{task_id}\n\n6. Handle errors:\n   - Wrap git commands in try-except blocks to log failures without crashing the agent.\n\n7. Testing:\n   - Verify by running a task in Docker, checking if the branch is created, changes are committed, and pushed to remote.",
       "acceptance": [
-        "At the start of each task, the agent execution logic creates a new git branch named 'features/{task_id}' using 'git checkout -b features/{task_id}'.",
-        "The task is executed on this branch.",
-        "At the end of the task, changes are added using 'git add .', committed with a message like 'Completed task {task_id}', and the branch is pushed to the remote 'origin' using 'git push origin features/{task_id}'.",
-        "All git operations are performed successfully within the Docker container, assuming git is installed and configured properly."
       ]
     }
   ]
