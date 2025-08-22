@@ -1,6 +1,6 @@
 {
   "id": 1,
-  "status": "-",
+  "status": "+",
   "title": "Task Management System Definition",
   "description": "Define and maintain the core components of the agent's task management system. This task serves as the canonical source of truth for task structure, guidance, and tooling.",
   "features": [
@@ -205,7 +205,7 @@
     },
     {
       "id": "1.10",
-      "status": "~",
+      "status": "+",
       "title": "Plan specification for Speccer",
       "description": "Create a specification for the speccer task that describes how to completely build up a new task with features just from a user input description. This document is meant to be directly passed to a speccer agent to serve as their starting point and guide.",
       "context": [

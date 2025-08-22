@@ -8,11 +8,8 @@ For context on the overall project structure, including how tasks and features a
 
 1.  **Analyze**: Carefully read the task's title and description to fully understand the goal. Consider the project's existing structure and conventions.
 2.  **Create Features**: Formulate a list of consecutive, atomic features required to accomplish the task. Each feature should be a small, logical, and testable unit of work. Use the `create_feature` tool for each one you identify.
-3.  **Finish Specification**: Once you have created all the necessary features and are confident the plan is complete, you **MUST** call the `finish_spec` tool to mark your work as done.
-
-## Handling Blockers
-
-If you cannot understand the task or are unable to break it down into features for any reason, you **MUST** use the `block_task` tool. Clearly explain why you are blocked. This will pause the task and signal that manual intervention is needed.
+3.  **Finish**: Once the features are created, you **MUST** call the `finish_spec` tool to complete your assignment.
+4.  **Handle Blockers**: If you cannot proceed, you **MUST** use `block_task` to explain the reason for being stuck - this signals that you are blocked and ready for a new assignment.
 
 ## Tools Reference
 
