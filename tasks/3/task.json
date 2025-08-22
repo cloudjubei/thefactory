@@ -61,7 +61,31 @@
         "tasks/3/task.json",
         "tasks/3/tests/test_3_3.py"
       ],
-      "acceptance": []
+      "acceptance": [
+        "Provide three POSIX shell scripts under scripts/: scripts/submodules-init.sh, scripts/submodules-sync.sh, scripts/project-add.sh.",
+        "All scripts must be portable POSIX sh: use shebang '#!/usr/bin/env sh', avoid bash-specific constructs (no [[ ]], arrays, 'function' keyword), and pass 'sh -n' syntax check.",
+        "All scripts must be executable (chmod +x).",
+        "scripts/submodules-init.sh:",
+        "- When run with no arguments inside a git repository, it must execute 'git submodule sync --recursive' followed by 'git submodule update --init --recursive', and exit 0.",
+        "- If the repository has no submodules (.gitmodules missing or empty), it must exit 0 and print a helpful message indicating no submodules to initialize.",
+        "- If run outside of a git repository, it must exit with a non-zero status and print a clear error message.",
+        "- It must support -h/--help, printing usage to stdout and exiting 0.",
+        "scripts/submodules-sync.sh:",
+        "- When run with no arguments inside a git repository, it must execute 'git submodule sync --recursive' and exit 0.",
+        "- If the repository has no submodules (.gitmodules missing or empty), it must still exit 0 with a helpful message.",
+        "- If run outside of a git repository, it must exit non-zero with a clear error message.",
+        "- It must support -h/--help, printing usage to stdout and exiting 0.",
+        "scripts/project-add.sh:",
+        "- Usage: 'project-add.sh <repo_url> <name> [--branch BRANCH]'.",
+        "- Must be run inside a git repository; if not, exit non-zero with a clear error message.",
+        "- Must ensure the 'projects/' directory exists (create it if missing).",
+        "- Must validate that <name> does not contain path separators or traversal components and that 'projects/<name>' does not already exist; otherwise exit non-zero with a clear error message.",
+        "- Must add the given repository as a git submodule at 'projects/<name>' using 'git submodule add' and the provided branch if '--branch' is specified.",
+        "- On success, '.gitmodules' must contain an entry for 'projects/<name>' with the correct URL, and 'projects/<name>' should be populated (cloned).",
+        "- A subsequent attempt to add the same <name> must fail with a non-zero exit and an explanatory message.",
+        "No script may depend on non-standard tools beyond POSIX sh and git; they must work on Linux and macOS (avoid non-portable utilities like 'readlink -f').",
+        "All scripts must print concise, readable usage text including a one-line description and examples for -h/--help."
+      ]
     },
     {
       "id": "3.4",
