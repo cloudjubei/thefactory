@@ -61,3 +61,27 @@ Argument	Required	Description	Example
 --mode	No	The execution mode: single (runs until finish_feature) or continuous (runs until finish).	single
 Example Command
 To run the developer agent on task 2, using the gpt-4-turbo model, and have it automatically pick the next pending feature:
+
+## 4. Git Configuration for the Agent
+
+The agent operates in a secure, isolated manner by cloning the project repository into a temporary directory for each run. To enable this, you must configure the agent's Git identity and the repository URL.
+
+Open your `.env` file and set the following variables:
+
+-   `GIT_REPO_URL`: The full URL of the repository for the project.
+-   `GIT_USER_NAME`: The git username.
+-   `GIT_USER_EMAIL`: The email address for commits made by the agent (e.g., `ai-agent@your-domain.com`).
+-   `GIT_PAT`: The personal access token created for this git username.
+
+## 5. Running the Agent
+
+Use the main launcher script, `run.py`, from the root of the repository.
+
+### Example Command
+
+To run the **developer** agent on **task 2**:
+
+```bash
+python run.py --agent developer --task 2
+```
+The launcher will handle creating a secure, temporary workspace, copying the project, and then executing the agent logic inside it. All commits will be made on a dedicated `features/2` branch and pushed to the remote repository upon completion.

@@ -6,6 +6,7 @@ import inspect
 from dotenv import load_dotenv
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Callable, Tuple
+import tempfile
 
 # Add project root to sys.path
 project_root = Path(__file__).resolve().parent.parent
@@ -20,7 +21,8 @@ load_dotenv()
 
 # --- Constants ---
 MAX_TURNS_PER_FEATURE = 10
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path.cwd()
 
 try:
     PROTOCOL_EXAMPLE_PATH = PROJECT_ROOT / "docs" / "agent_response_example.json"
@@ -212,42 +214,48 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     return True
 
 
+
 def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
-    print("--- Starting Autonomous Orchestrator ---")
-    
-    if task_id:
-        current_task = task_utils.get_task(task_id)
-    else:
-        current_task = task_utils.find_next_pending_task()
+    """
+    Main orchestration loop. Assumes it is running inside an isolated,
+    temporary copy of the repository.
+    """
+    try:
+        # Find the task to work on. The functions now implicitly use PROJECT_ROOT.
+        if task_id:
+            current_task = task_utils.get_task(task_id) # No longer pass PROJECT_ROOT
+        else:
+            current_task = task_utils.find_next_pending_task() # No longer pass PROJECT_ROOT
 
-    if not current_task:
-        print("No available tasks to work on.")
-        return
-
-    print(f"Selected Task: [{current_task['id']}] {current_task['title']}")
-    git_manager = GitManager()
-    branch_name = f"features/{current_task['id']}"
-    git_manager.create_branch_and_checkout(branch_name)
-    
-    processed_feature_ids = set()
-    while True:
-        current_task = task_utils.get_task(current_task['id'])
+        if not current_task:
+            print("No available tasks to work on in the repository.")
+            return
         
-        next_feature = task_utils.find_next_available_feature(current_task, exclude_ids=processed_feature_ids)
-        if not next_feature:
-            print(f"\nNo more available features for task {current_task['id']}.")
-            break
+        task_id = current_task['id']
+        print(f"Selected Task: [{task_id}] {current_task['title']}")
+        
+        git_manager = GitManager(str(PROJECT_ROOT))
+        
+        branch_name = f"features/{task_id}"
+        git_manager.checkout_branch(branch_name)
+
+        # --- Main Loop ---
+        processed_feature_ids = set()
+        while True:
+            current_task = task_utils.get_task(task_id)
+            next_feature = task_utils.find_next_available_feature(current_task, exclude_ids=processed_feature_ids)
             
-        should_continue = run_agent_on_feature(model, agent_type, current_task, next_feature, git_manager)
-        processed_feature_ids.add(next_feature['id'])
-        if not should_continue:
-            break
+            if not next_feature:
+                print(f"\nNo more available features for task {task_id}.")
+                break
+            
+            run_agent_on_feature(model, agent_type, current_task, next_feature, git_manager)
+            processed_feature_ids.add(next_feature['id'])
         
-    git_manager.stage_files(['.'])
-    commit_result = git_manager.commit(f"Completed task {current_task['id']}")
-    print(f"Commit result: {commit_result}")
-    git_manager.push("origin", branch_name)
-    print("\n--- Orchestrator Finished ---")
+        git_manager.push(branch_name)
+
+    except Exception as e:
+        print(f"\n--- A critical error occurred during the orchestrator run: {e} ---")
 
 def main():
     parser = argparse.ArgumentParser(description="Run an autonomous AI agent.")

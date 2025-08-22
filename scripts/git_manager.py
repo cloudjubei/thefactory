@@ -1,131 +1,60 @@
 import subprocess
-import sys
+import os
+from pathlib import Path
 from typing import List
+from urllib.parse import urlparse
+
 
 class GitManager:
-    """A class to interact with a git repository."""
+    """A class to interact with a git repository in its current directory."""
 
-    def __init__(self, repo_path: str = "."):
-        """
-        Initializes the GitManager.
+    def __init__(self, repo_path: str):
+        self.repo_path = Path(repo_path)
 
-        :param repo_path: The path to the git repository.
-        """
-        self.repo_path = repo_path
-        self.configure()
-
-    def configure(self):
-        self._run_command(["config", "--local", "user.name", "AI Agent"])
-        self._run_command(["config", "--local", "user.email", "ai@agent.com"])
-
+        if not all([os.getenv("GIT_USER_NAME"), os.getenv("GIT_USER_EMAIL")]):
+            print("ERROR: GIT_USER_NAME and GIT_USER_EMAIL must be set in your .env file.")
+            return
     
-    def _run_command(self, command: list[str], cwd: str = None):
-        """
-        Runs a shell command and handles errors.
+        self._run_command(["config", "user.name", os.getenv("GIT_USER_NAME")])
+        self._run_command(["config", "user.email", os.getenv("GIT_USER_EMAIL")])
 
-        Args:
-            command (list[str]): The command to run as a list of strings.
-            cwd (str, optional): The directory to run the command in. Defaults to None.
-
-        Returns:
-            bool: True if the command was successful, False otherwise.
-        """
-        print(f"Executing command: {' '.join(command)}")
+    def _run_command(self, command: List[str]) -> str:
         try:
-            subprocess.run(
-                ["git"] + command,
-                check=True,
-                capture_output=True,
-                text=True,
-                cwd=cwd or self.repo_path
-            )
-            return True
+            return subprocess.run(
+                ["git"] + command, cwd=self.repo_path,
+                capture_output=True, text=True, check=True
+            ).stdout.strip()
         except subprocess.CalledProcessError as e:
-            print(f"Error executing command: {' '.join(command)}", file=sys.stderr)
-            print(f"Stderr: {e.stderr}", file=sys.stderr)
-            print(f"Stdout: {e.stdout}", file=sys.stderr)
-            return False
+            raise RuntimeError(f"Git command failed: {' '.join(command)}\nStderr: {e.stderr}") from e
+
+    def checkout_branch(self, branch_name: str):
+        """Creates and checks out a new branch from the current HEAD."""
+        print(f"Creating and checking out new branch '{branch_name}'...")
+        # We start from a clean copy, so we always create a new branch.
+        self._run_command(["checkout", "-b", branch_name])
 
     def stage_files(self, files: List[str]):
-        """
-        Stages the given files.
-
-        :param files: A list of file paths to stage.
-        """
         self._run_command(["add"] + files)
 
-    def commit(self, message: str) -> str:
-        """
-        Commits the staged changes, handling the case where there is nothing to commit.
+    def commit(self, message: str):
+        self._run_command(["commit", "-m", message])
 
-        :param message: The commit message.
-        """
-        try:
-            result = subprocess.run(
-                ["git", "-C", self.repo_path, "commit", "-m", message],
-                capture_output=True,
-                text=True,
-                check=False
-            )
-            if result.returncode == 0:
-                return result.stdout.strip()
-            else:
-                full_output = (result.stdout + result.stderr).lower()
-                if "nothing to commit" in full_output or "no changes added to commit" in full_output:
-                    return "Nothing to commit."
-                else:
-                    raise RuntimeError(f"Git commit failed: {result.stderr.strip()} (stdout: {result.stdout.strip()})")
-        except Exception as e:
-            raise RuntimeError(f"Unexpected error in commit: {e}") from e
+    def push(self, branch_name: str):
+        """Pushes the specified branch to the remote, using credentials from .env."""
+        repo_url = os.getenv("GIT_REPO_URL")
+        username = os.getenv("GIT_USER_NAME")
+        pat = os.getenv("GIT_PAT")
 
-    def push(self, remote: str = "origin", branch: str = "main"):
-        """
-        Pushes the changes to the remote repository.
+        if not all([repo_url, username, pat]):
+            raise ValueError("GIT_REPO_URL, GIT_USER_NAME, and GIT_PAT must be set in .env for push operations.")
 
-        :param remote: The name of the remote repository.
-        :param branch: The branch to push to.
-        """
-        self._run_command(["push", remote, branch])
-
-    def get_current_branch(self) -> str:
-        """
-        Gets the current active branch name.
-
-        :return: The name of the current branch.
-        """
-        return self._run_command(["rev-parse", "--abbrev-ref", "HEAD"])
-
-    def create_branch_and_checkout(self, branch_name: str, remote: str = "origin"):
-        """
-        Creates and checks out a new branch.
-
-        :param branch_name: The name of the branch to create.
-        """
-
-        self._run_command(["checkout", "main"])
-        self._run_command(["pull"])
-
-        self._run_command(["checkout", "-b", branch_name])
+        # Construct the authenticated URL
+        parsed_url = urlparse(repo_url)
+        authenticated_url = f"{parsed_url.scheme}://{username}:{pat}@{parsed_url.netloc}{parsed_url.path}"
         
-        try:
-            self._run_command(["pull", remote, branch_name])
-        except Exception:
-                print(f"Branch {branch_name} does not exist on remote {remote}. Continuing without pulling.")
+        # Set the remote URL to the authenticated one for this push command
+        remote_name = "origin"
+        self._run_command(["remote", "set-url", remote_name, authenticated_url])
         
-        print(f"Successfully created and checked out branch '{branch_name}' in '{self.repo_path}'")
-
-
-        # if os.path.exists(self.working_dir):
-        #     print(f"Cleaning up existing working directory: {self.working_dir}")
-        #     if not self._run_command(["rm", "-rf", self.working_dir], cwd="/"):
-        #         return False
-        
-        # if not self._run_command(["git", "clone", self.repo_url, self.repo_path], cwd="/"):
-        #     return False
-            
-        # if not self._run_command(["git", "checkout", "main"]): return False
-        # if not self._run_command(["git", "pull"]): return False
-        # if (branch_name != "main"):
-        #     if not self._run_command(["git", "checkout", "-b", branch_name]): return False
-        #     self._run_command(["git", "pull", "origin", branch_name]) # this can fail as this could be a fresh branch
-            
+        print(f"Pushing branch '{branch_name}' to remote repository...")
+        self._run_command(["push", "-u", remote_name, branch_name])

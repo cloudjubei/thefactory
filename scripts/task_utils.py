@@ -7,13 +7,24 @@ from typing import List, Optional
 from docs.tasks.task_format import Task, Feature, Status
 from scripts.git_manager import GitManager
 
-TASKS_DIR = Path("tasks")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+TASKS_DIR_NAME = "tasks" 
+
+
+def _get_tasks_dir() -> Path:
+    return PROJECT_ROOT / TASKS_DIR_NAME
+def _get_task_dir(task_id: int) -> Path:
+    return _get_tasks_dir() / str(task_id)
+def _get_task_path(task_id: int) -> Path:
+    return _get_task_dir(task_id) / "task.json"
+def _get_test_path(task_id: int, feature_id: str) -> Path:
+    """Helper to get the conventional path for a feature's test file."""
+    feature_number = feature_id.split('.')[-1]
+    return _get_task_dir(task_id) / "tests" / f"test_{task_id}_{feature_number}.py"
 
 # --- Core Task I/O ---
-
 def get_task(task_id: int) -> Task:
-    """Loads a task from its JSON file."""
-    task_file = TASKS_DIR / str(task_id) / "task.json"
+    task_file = _get_task_path(task_id)
     if not task_file.exists():
         raise FileNotFoundError(f"Task file not found for task_id: {task_id}")
     with open(task_file, "r") as f:
@@ -21,17 +32,9 @@ def get_task(task_id: int) -> Task:
 
 def save_task(task: Task):
     """Saves a task to its JSON file."""
-    task_dir = TASKS_DIR / str(task["id"])
-    task_dir.mkdir(exist_ok=True, parents=True)
-    task_file = task_dir / "task.json"
+    task_file = _get_task_path(task.id)
     with open(task_file, "w") as f:
         json.dump(task, f, indent=2)
-
-# --- Universal Agent Tools ---
-
-def finish(task_id: int) -> str:
-    """A signal tool for the agent to indicate it has finished all its work."""
-    return f"Agent has signaled work is finished for task {task_id}."
 
 def update_task_status(task_id: int, status: Status) -> Task:
     """Updates the overall status of a task."""
@@ -39,27 +42,35 @@ def update_task_status(task_id: int, status: Status) -> Task:
     task["status"] = status
     save_task(task)
     return task
-
-
 # --- Developer Agent Tools ---
 
-def get_context(files: List[str]) -> List[str]:
-    """Retrieves the content of specific files."""
-    content = []
-    for file_path in files:
+def get_context(files: List[str]) -> str:
+    """Retrieves the content of files, ensuring they are safely within the project root."""
+    content_str = ""
+    for file_path_str in files:
+        target_file_path = (PROJECT_ROOT / file_path_str).resolve()
+        content_str += f"--- FILE: {file_path_str} ---\n"
         try:
-            with open(file_path, "r") as f:
-                content.append(f.read())
+            target_file_path.relative_to(PROJECT_ROOT.resolve())
+            content_str += target_file_path.read_text() + "\n"
+        except (ValueError, PermissionError):
+            content_str += f"SECURITY ERROR: Cannot read file outside project directory.\n"
         except FileNotFoundError:
-            content.append(f"File not found: {file_path}")
-    return content
+            content_str += f"File not found.\n"
+        content_str += f"--- END OF FILE: {file_path_str} ---\n\n"
+    return content_str
 
 def write_file(filename: str, content: str):
-    """Creates or overwrites a file with the full content."""
-    # ... (implementation from previous message is correct)
-    Path(filename).parent.mkdir(exist_ok=True, parents=True)
-    with open(filename, "w") as f:
-        f.write(content)
+    """Creates or overwrites a file, ensuring it's safely within the given project root."""
+    target_file_path = (PROJECT_ROOT / filename).resolve()
+    try:
+        target_file_path.relative_to(PROJECT_ROOT.resolve())
+    except ValueError:
+        raise PermissionError(f"Security violation: Attempted to write outside of project root: {filename}")
+    
+    target_file_path.parent.mkdir(exist_ok=True, parents=True)
+    target_file_path.write_text(content)
+    print(f"File securely written to: {filename}")
 
 def update_feature_status(task_id: int, feature_id: str, status: Status) -> Optional[Feature]:
     """Updates the status of a specific feature."""
@@ -150,10 +161,6 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
 
 # --- Tester Agent Tools ---
 
-def _get_test_path(task_id: int, feature_id: str) -> Path:
-    """Helper to get the conventional path for a feature's test file."""
-    feature_number = feature_id.split('.')[-1]
-    return TASKS_DIR / str(task_id) / "tests" / f"test_{task_id}_{feature_number}.py"
 
 def get_test(task_id: int, feature_id: str) -> str:
     """Retrieves the current test content for a feature."""
@@ -215,11 +222,10 @@ def run_test(task_id: int, feature_id: str) -> str:
         return f"FAIL: An unexpected error occurred while running the test: {e}"
 
 # --- Orchestrator Helpers ---
-# ... (implementations from previous message are correct)
 def find_next_pending_task() -> Optional[Task]:
     """Scans task directories and returns the first task that is pending or in progress."""
-    if not TASKS_DIR.exists(): return None
-    for task_dir in sorted(TASKS_DIR.iterdir(), key=lambda x: int(x.name)):
+    if not _get_tasks_dir().exists(): return None
+    for task_dir in sorted(_get_tasks_dir().iterdir(), key=lambda x: int(x.name)):
         if task_dir.is_dir():
             try:
                 task_id = int(task_dir.name)
