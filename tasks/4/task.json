@@ -90,7 +90,7 @@
       "title": "Ensure container isolation for periodic agent runs",
       "description": "Configure the Docker setup so that the agent can run periodically inside the container without affecting the host machine, possibly using cron or a loop in the entrypoint script.",
       "context": [
-        "Dockerfile",
+        "docs/docker/Dockerfile",
         "entrypoint.sh",
         "scripts/run_local_agent.py"
       ],
@@ -112,7 +112,7 @@
         "scripts/git_manager.py",
         "scripts/task_utils.py",
         "docs/LOCAL_SETUP.md",
-        "Dockerfile"
+        "docs/docker/Dockerfile"
       ],
       "plan": "Detailed Implementation Plan for Feature 4.6: Integrate git workflow for feature branches in agent runs\n\n1. Update Dockerfile to install Git:\n   - Add 'RUN apt-get update && apt-get install -y git' to the Dockerfile to ensure Git is available in the container.\n\n2. Configure Git globally in the agent execution script:\n   - At the start of task processing, use subprocess or os.system to run:\n     git config --global user.name 'AI Agent'\n     git config --global user.email 'agent@ai.com'\n\n3. Create the feature branch:\n   - In the task initiation code:\n     - Run: git checkout main\n     - Run: git pull origin main\n     - Run: git checkout -b features/{task_id} (replace {task_id} with the actual task ID, e.g., 4.6)\n\n4. Allow agents to make file changes:\n   - No specific action needed; changes will be written to the filesystem in the repo.\n\n5. Commit and push at task completion:\n   - In the task completion code:\n     - Run: git add .\n     - Run: git commit -m 'Implemented feature {task_id}'\n     - To enable pushing, assume a GIT_TOKEN env var is passed to Docker.\n     - Run: git remote set-url origin https://${GIT_TOKEN}@github.com/<username>/<repo>.git (configure repo URL as needed)\n     - Run: git push -u origin features/{task_id}\n\n6. Handle errors:\n   - Wrap git commands in try-except blocks to log failures without crashing the agent.\n\n7. Testing:\n   - Verify by running a task in Docker, checking if the branch is created, changes are committed, and pushed to remote."
     }
