@@ -45,7 +45,15 @@
       "id": "4.3",
       "status": "-",
       "title": "Create build script for Docker",
-      "description": "Create a script (e.g., scripts/build_docker.sh) that clones the repository, checks for a prepared .env file with API keys, builds the Docker image using the Dockerfile, and provides instructions for running the container."
+      "description": "Create a script (e.g., scripts/build_docker.sh) that clones the repository, checks for a prepared .env file with API keys, builds the Docker image using the Dockerfile, and provides instructions for running the container.",
+      "context": [
+        "docs/FILE_ORGANISATION.md",
+        "docs/docker/Dockerfile",
+        ".env.example",
+        "docs/docker/RUNNING_DOCKER_README.md",
+        "docs/LOCAL_SETUP.md",
+        "scripts/run_local_agent.py"
+      ]
     },
     {
       "id": "4.4",
