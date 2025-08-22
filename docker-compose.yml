@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  agent:
+    build: .
+    env_file:
+      - .env
+    command: python scripts/run_local_agent.py --agent developer --task 4

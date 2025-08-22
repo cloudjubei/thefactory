@@ -44,7 +44,7 @@
     },
     {
       "id": "4.3",
-      "status": "~",
+      "status": "+",
       "title": "Create build script for Docker",
       "description": "Create a script (e.g., scripts/build_docker.sh) that clones the repository, checks for a prepared .env file with API keys, builds the Docker image using the Dockerfile, and provides instructions for running the container.",
       "context": [
@@ -67,7 +67,7 @@
     },
     {
       "id": "4.4",
-      "status": "-",
+      "status": "~",
       "title": "Handle API keys via .env in Docker setup",
       "description": "Ensure the Dockerfile and build script handle a .env file for API keys, copying it into the container during build or mounting it at runtime to avoid exposing keys on the host.",
       "context": [
