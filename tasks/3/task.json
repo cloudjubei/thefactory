@@ -33,7 +33,22 @@
         ".gitmodules",
         "README.md"
       ],
-      "acceptance": []
+      "acceptance": [
+        "A Markdown document exists at docs/projects-submodules.md describing how child projects under the projects/ directory are managed as git submodules.",
+        "The document includes an Overview section explaining the purpose of the projects/ folder and that each child project is a git submodule.",
+        "The document provides instructions for cloning the repository with submodules using git clone --recurse-submodules, and for initializing submodules in an existing clone using git submodule init and git submodule update (including the --init --recursive variant).",
+        "The document explains how to add a new child project as a submodule under projects/<name> using git submodule add -b <branch> <url> projects/<name>, and explicitly mentions committing both .gitmodules and the submodule pointer update in the superproject.",
+        "The document explains how to update submodules to newer commits using either git submodule update --remote [--recursive] or by entering the submodule and pulling, then committing the pointer bump in the superproject. It includes examples of git submodule foreach for bulk operations.",
+        "The document explains how to switch the tracked branch for a submodule via git config -f .gitmodules submodule.projects/<name>.branch <branch> and notes committing .gitmodules.",
+        "The document explains how to remove a child project submodule, including the steps: git submodule deinit -f projects/<name>, git rm -f projects/<name>, and removing the .git/modules/projects/<name> directory, and notes that .gitmodules is updated and committed accordingly.",
+        "The document contains a Common pitfalls section that explicitly mentions: detached HEAD in submodules, uncommitted changes in submodules, mixing SSH and HTTPS URLs, forgetting to commit .gitmodules, not committing the submodule pointer update, needing git submodule sync when URLs change, and ensuring CI uses --init --recursive.",
+        "The document contains a CI/CD notes section showing recommended commands to fetch submodules in automation: git clone --recurse-submodules and/or git submodule update --init --recursive.",
+        "The document includes a Troubleshooting section with git submodule sync (preferably with --recursive) and git submodule status usage.",
+        "The document includes a Quick reference or cheat sheet that summarizes the most common commands for clone/init, add, update, switch branch, remove, and status.",
+        "All examples use paths under projects/ and illustrate projects/<name> for submodules, and the document makes clear that changes inside a submodule should be committed within the submodule and then the superproject pointer updated and committed.",
+        "The document references and demonstrates the following commands at least once: git clone --recurse-submodules; git submodule init; git submodule update; git submodule update --init --recursive; git submodule add -b; git submodule update --remote; git submodule foreach; git submodule status; git config -f .gitmodules submodule.projects/<name>.branch <branch>; git submodule deinit -f; git rm -f projects/<name>; rm -rf .git/modules/projects/<name>; git submodule sync.",
+        "The document discusses authentication schemes (SSH vs HTTPS) and warns about mixing them across submodules and CI."
+      ]
     },
     {
       "id": "3.3",
