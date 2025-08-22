@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import traceback
 from pathlib import Path
 
 IGNORE_PATTERNS = shutil.ignore_patterns('venv', '__pycache__', '*.pyc', '.idea')
@@ -31,6 +32,9 @@ def main():
             shutil.copytree(project_root, workspace_path, ignore=IGNORE_PATTERNS)
         except Exception as e:
             print(f"FATAL: Failed to copy repository to temporary directory: {e}")
+            print("\n--- Full Stack Trace ---")
+            traceback.print_exc()
+            print("------------------------\n")
             return
 
         orchestrator_script_path = workspace_path / "scripts" / "run_local_agent.py"
@@ -50,6 +54,9 @@ def main():
             subprocess.run(command, cwd=workspace_path, check=True)
         except subprocess.CalledProcessError as e:
             print(f"\n--- An error occurred while running the agent orchestrator: {e} ---")
+            print("\n--- Full Stack Trace ---")
+            traceback.print_exc()
+            print("------------------------\n")
         except KeyboardInterrupt:
             print("\n--- Agent run interrupted by user. ---")
 

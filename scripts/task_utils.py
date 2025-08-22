@@ -45,20 +45,31 @@ def update_task_status(task_id: int, status: Status) -> Task:
 # --- Developer Agent Tools ---
 
 def get_context(files: List[str]) -> str:
-    """Retrieves the content of files, ensuring they are safely within the project root."""
-    content_str = ""
+    """
+    Retrieves the content of specified paths.
+    - If a path is a file, its content is returned.
+    - If a path is a directory, the names of the files within it are returned as a JSON array string.
+    """
+    content = {}
     for file_path_str in files:
         target_file_path = (PROJECT_ROOT / file_path_str).resolve()
-        content_str += f"--- FILE: {file_path_str} ---\n"
         try:
             target_file_path.relative_to(PROJECT_ROOT.resolve())
-            content_str += target_file_path.read_text() + "\n"
+
+            if target_file_path.is_dir():
+                dir_files = [f.name for f in target_file_path.iterdir()]
+                content[file_path_str] = dir_files
+            elif target_file_path.is_file():
+                content[file_path_str] = target_file_path.read_text()
+            else:
+                content[file_path_str] = "Path not found or is not a regular file/directory."
+
         except (ValueError, PermissionError):
-            content_str += f"SECURITY ERROR: Cannot read file outside project directory.\n"
+            content[file_path_str] = f"SECURITY ERROR: Cannot access path outside project directory.\n"
         except FileNotFoundError:
-            content_str += f"File not found.\n"
-        content_str += f"--- END OF FILE: {file_path_str} ---\n\n"
-    return content_str
+            content[file_path_str] = "Path not found or is not a regular file/directory."
+        
+    return json.dumps(content, indent=0)
 
 def write_file(filename: str, content: str):
     """Creates or overwrites a file, ensuring it's safely within the given project root."""
@@ -277,7 +288,7 @@ def create_feature(task_id: int, title: str, description: str, plan: str) -> Fea
         "id": new_id,
         "status": "-",
         "title": title,
-        "action": description,
+        "description": description,
         "plan": plan,
         "context": [],
         "acceptance": [],
