@@ -45,8 +45,8 @@
       ],
       "acceptance": [
         ".gitignore exists at the repository root.",
-        ".gitignore includes an ignore rule that ignores the entire projects/ directory and its contents (accepted patterns: 'projects/', '/projects/', 'projects/**', or '/projects/**').",
-        ".gitignore explicitly unignores the .gitmodules file to keep submodule tracking intact (accepted patterns: '!.gitmodules' or '!/.gitmodules').",
+        ".gitignore includes an ignore rule that ignores the entire projects/ directory and its contents. Accepted patterns (exact lines): 'projects/', '/projects/', 'projects/**', or '/projects/**'.",
+        ".gitignore explicitly unignores the .gitmodules file to keep submodule tracking intact. Accepted patterns (exact lines): '!.gitmodules' or '!/.gitmodules'.",
         ".gitignore does not contain a rule that directly ignores .gitmodules (e.g., '.gitmodules' or '/.gitmodules')."
       ]
     },
