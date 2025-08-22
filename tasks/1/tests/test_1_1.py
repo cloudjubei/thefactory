@@ -19,8 +19,8 @@ assert issubclass(Task, dict), "Task is not a subclass of dict"
 assert hasattr(Task, '__annotations__'), "Task has no __annotations__"
 
 task_annotations = Task.__annotations__
-assert set(task_annotations.keys()) == {'id', 'title', 'features'}, "Task fields mismatch"
-assert task_annotations['id'] is str, "id not str"
+assert set(task_annotations.keys()) == {'id', 'title', 'features', 'status', 'description'}, "Task fields mismatch"
+assert task_annotations['id'] is int, "id not int"
 assert task_annotations['title'] is str, "title not str"
 
 # For features: should be list[Feature]
@@ -37,13 +37,12 @@ assert issubclass(Feature, dict), "Feature not subclass of dict"
 assert hasattr(Feature, '__annotations__'), "Feature has no __annotations__"
 
 feature_annotations = Feature.__annotations__
-assert set(feature_annotations.keys()) == {'id', 'title', 'description', 'acceptance_criteria'}, "Feature fields mismatch"
+assert set(feature_annotations.keys()) == {'id', 'status', 'title', 'description', 'plan', 'context', 'acceptance', 'dependencies', 'rejection'}, "Feature fields mismatch"
 assert feature_annotations['id'] is str
 assert feature_annotations['title'] is str
 assert feature_annotations['description'] is str
 
-# For acceptance_criteria: list[str]
-ac_type = feature_annotations['acceptance_criteria']
+ac_type = feature_annotations['acceptance']
 assert ac_type.__origin__ is list
 assert len(ac_type.__args__) == 1
 assert ac_type.__args__[0] is str
