@@ -100,7 +100,27 @@
         "scripts/run_local_agent.py",
         ".env"
       ],
-      "acceptance": []
+      "acceptance": [
+        "A Dockerfile exists at projects/docker/Dockerfile.",
+        "Dockerfile uses a Python base image (FROM ...python...).",
+        "Dockerfile sets a working directory (WORKDIR).",
+        "Dockerfile copies project files and a dependency manifest (e.g., requirements.txt or pyproject) using COPY.",
+        "Dockerfile installs dependencies (e.g., pip install -r requirements.txt, pip install ., or poetry install).",
+        "Dockerfile defines an ENTRYPOINT or CMD that runs the agent periodically inside the container, either by a loop (while true with sleep) or by using cron.",
+        "If an entrypoint script is referenced by Dockerfile (e.g., entrypoint.sh), it is included in the repository and implements periodic execution (either a while/sleep loop or cron setup).",
+        "A README exists at projects/docker/RUNNING_DOCKER_README.md.",
+        "README includes instructions to prepare a .env file with API keys and where to place it before building/running.",
+        "README explains how to build the image (either via projects/docker/build_docker.sh or docker build -f projects/docker/Dockerfile).",
+        "README provides a docker run example that supplies environment variables via --env-file .env or by mounting the .env file as a volume.",
+        "README makes clear that the agent runs periodically inside the container (via cron or a loop) and that no host-level scheduler configuration is required.",
+        "A build script exists at projects/docker/build_docker.sh.",
+        "build_docker.sh has a bash shebang and is a bash script.",
+        "build_docker.sh clones the repository (uses git clone).",
+        "build_docker.sh checks for the presence of a .env file and warns or exits if missing.",
+        "build_docker.sh builds the Docker image using projects/docker/Dockerfile (docker build -f projects/docker/Dockerfile) and sets a tag (-t).",
+        "build_docker.sh provides clear instructions for running the container, including passing environment via --env-file or volume mounting the .env file.",
+        "The Docker setup enables running the agent on a periodic schedule inside the container without requiring host machine cron or other host-level schedulers."
+      ]
     }
   ]
 }
