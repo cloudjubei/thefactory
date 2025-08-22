@@ -238,7 +238,14 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
         git_manager = GitManager(str(PROJECT_ROOT))
         
         branch_name = f"features/{task_id}"
-        git_manager.checkout_branch(branch_name)
+        try:
+            git_manager.checkout_branch(branch_name)
+        except Exception as e:
+            print(f"Could not create or checkout branch '{branch_name}': {e}")
+        try:
+            git_manager.pull(branch_name)
+        except Exception as e:
+            print(f"Could not pull branch '{branch_name}': {e}")
 
         # --- Main Loop ---
         processed_feature_ids = set()
