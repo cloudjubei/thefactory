@@ -133,6 +133,9 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
     elif agent_type == 'tester':
         commit_message = f"test: Add tests for feature {feature_id} - {feature_title}"
         update_feature_status(task_id, feature_id, "-")
+    elif agent_type == 'contexter': 
+        commit_message = f"context: Set context for feature {feature_id} - {feature_title}"
+        update_feature_status(task_id, feature_id, "-")
     else:
         raise ValueError(f"Unknown agent_type '{agent_type}' called finish_feature.")
 
@@ -288,6 +291,21 @@ def update_feature_plan(task_id: int, feature_id: str, plan: any) -> Optional[Fe
     for feature in task["features"]:
         if feature["id"] == feature_id:
             feature["plan"] = plan_str
+            updated_feature = feature
+            break
+    if updated_feature:
+        save_task(task)
+    return updated_feature
+
+def update_feature_context(task_id: int, feature_id: str, context: List[str]) -> Optional[Feature]:
+    """
+    Updates the 'context' field of a specific feature. This is the primary tool for the Contexter agent.
+    """
+    task = get_task(task_id)
+    updated_feature = None
+    for feature in task["features"]:
+        if feature["id"] == feature_id:
+            feature["context"] = context
             updated_feature = feature
             break
     if updated_feature:

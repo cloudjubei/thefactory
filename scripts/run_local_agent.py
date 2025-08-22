@@ -64,6 +64,10 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
             "update_test": (task_utils.update_test, "update_test(test: str)"),
             "run_test": (task_utils.run_test, "run_test() -> str"),
         }
+    elif agent_type == 'contexter':
+        agent_tools = {
+            "update_feature_context": (task_utils.update_feature_context, "update_feature_context(context: list[str])"),
+        }
     
     base_tools.update(agent_tools)
     
@@ -99,6 +103,12 @@ Your job is to write the acceptance criteria and a corresponding Python test for
 2. Second, use the `update_test` tool to write a test that verifies those criteria.
 When you are done, you **MUST** call `finish_feature` to mark it as ready for development.
 """
+    elif agent_type == 'contexter':
+        prompt += """
+Your **ONLY** job is to analyze the feature and set its `context` field to the minimal list of files a developer would need.
+The `docs/FILE_ORGANISATION.md` file has been provided in your context to help you.
+Use the `update_feature_context` tool to set the list, and then call `finish_feature`.
+"""
     else: # Developer prompt
         prompt += f"""
 The following context files have been provided:
@@ -132,8 +142,13 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     if agent_type == 'developer':
         task_utils.update_feature_status(task['id'], feature['id'], '~')
 
+    feature_context_files = [f"docs/AGENT_{agent_type.upper()}.md"] + feature.get("context", [])
+    if agent_type == 'contexter':
+        if "docs/FILE_ORGANISATION.md" not in feature_context_files:
+            feature_context_files.append("docs/FILE_ORGANISATION.md")
+
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
-    context = task_utils.get_context(feature.get("context", []))
+    context = task_utils.get_context(feature_context_files)
     system_prompt = construct_system_prompt(agent_type, task, feature, context, tool_signatures)
 
     messages = [{"role": "user", "content": system_prompt}]
