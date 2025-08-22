@@ -91,7 +91,21 @@
         "tasks/3/tests/test_3_1.py",
         "tasks/3/tests/test_3_4.py"
       ],
-      "acceptance": []
+      "acceptance": [
+        "A Python migration/backfill script exists at module path 'scripts.migrate_child_projects' exposing a callable 'migrate(fetcher, writer, auditor, batch_size=1000, dry_run=False, resume_from=None, logger=None)'.",
+        "The migrate function consumes legacy project records from 'fetcher(resume_from, batch_size)' which yields batches (lists) of dicts with keys: 'id' (int) and 'legacy_parent_id' (int or None).",
+        "For each record where 'legacy_parent_id' is not None, the script writes a single parent->child relation into the new child projects structure via 'writer.create_relation(parent_id, child_id)'.",
+        "Before creating a relation, the script verifies both the parent and child exist using 'writer.exists_project(project_id)' and skips with error logging if either is missing.",
+        "The script prevents invalid relations: self-parenting (parent_id == child_id) must be skipped and counted as failures; such cases must log an error.",
+        "Idempotency: if 'writer.relation_exists(parent_id, child_id)' returns True, the script must not create a duplicate relation. A second run on the same data creates no duplicates and reports the correct number of skipped existing relations.",
+        "Dry-run mode: when 'dry_run=True', no calls to 'writer.create_relation' are made, but processing, logging, and summary counts still reflect what would be processed (created reported as 0).",
+        "Batch processing: the script processes records in batches based on 'batch_size'. If the 'writer' implements optional 'begin_batch()' and 'commit_batch()' methods, the script calls them once per processed batch.",
+        "Resume support: the script accepts 'resume_from' (an integer checkpoint). It must pass 'resume_from' through to 'fetcher'. The script returns a 'checkpoint' value equal to the highest 'id' seen during processing, allowing subsequent runs to resume from that point.",
+        "Audit logging: for each successfully created relation, the script calls 'auditor.log(\"child_project_backfill\", details)', where details includes at least 'parent_id', 'child_id', and 'source' set to 'legacy'.",
+        "Progress and error logging: the script logs batch progress and totals via 'logger.info' and invalid cases via 'logger.error'.",
+        "Summary: the migrate function returns a dict with keys: 'processed' (number of candidate records with non-null legacy_parent_id examined), 'created', 'skipped_existing', 'failed', 'dry_run', and 'checkpoint'. It must satisfy: processed == created + skipped_existing + failed.",
+        "Minimal downtime expectation: the script's batch processing and resume capability allow for online/rolling execution without full-table locks (validated indirectly via batch and resume behavior in tests)."
+      ]
     },
     {
       "id": "3.5",
