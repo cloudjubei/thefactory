@@ -209,10 +209,10 @@
       "title": "Plan specification for Speccer",
       "description": "Create a specification for the speccer task that describes how to completely build up a new task with features just from a user input description. This document is meant to be directly passed to a speccer agent to serve as their starting point and guide.",
       "context": [
+        "docs/AGENT_SPECCER.md",
         "docs/FILE_ORGANISATION.md",
-        "docs/AGENT_COMMUNICATION_PROTOCOL.md",
-        "docs/agent_response_example.json",
-        "docs/AGENT_SPECCER.md"
+        "docs/tasks/task_example.json",
+        "docs/AGENT_COMMUNICATION_PROTOCOL.md"
       ],
       "acceptance": [
         "The specification file `docs/AGENT_SPECCER.md` is created or updated.",
