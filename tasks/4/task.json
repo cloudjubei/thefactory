@@ -26,7 +26,7 @@
     },
     {
       "id": "4.2",
-      "status": "~",
+      "status": "+",
       "title": "Create README for running in Docker",
       "description": "Create a file at docs/docker/RUNNING_DOCKER_README.md detailing the steps to build and run the project in Docker, including how to prepare .env, use the build script, and run the container periodically.",
       "context": [
@@ -44,7 +44,7 @@
     },
     {
       "id": "4.3",
-      "status": "-",
+      "status": "~",
       "title": "Create build script for Docker",
       "description": "Create a script (e.g., scripts/build_docker.sh) that clones the repository, checks for a prepared .env file with API keys, builds the Docker image using the Dockerfile, and provides instructions for running the container.",
       "context": [
@@ -114,7 +114,13 @@
         "docs/LOCAL_SETUP.md",
         "docs/docker/Dockerfile"
       ],
-      "plan": "Detailed Implementation Plan for Feature 4.6: Integrate git workflow for feature branches in agent runs\n\n1. Update Dockerfile to install Git:\n   - Add 'RUN apt-get update && apt-get install -y git' to the Dockerfile to ensure Git is available in the container.\n\n2. Configure Git globally in the agent execution script:\n   - At the start of task processing, use subprocess or os.system to run:\n     git config --global user.name 'AI Agent'\n     git config --global user.email 'agent@ai.com'\n\n3. Create the feature branch:\n   - In the task initiation code:\n     - Run: git checkout main\n     - Run: git pull origin main\n     - Run: git checkout -b features/{task_id} (replace {task_id} with the actual task ID, e.g., 4.6)\n\n4. Allow agents to make file changes:\n   - No specific action needed; changes will be written to the filesystem in the repo.\n\n5. Commit and push at task completion:\n   - In the task completion code:\n     - Run: git add .\n     - Run: git commit -m 'Implemented feature {task_id}'\n     - To enable pushing, assume a GIT_TOKEN env var is passed to Docker.\n     - Run: git remote set-url origin https://${GIT_TOKEN}@github.com/<username>/<repo>.git (configure repo URL as needed)\n     - Run: git push -u origin features/{task_id}\n\n6. Handle errors:\n   - Wrap git commands in try-except blocks to log failures without crashing the agent.\n\n7. Testing:\n   - Verify by running a task in Docker, checking if the branch is created, changes are committed, and pushed to remote."
+      "plan": "Detailed Implementation Plan for Feature 4.6: Integrate git workflow for feature branches in agent runs\n\n1. Update Dockerfile to install Git:\n   - Add 'RUN apt-get update && apt-get install -y git' to the Dockerfile to ensure Git is available in the container.\n\n2. Configure Git globally in the agent execution script:\n   - At the start of task processing, use subprocess or os.system to run:\n     git config --global user.name 'AI Agent'\n     git config --global user.email 'agent@ai.com'\n\n3. Create the feature branch:\n   - In the task initiation code:\n     - Run: git checkout main\n     - Run: git pull origin main\n     - Run: git checkout -b features/{task_id} (replace {task_id} with the actual task ID, e.g., 4.6)\n\n4. Allow agents to make file changes:\n   - No specific action needed; changes will be written to the filesystem in the repo.\n\n5. Commit and push at task completion:\n   - In the task completion code:\n     - Run: git add .\n     - Run: git commit -m 'Implemented feature {task_id}'\n     - To enable pushing, assume a GIT_TOKEN env var is passed to Docker.\n     - Run: git remote set-url origin https://${GIT_TOKEN}@github.com/<username>/<repo>.git (configure repo URL as needed)\n     - Run: git push -u origin features/{task_id}\n\n6. Handle errors:\n   - Wrap git commands in try-except blocks to log failures without crashing the agent.\n\n7. Testing:\n   - Verify by running a task in Docker, checking if the branch is created, changes are committed, and pushed to remote.",
+      "acceptance": [
+        "At the start of each task, the agent execution logic creates a new git branch named 'features/{task_id}' using 'git checkout -b features/{task_id}'.",
+        "The task is executed on this branch.",
+        "At the end of the task, changes are added using 'git add .', committed with a message like 'Completed task {task_id}', and the branch is pushed to the remote 'origin' using 'git push origin features/{task_id}'.",
+        "All git operations are performed successfully within the Docker container, assuming git is installed and configured properly."
+      ]
     }
   ]
 }
