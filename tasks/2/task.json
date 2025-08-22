@@ -42,10 +42,11 @@
         "The file `scripts/task_utils.py` exists.",
         "`scripts/task_utils.py` imports the Task and Feature schemas from `docs/tasks/task_format.py`.",
         "Functions in `scripts/task_utils.py` that modify files accept a `git_manager: GitManager` parameter, imported from `scripts/git_manager.py`.",
-        "`scripts/task_utils.py` defines the following functions from AGENT_PLANNER.md: update_feature_plan(task_id: int, feature_id: str, plan: str), create_feature(task_id: int, feature: Feature), finish_feature(task_id: int, feature_id: str, git_manager: GitManager), block_feature(task_id: int, feature_id: str, reason: str).",
+        "`scripts/task_utils.py` defines the following functions from AGENT_PLANNER.md: update_feature_plan(task_id: int, feature_id: str, plan: str),  finish_feature(task_id: int, feature_id: str, git_manager: GitManager), block_feature(task_id: int, feature_id: str, reason: str).",
         "`scripts/task_utils.py` defines the following functions from AGENT_TESTER.md: update_acceptance_criteria(task_id: int, feature_id: str, criteria: list[str]), update_test(task_id: int, feature_id: str, test: str), run_test(task_id: int, feature_id: str) -> str.",
         "`scripts/task_utils.py` defines the following functions from AGENT_DEVELOPER.md: write_file(filename: str, content: str), get_context(files: list[str]) -> list[str].",
         "`scripts/task_utils.py` defines the following functions from AGENT_CONTEXTER.md: get_context(files: list[str]) -> list[str], update_feature_context(task_id: int, feature_id: str, context: list[str])->Feature",
+        "`scripts/task_utils.py` defines the following functions from AGENT_SPECCER.md: get_context(files: list[str]) -> list[str], create_feature(task_id: int, feature: Feature), block_task(reason:str), finish_spec()",
         "All functions respect the file format in `docs/FILE_ORGANISATION.md`, e.g., reading/writing to `tasks/{id}/task.json` using the Task schema, and placing tests in `tasks/{id}/tests/test_{id}_{feature_id}.py`."
       ],
       "dependencies": [
@@ -77,7 +78,8 @@
         "The script has a function to gather all available tools for each agent type in a clean way",
         "The script passes all the relevant data, and especially context and tools available, to the agent type to start a multi-way conversation that will result in tool calls",
         "The conversation continues for a given task in continuous mode until the agent decides to finish calling the finish tool.",
-        "The conversation continues for a given task in single mode until the agent decides to finish a feature calling the finish_feature tool."
+        "The conversation continues for a given task in single mode until the agent decides to finish a feature calling the finish_feature tool.",
+        "The logic for the speccer agent is slightly different as it runs on a task - no features"
       ],
       "dependencies": [
         "2.1",
