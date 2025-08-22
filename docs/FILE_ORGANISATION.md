@@ -37,28 +37,30 @@ The following tree is graphical and illustrative of a typical repository layout:
 
 ```
 repo_root/
-├─ run.py
 ├─ .env
 ├─ .gitignore
-├─ requirements.txt
 ├─ LICENSE
+├─ requirements.txt
+├─ run.py
 ├─ docs/
-│  ├─ FILE_ORGANISATION.md
+│  ├─ AGENT_COMMUNICATION_PROTOCOL.md
+│  ├─ AGENT_CONTEXTER.md
 │  ├─ AGENT_DEVELOPER.md
 │  ├─ AGENT_PLANNER.md
-│  ├─ AGENT_TESTER.md
-│  ├─ LOCAL_SETUP.md
-│  ├─ AGENT_COMMUNICATION_PROTOCOL.md
-│  ├─ PROJECTS_GUIDE.md
 │  ├─ agent_response_example.json
+│  ├─ AGENT_TESTER.md
+│  ├─ FILE_ORGANISATION.md
+│  ├─ LOCAL_SETUP.md
+│  ├─ PROJECTS_GUIDE.md
 │  └─ tasks/
 │     ├─ task_format.py
 │     └─ task_example.json
 ├─ scripts/
+│  ├─ child_project_utils.py
+│  ├─ git_manager.py
 │  ├─ run_local_agent.py
-│  ├─ task_utils.py
 │  ├─ run_tests.py
-│  └─ git_manager.py
+│  └─ task_utils.py
 ├─ projects/
 │  └─ <child_submodules>
 └─ tasks/

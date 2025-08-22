@@ -2,7 +2,7 @@
   "id": 4,
   "status": "-",
   "title": "Running in docker",
-  "description": "Child project - workflow for running projects in docker, i.e. isolated environment.",
+  "description": "Workflow for running projects in docker, i.e. isolated environment - all being contained in scripts/docker",
   "features": [
     {
       "id": "4.0",
@@ -13,11 +13,9 @@
       "context": [
         "docs/FILE_ORGANISATION.md",
         "docs/LOCAL_SETUP.md",
-        "docs/PROJECTS_GUIDE.md",
         "run.py",
         "run_local_agent.py",
         "git_manager.py",
-        "child_project_utils.py",
         "requirements.txt"
       ],
       "acceptance": []
