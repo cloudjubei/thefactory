@@ -142,7 +142,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     if agent_type == 'developer':
         task_utils.update_feature_status(task['id'], feature['id'], '~')
 
-    feature_context_files = [f"docs/AGENT_{agent_type.upper()}.md"] + feature.get("context", [])
+    feature_context_files = ["docs/AGENT_{agent_type.upper()}.md"] + feature.get("context", [])
     if agent_type == 'contexter':
         if "docs/FILE_ORGANISATION.md" not in feature_context_files:
             feature_context_files.append("docs/FILE_ORGANISATION.md")
@@ -226,6 +226,8 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
 
     print(f"Selected Task: [{current_task['id']}] {current_task['title']}")
     git_manager = GitManager()
+    branch_name = f"features/{current_task['id']}"
+    git_manager.create_branch_and_checkout(branch_name)
     
     processed_feature_ids = set()
     while True:
@@ -240,6 +242,11 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
         processed_feature_ids.add(next_feature['id'])
         if not should_continue:
             break
+    # End of task git operations
+    git_manager.stage_files(['.'])
+    commit_result = git_manager.commit(f"Completed task {current_task['id']}")
+    print(f"Commit result: {commit_result}")
+    git_manager.push("origin", branch_name)
     print("\n--- Orchestrator Finished ---")
 
 def main():

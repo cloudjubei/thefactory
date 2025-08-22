@@ -86,7 +86,7 @@
     },
     {
       "id": "4.5",
-      "status": "~",
+      "status": "+",
       "title": "Ensure container isolation for periodic agent runs",
       "description": "Configure the Docker setup so that the agent can run periodically inside the container without affecting the host machine, possibly using cron or a loop in the entrypoint script.",
       "context": [
@@ -104,7 +104,7 @@
     },
     {
       "id": "4.6",
-      "status": "-",
+      "status": "~",
       "title": "Integrate git workflow for feature branches in agent runs",
       "description": "Modify the agent execution logic to create a feature branch named features/{task_id} at the start of each task and push all code changes to it, ensuring this works within the Docker container.",
       "context": [
