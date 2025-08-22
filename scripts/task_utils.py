@@ -32,7 +32,7 @@ def get_task(task_id: int) -> Task:
 
 def save_task(task: Task):
     """Saves a task to its JSON file."""
-    task_file = _get_task_path(task.id)
+    task_file = _get_task_path(task.get('id'))
     with open(task_file, "w") as f:
         json.dump(task, f, indent=2)
 
@@ -77,8 +77,8 @@ def update_feature_status(task_id: int, feature_id: str, status: Status) -> Opti
     # ... (implementation from previous message is correct)
     task = get_task(task_id)
     updated_feature = None
-    for feature in task["features"]:
-        if feature["id"] == feature_id:
+    for feature in task.get("features"):
+        if feature.get("id") == feature_id:
             feature["status"] = status
             updated_feature = feature
             break
@@ -91,8 +91,8 @@ def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Featur
     # ... (implementation from previous message is correct)
     task = get_task(task_id)
     deferred_feature = None
-    for feature in task["features"]:
-        if feature["id"] == feature_id:
+    for feature in task.get("features"):
+        if feature.get("id") == feature_id:
             feature["status"] = "?"
             feature["rejection"] = f"Blocked: {reason}"
             deferred_feature = feature
@@ -105,7 +105,7 @@ def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Featur
 def _check_and_update_task_completion(task_id: int):
     """Checks if all features in a task are done, and if so, marks the task as done."""
     task = get_task(task_id)
-    all_features_done = all(f.get("status") == "+" for f in task["features"])
+    all_features_done = all(f.get("status") == "+" for f in task.get("features"))
     
     if all_features_done:
         print(f"All features for task {task_id} are complete. Updating task status to '+'.")
@@ -118,9 +118,9 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
     """
     task = get_task(task_id)
     feature_title = ""
-    for f in task['features']:
-        if f['id'] == feature_id:
-            feature_title = f['title']
+    for f in task.get('features'):
+        if f.get('id') == feature_id:
+            feature_title = f.get('title')
             break
 
     # 1. Stage all unstaged changes in the repository.
@@ -174,8 +174,8 @@ def update_acceptance_criteria(task_id: int, feature_id: str, criteria: List[str
     """Replace the feature's acceptance criteria with a new list."""
     task = get_task(task_id)
     updated_feature = None
-    for feature in task["features"]:
-        if feature["id"] == feature_id:
+    for feature in task.get("features"):
+        if feature.get("id") == feature_id:
             feature["acceptance"] = criteria
             updated_feature = feature
             break
@@ -241,12 +241,12 @@ def find_next_available_feature(task: Task, exclude_ids: set = set()) -> Optiona
     EXCLUDING any feature IDs passed in the `exclude_ids` set.
     """
 
-    completed_feature_ids = {f["id"] for f in task["features"] if f["status"] == "+"}
+    completed_feature_ids = {f.get("id") for f in task.get("features") if f.get("status") == "+"}
     
     for feature in task["features"]:
-        if feature["id"] in exclude_ids:
+        if feature.get("id") in exclude_ids:
             continue
-        if feature["status"] == "-":
+        if feature.get("status") == "-":
             dependencies = feature.get("dependencies", [])
             if all(dep_id in completed_feature_ids for dep_id in dependencies):
                 return feature
@@ -307,8 +307,8 @@ def update_feature_plan(task_id: int, feature_id: str, plan: any) -> Optional[Fe
 
     task = get_task(task_id)
     updated_feature = None
-    for feature in task["features"]:
-        if feature["id"] == feature_id:
+    for feature in task.get("features"):
+        if feature.get("id") == feature_id:
             feature["plan"] = plan_str
             updated_feature = feature
             break
@@ -322,8 +322,8 @@ def update_feature_context(task_id: int, feature_id: str, context: List[str]) ->
     """
     task = get_task(task_id)
     updated_feature = None
-    for feature in task["features"]:
-        if feature["id"] == feature_id:
+    for feature in task.get("features"):
+        if feature.get("id") == feature_id:
             feature["context"] = context
             updated_feature = feature
             break
