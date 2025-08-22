@@ -43,7 +43,18 @@
         "docs/PROJECTS_GUIDE.md",
         "scripts/child_project_utils.py"
       ],
-      "acceptance": []
+      "acceptance": [
+        "A CLI entry point exists to generate a child project (e.g., `python -m scripts.generate_child_project` or `scripts/generate_child_project.py`) that accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), and path (defaulting to projects/).",
+        "When invoked with a new project_name, the script creates a directory at projects/{project_name}. If the directory already exists, the script exits with a non-zero code and a clear error message without modifying existing contents.",
+        "Inside the new child project, the script creates a minimal structure including: a README.md with the provided name/description, a tasks/ directory containing an initial task file (e.g., tasks/000_initial_task.md) with placeholder content, and a .gitignore with typical Python/node/temp artifacts (or inherits from a template if present).",
+        "The script initializes a new git repository inside the child project directory (independent repo): `.git/` exists, `git status` is clean after initial commit, and the initial commit includes the scaffolded files.",
+        "If a repo_url is provided, it is set as the `origin` remote in the child project's git repo.",
+        "The root repository is updated to include the new child project as a git submodule at projects/{project_name}. The .gitmodules file is updated accordingly with the correct path and URL (if repo_url provided) or with a local path URL if not provided.",
+        "Re-running the script for the same project_name is idempotent and fails fast with a clear message without altering existing submodule configuration.",
+        "The script provides a `--dry-run` option that prints planned actions (paths to create, git commands to run) and makes no filesystem or git changes when used.",
+        "The script returns exit code 0 on success and non-zero on failure; errors include actionable messages (e.g., missing git, invalid name, non-empty target path).",
+        "A help/usage message is available via `-h/--help` describing arguments, options, examples, and behavior."
+      ]
     }
   ]
 }
