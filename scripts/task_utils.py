@@ -246,21 +246,6 @@ def find_next_available_feature(task: Task, exclude_ids: set = set()) -> Optiona
                 return feature
     return None
 
-def create_task(task: Task) -> Task:
-    """Creates a new task directory and task.json file."""
-    task_id = task.get("id")
-    if not task_id:
-        raise ValueError("Task dictionary must include an 'id'.")
-    
-    task_dir = TASKS_DIR / str(task_id)
-    if task_dir.exists():
-        raise FileExistsError(f"Task with ID {task_id} already exists.")
-    
-    # Ensure features list exists
-    task.setdefault("features", [])
-    save_task(task)
-    return task
-
 def create_feature(task_id: int, feature: Feature) -> Feature:
     """Adds a new feature to an existing task. (For rare cases where a feature must be split)."""
     task = get_task(task_id)

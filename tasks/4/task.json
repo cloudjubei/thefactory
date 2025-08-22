@@ -9,34 +9,13 @@
       "status": "-",
       "title": "Create all the  missing features for this using `create_feature`",
       "description": "The file docs/docker/RUNNING_DOCKER_README.md exists detailing the steps involved in running the project in a container environment. A docs/docker/Dockerfile exists that a user can copy and use. A script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in a prepare .env file that the script will look into and set everything up. The purpose is to have an agent periodically run in a container and not affect the host machine. Whenever an agent is run on a task - at the beginning a feature branch features/{task_id} needs to be created and all code is pushed to it",
-      "context": [],
+      "context": [
+        "docs/FILE_ORGANISATION.md",
+        "docs/tasks/task_format.py",
+        "docs/tasks/task_example.py"
+      ],
       "acceptance": [],
       "plan": "Step 1: Implement sub-feature 4.1 by creating the Dockerfile with base image (e.g., Python), installing dependencies from requirements.txt, copying project files, setting environment variables from .env, and defining an entrypoint script to run the agent.\nStep 2: Implement sub-feature 4.2 by writing the README detailing prerequisites (Docker installed, Git), steps to clone repo, prepare .env with API keys, build image using the script, run the container, and troubleshoot common issues.\nStep 3: Implement sub-feature 4.3 by creating a bash script that clones the repo if not present, checks for .env file (prompt to create if missing), builds the Docker image with a tag, and outputs run commands.\nStep 4: Implement sub-feature 4.4 by adding a script or cron job in the Dockerfile/entrypoint to run the agent at intervals (e.g., every hour), ensuring it processes tasks without host interference.\nStep 5: Implement sub-feature 4.5 by updating the agent's task handling code to git checkout -b features/{task_id}, perform work, commit changes, and git push origin features/{task_id} at the end.\nStep 6: Test the entire Docker setup end-to-end, ensuring agents run periodically in container, use provided API keys, create branches, and isolate changes."
-    },
-    {
-      "id": "4.1",
-      "name": "Create Dockerfile for the project",
-      "description": "Develop a Dockerfile in docs/docker/ that sets up the environment for running the agent in a container, including necessary dependencies, copying the project files, and setting entrypoint for running the agent."
-    },
-    {
-      "id": "4.2",
-      "name": "Create RUNNING_DOCKER_README.md",
-      "description": "Write a detailed README file in docs/docker/ explaining the steps to run the project in Docker, including how to use the Dockerfile, provide API keys via .env, build and run the container, and any other relevant instructions."
-    },
-    {
-      "id": "4.3",
-      "name": "Create build script for Docker image",
-      "description": "Develop a script (e.g., build_docker.sh) that clones the repository, prompts or checks for a .env file with API keys, copies it into the build context, builds the Docker image using the Dockerfile, and provides instructions for running it."
-    },
-    {
-      "id": "4.4",
-      "name": "Setup periodic agent runs in container",
-      "description": "Implement a mechanism inside the container (e.g., using cron, a loop in the entrypoint script, or a scheduler) to run the agent periodically without affecting the host machine. Ensure it handles tasks in isolation."
-    },
-    {
-      "id": "4.5",
-      "name": "Implement feature branch creation for tasks",
-      "description": "Modify the agent workflow so that at the beginning of each task, it creates a Git branch named features/{task_id}, switches to it, and ensures all code changes are committed and pushed to this branch."
     }
   ]
 }
