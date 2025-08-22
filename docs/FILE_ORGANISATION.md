@@ -35,6 +35,11 @@ The following tree is graphical and illustrative of a typical repository layout:
 
 ```
 repo_root/
+├─ run.py
+├─ .env
+├─ .gitignore
+├─ requirements.txt
+├─ LICENSE
 ├─ docs/
 │  ├─ FILE_ORGANISATION.md
 │  ├─ AGENT_DEVELOPER.md
@@ -50,7 +55,6 @@ repo_root/
 │  ├─ run_local_agent.py
 │  ├─ task_utils.py
 │  ├─ run_tests.py
-│  ├─ run.py
 │  └─ git_manager.py
 └─ tasks/
    ├─ 1/

@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-IGNORE_PATTERNS = shutil.ignore_patterns('.git', 'venv', '__pycache__', '*.pyc', '.idea')
+IGNORE_PATTERNS = shutil.ignore_patterns('venv', '__pycache__', '*.pyc', '.idea')
 
 def main():
     """
