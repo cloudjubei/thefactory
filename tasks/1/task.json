@@ -1,6 +1,6 @@
 {
   "id": 1,
-  "status": "-",
+  "status": "+",
   "title": "Task Management System Definition",
   "description": "Define and maintain the core components of the agent's task management system. This task serves as the canonical source of truth for task structure, guidance, and tooling.",
   "features": [
@@ -181,7 +181,7 @@
     },
     {
       "id": "1.9",
-      "status": "-",
+      "status": "+",
       "title": "Plan specification for Contexter",
       "description": "Create a specification for the contexter task that describes how to provide context to each feature. This document is meant to be directly passed to a contexter agent to serve as their starting point and guide.",
       "context": [
