@@ -12,6 +12,7 @@
       "plan": "",
       "context": [
         "docs/FILE_ORGANISATION.md",
+        "docs/PROJECTS_GUIDE.md",
         "run.py",
         "requirements.txt",
         "scripts/run_local_agent.py",
