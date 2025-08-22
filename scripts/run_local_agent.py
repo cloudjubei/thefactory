@@ -207,6 +207,9 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
 
         except Exception as e:
             print(f"An error occurred in agent loop: {e}")
+            print("\n--- Full Stack Trace ---")
+            traceback.print_exc()
+            print("------------------------\n")
             task_utils.block_feature(task['id'], feature['id'], f"Agent loop failed: {e}")
             return True
             
@@ -265,7 +268,7 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
     except Exception as e:
         print(f"\n--- A critical error occurred during the orchestrator run: {e} ---")
         print("\n--- Full Stack Trace ---")
-        traceback.print_exc()  # This will print the full traceback to the console.
+        traceback.print_exc()
         print("------------------------\n")
 
 def main():
