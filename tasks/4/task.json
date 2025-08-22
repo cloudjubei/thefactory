@@ -6,7 +6,7 @@
   "features": [
     {
       "id": "4.0",
-      "status": "-",
+      "status": "+",
       "title": "Create all the  missing features for this using `create_feature`",
       "description": "The file docs/docker/RUNNING_DOCKER_README.md exists detailing the steps involved in running the project in a container environment. A docs/docker/Dockerfile exists that a user can copy and use. A script can exist that a use can us to clone the repository and build a docker image. At some point they will just have to provide the API keys, so maybe before the build docker script is is required that the user fills in a prepare .env file that the script will look into and set everything up. The purpose is to have an agent periodically run in a container and not affect the host machine. Whenever an agent is run on a task - at the beginning a feature branch features/{task_id} needs to be created and all code is pushed to it",
       "context": [
@@ -19,31 +19,44 @@
     },
     {
       "id": "4.1",
+      "status": "-",
       "title": "Create Dockerfile for the project",
-      "description": "Create a file at docs/docker/Dockerfile that sets up the environment for running the project in a Docker container. It should include installing dependencies, copying necessary files, handling .env for API keys, and setting the entrypoint for running the agent periodically."
+      "description": "Create a file at docs/docker/Dockerfile that sets up the environment for running the project in a Docker container. It should include installing dependencies, copying necessary files, handling .env for API keys, and setting the entrypoint for running the agent periodically.",
+      "context": [
+        "requirements.txt",
+        ".env.example",
+        "scripts/run_local_agent.py",
+        "docs/LOCAL_SETUP.md",
+        "docs/FILE_ORGANISATION.md"
+      ]
     },
     {
       "id": "4.2",
+      "status": "-",
       "title": "Create README for running in Docker",
       "description": "Create a file at docs/docker/RUNNING_DOCKER_README.md detailing the steps to build and run the project in Docker, including how to prepare .env, use the build script, and run the container periodically."
     },
     {
       "id": "4.3",
+      "status": "-",
       "title": "Create build script for Docker",
       "description": "Create a script (e.g., scripts/build_docker.sh) that clones the repository, checks for a prepared .env file with API keys, builds the Docker image using the Dockerfile, and provides instructions for running the container."
     },
     {
       "id": "4.4",
+      "status": "-",
       "title": "Handle API keys via .env in Docker setup",
       "description": "Ensure the Dockerfile and build script handle a .env file for API keys, copying it into the container during build or mounting it at runtime to avoid exposing keys on the host."
     },
     {
       "id": "4.5",
+      "status": "-",
       "title": "Ensure container isolation for periodic agent runs",
       "description": "Configure the Docker setup so that the agent can run periodically inside the container without affecting the host machine, possibly using cron or a loop in the entrypoint script."
     },
     {
       "id": "4.6",
+      "status": "-",
       "title": "Integrate git workflow for feature branches in agent runs",
       "description": "Modify the agent execution logic to create a feature branch named features/{task_id} at the start of each task and push all code changes to it, ensuring this works within the Docker container."
     }

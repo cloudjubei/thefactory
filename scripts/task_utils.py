@@ -246,7 +246,7 @@ def find_next_available_feature(task: Task, exclude_ids: set = set()) -> Optiona
                 return feature
     return None
 
-def create_feature(task_id: int, feature: Feature) -> Feature:
+def create_feature(task_id: int, title: str, description: str, plan: str) -> Feature:
     """Adds a new feature to an existing task. (For rare cases where a feature must be split)."""
     task = get_task(task_id)
     existing_ids = {f["id"] for f in task["features"]}
