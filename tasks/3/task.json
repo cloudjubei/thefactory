@@ -44,7 +44,7 @@
         "scripts/child_project_utils.py"
       ],
       "acceptance": [
-        "A CLI entry point exists to generate a child project (e.g., `python -m scripts.generate_child_project` or `scripts/generate_child_project.py`) that accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), and path (defaulting to projects/).",
+        "A CLI entry point exists to generate a child project `scripts.child_project_utils` that accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), and path (defaulting to projects/).",
         "When invoked with a new project_name, the script creates a directory at projects/{project_name}. If the directory already exists, the script exits with a non-zero code and a clear error message without modifying existing contents.",
         "Inside the new child project, the script creates a minimal structure including: a README.md with the provided name/description, a tasks/ directory containing an initial task file (e.g., tasks/000_initial_task.md) with placeholder content, and a .gitignore with typical Python/node/temp artifacts (or inherits from a template if present).",
         "The script initializes a new git repository inside the child project directory (independent repo): `.git/` exists, `git status` is clean after initial commit, and the initial commit includes the scaffolded files.",
