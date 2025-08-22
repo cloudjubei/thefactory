@@ -6,20 +6,18 @@
   "features": [
     {
       "id": "4.1",
-      "status": "-",
+      "status": "+",
       "title": "Create Dockerfile for the project",
       "description": "Create a file at docs/docker/Dockerfile that sets up the environment for running the project in a Docker container. It should include installing dependencies, copying necessary files, handling .env for API keys, and setting the entrypoint for running the agent periodically.",
       "context": [
         "requirements.txt",
         ".env.example",
-        "scripts/run_local_agent.py",
-        "docs/LOCAL_SETUP.md",
-        "docs/FILE_ORGANISATION.md"
+        "scripts/run_local_agent.py"
       ]
     },
     {
       "id": "4.2",
-      "status": "-",
+      "status": "+",
       "title": "Create README for running in Docker",
       "description": "Create a file at docs/docker/RUNNING_DOCKER_README.md detailing the steps to build and run the project in Docker, including how to prepare .env, use the build script, and run the container periodically.",
       "context": [
@@ -30,7 +28,7 @@
     },
     {
       "id": "4.3",
-      "status": "-",
+      "status": "+",
       "title": "Create build script for Docker",
       "description": "Create a script (e.g., scripts/build_docker.sh) that clones the repository, checks for a prepared .env file with API keys, builds the Docker image using the Dockerfile, and provides instructions for running the container.",
       "context": [
@@ -44,7 +42,7 @@
     },
     {
       "id": "4.4",
-      "status": "-",
+      "status": "+",
       "title": "Handle API keys via .env in Docker setup",
       "description": "Ensure the Dockerfile and build script handle a .env file for API keys, copying it into the container during build or mounting it at runtime to avoid exposing keys on the host.",
       "context": [
