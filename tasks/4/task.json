@@ -1,8 +1,119 @@
 {
   "id": 4,
-  "status": "-",
+  "status": "+",
   "title": "Running in docker",
   "description": "adhere to `docs/PROJECTS_GUIDE.md` to create all needed features for any project to be able to run in docker. It must be possible to do this with a minimal amount of steps and configuration. As much as possible should be configured for the user - if possible any data already present in THIS project should be reused - especially the `.env` file. It should be possible to run the current project and launch an agent in docker with a single script or command. All files for this should live in `scripts/docker`",
   "features": [
+    {
+      "id": "4.1",
+      "status": "+",
+      "title": "Create Dockerfile for the agent environment",
+      "description": "Create a `Dockerfile` inside `scripts/docker/`. It should use a suitable Python base image (e.g., `python:3.11-slim`), set up a working directory, copy project files, and install dependencies from `requirements.txt`. The context for the build will be the project's root directory.",
+      "plan": "1. Navigate to the project's root directory.\n2. If the directory 'scripts/docker' does not exist, create it.\n3. Inside 'scripts/docker', create a new file named 'Dockerfile'.\n4. In the Dockerfile, start with the base image: FROM python:3.11-slim\n5. Set the working directory: WORKDIR /app\n6. Copy the project files from the root context: COPY . /app\n7. Install dependencies: RUN pip install --no-cache-dir -r requirements.txt\n8. Ensure no unnecessary commands are added; this sets up the environment as specified without specifying a default command, as it's for the agent environment setup.\n9. Save and commit the changes to the repository.",
+      "context": [
+        "docs/PROJECTS_GUIDE.md",
+        "requirements.txt",
+        ".env",
+        ".gitmodules"
+      ],
+      "acceptance": [
+        "The directory 'scripts/docker' exists in the project root.",
+        "A file named 'Dockerfile' exists in 'scripts/docker/'.",
+        "The Dockerfile uses 'python:3.11-slim' or a similar suitable Python base image (e.g., starts with 'FROM python:3.11-slim').",
+        "The Dockerfile sets a working directory (e.g., contains 'WORKDIR /app').",
+        "The Dockerfile copies project files (e.g., contains 'COPY . /app' or equivalent).",
+        "The Dockerfile installs dependencies from 'requirements.txt' (e.g., contains 'RUN pip install -r requirements.txt')."
+      ]
+    },
+    {
+      "id": "4.2",
+      "status": "+",
+      "title": "Create .dockerignore file",
+      "description": "Create a `.dockerignore` file in the `scripts/docker/` directory. This file will be used with the Dockerfile from the same directory to prevent unnecessary files and directories (like `.git`, `__pycache__`, `.venv`, `tasks/`) from being copied into the Docker image, keeping it lean. The build context is the project root, so paths in .dockerignore should be relative to the root.",
+      "plan": "1. Ensure the `scripts/docker/` directory exists in the project root. If it does not, create it.\n2. In the `scripts/docker/` directory, create a new file named `.dockerignore`.\n3. Open the `.dockerignore` file in a text editor.\n4. Add the following entries to the file, each on a new line, to ignore unnecessary files and directories relative to the project root:\n   - .git\n   - **/__pycache__\n   - .venv\n   - tasks/\n   - *.pyc\n   - *.pyo\n   - .gitignore\n   - README.md (if not needed in the image)\n   - docs/\n   - tests/ (if tests are not required in the Docker image)\n   - Any other project-specific unnecessary files or directories to keep the image lean, but do not ignore `.env` to allow reuse as per the parent task.\n5. Save the file.\n6. Commit the new `.dockerignore` file to the repository with a message like 'Add .dockerignore for Docker builds'.\n7. Note: Since the build context is the project root, ensure any build script in `scripts/docker/` handles using this .dockerignore (e.g., by temporarily copying it to the root during build or adjusting the Docker build command accordingly).",
+      "context": [
+        ".gitignore",
+        "docs/PROJECTS_GUIDE.md",
+        "docs/FILE_ORGANISATION.md",
+        ".env"
+      ],
+      "acceptance": [
+        "The .dockerignore file exists at 'scripts/docker/.dockerignore'.",
+        "The .dockerignore file contains all positive ignore patterns from '.gitignore'.",
+        "The .dockerignore file additionally contains '.git'.",
+        "The .dockerignore file additionally contains '.venv'.",
+        "The .dockerignore file additionally contains 'tasks/'.",
+        "All patterns in the .dockerignore file are relative paths (do not start with '/')."
+      ]
+    },
+    {
+      "id": "4.3",
+      "status": "+",
+      "title": "Create docker-compose.yml for easy container management",
+      "description": "Create a `docker-compose.yml` file in `scripts/docker/`. This file will define an `agent` service that builds from the local Dockerfile. It must mount the project's root `.env` file, the `projects/` directory, and the `tasks/` directory as volumes into the container to ensure the agent has access to necessary configurations and data.",
+      "plan": "1. Ensure that a Dockerfile exists in scripts/docker/ (as per parent task ID 4). If not, create one that sets up the environment for running the agent, but assume it's already present based on the feature description.\n2. In the scripts/docker/ directory, create a new file named docker-compose.yml.\n3. In docker-compose.yml, specify the Compose file version, e.g., 'version: \"3\"' or a suitable version.\n4. Define the 'services' section.\n5. Under services, add an 'agent' service.\n6. For the 'agent' service, set 'build: .' to build from the local Dockerfile in scripts/docker/.\n7. Add a 'volumes' section under the 'agent' service.\n8. In volumes, mount the project's root .env file: '../../.env:/app/.env' (assuming the container's working directory is /app; adjust if necessary based on Dockerfile).\n9. Mount the projects/ directory: '../../projects:/app/projects' to provide access to child projects and submodules as per docs/PROJECTS_GUIDE.md.\n10. Mount the tasks/ directory: '../../tasks:/app/tasks' for task data.\n11. Optionally, add other service configurations like 'command' to run the agent, environment variables if needed, or ports if applicable, but keep minimal as per the task's emphasis on simplicity.\n12. Ensure the mounts reuse existing data, especially .env, and allow running with a single command like 'docker-compose up' from scripts/docker/.\n13. Test the docker-compose.yml by running 'docker-compose up --build' to verify the agent service starts and has access to the mounted files/directories.\n14. Commit the new docker-compose.yml file to the repository with an appropriate message.",
+      "context": [
+        "docs/PROJECTS_GUIDE.md",
+        ".env",
+        "docs/FILE_ORGANISATION.md"
+      ],
+      "acceptance": [
+        "The directory 'scripts/docker/' exists in the project root.",
+        "The file 'scripts/docker/docker-compose.yml' exists.",
+        "The 'docker-compose.yml' file is valid YAML and defines a compose version (e.g., '3' or higher).",
+        "The file defines a service named 'agent'.",
+        "The 'agent' service has a build configuration that uses the local Dockerfile (e.g., build: '.' assuming Dockerfile in the same directory, or explicit context and dockerfile).",
+        "The 'agent' service includes a volume mount for the project's root '.env' file (e.g., - ../../.env:/app/.env or similar relative/absolute path).",
+        "The 'agent' service includes a volume mount for the 'projects/' directory (e.g., - ../../projects:/app/projects or similar).",
+        "The 'agent' service includes a volume mount for the 'tasks/' directory (e.g., - ../../tasks:/app/tasks or similar)."
+      ]
+    },
+    {
+      "id": "4.4",
+      "status": "+",
+      "title": "Create a run script to launch the agent in Docker",
+      "description": "Create an executable shell script `scripts/docker/run.sh`. This script will serve as the single command to build the Docker image (if not already built) and run the agent container using `docker-compose`. It should accept arguments and pass them to the agent process inside the container. It should also handle graceful shutdown.",
+      "plan": "1. Create a new file at `scripts/docker/run.sh` and make it executable using `chmod +x scripts/docker/run.sh`.\n2. At the top of the script, add a shebang line: `#!/bin/bash`.\n3. Add code to check if the Docker image exists (e.g., using `docker images -q <image_name>`), assuming the image name is defined in docker-compose.yml; if not, run `docker-compose build` to build it.\n4. Source the existing `.env` file if present (e.g., `set -a; source ../../.env; set +a`) to reuse any environment variables.\n5. Accept command-line arguments in the script (e.g., using `$@`) and prepare to pass them to the agent process inside the container, possibly by overriding the command in docker-compose (e.g., `docker-compose run --rm agent $@` or setting an environment variable that the entrypoint uses).\n6. Run the container using `docker-compose up` (or `docker-compose run` for non-detached mode), ensuring it launches the agent with the passed arguments.\n7. Implement graceful shutdown by trapping signals like SIGINT and SIGTERM (e.g., `trap 'docker-compose down' SIGINT SIGTERM`), so that on script interruption, it runs `docker-compose down` to stop the containers cleanly.\n8. Add error handling, such as checking if docker-compose is installed and providing user-friendly messages.\n9. Test the script to ensure it builds only when necessary, passes arguments correctly, reuses .env, and shuts down gracefully.",
+      "context": [
+        ".env",
+        "run.py",
+        "scripts/run_local_agent.py",
+        "requirements.txt",
+        "docs/PROJECTS_GUIDE.md"
+      ],
+      "acceptance": [
+        "The file 'scripts/docker/run.sh' exists in the repository.",
+        "The file 'scripts/docker/run.sh' has executable permissions (mode at least 0o755).",
+        "The script checks if the Docker image is already built and builds it if not (e.g., contains logic with 'docker image inspect' or similar and 'docker build').",
+        "The script uses 'docker-compose up' to run the agent container.",
+        "The script accepts command-line arguments and passes them to the agent process inside the container (e.g., forwards $@ to the entrypoint).",
+        "The script handles graceful shutdown, such as trapping SIGINT/SIGTERM and running 'docker-compose down'.",
+        "The script reuses the existing '.env' file, for example by mounting it into the container or sourcing it.",
+        "Running the script launches the agent in Docker with minimal steps, and it can be invoked as a single command."
+      ]
+    },
+    {
+      "id": "4.5",
+      "status": "+",
+      "title": "Add documentation for the Docker setup",
+      "description": "Create a new file `docs/DOCKER_SETUP.md`. This document will explain the prerequisites (Docker, Docker Compose) and provide clear instructions on how to use the `scripts/docker/run.sh` script to start and interact with the agent in a Docker container.",
+      "plan": "1. Create a new file named `DOCKER_SETUP.md` in the `docs` directory.\n\n2. Add a main title to the document, such as '# Docker Setup for the Agent Project'.\n\n3. Create a 'Prerequisites' section:\n   - List Docker as a requirement and provide a brief explanation with a link to the official Docker installation guide (e.g., https://docs.docker.com/get-docker/).\n   - List Docker Compose as a requirement and provide a brief explanation with a link to the official installation guide (e.g., https://docs.docker.com/compose/install/).\n   - Mention any other necessary tools or system requirements if applicable, based on the project guide.\n\n4. Create a 'Setup and Configuration' section:\n   - Explain that the Docker setup reuses existing project data, such as the `.env` file, to minimize user configuration.\n   - Describe any automatic configurations handled by the setup.\n\n5. Create a 'Usage Instructions' section:\n   - Provide step-by-step commands to run the Docker setup, e.g., navigate to the project root and execute `./scripts/docker/run.sh`.\n   - Explain what the script does: builds the Docker image, starts the container, launches the agent, etc.\n   - Include instructions on interacting with the agent in the container, such as accessing logs, entering the container shell (e.g., docker exec), or stopping the container.\n   - Mention that the setup allows running the project and launching an agent with a single command, adhering to the project guide.\n\n6. Add optional sections if needed, such as 'Troubleshooting' for common issues or 'Advanced Configuration' for customizing the Docker setup.\n\n7. Ensure the document is well-formatted with Markdown syntax, clear language, and examples where appropriate.\n\n8. Commit the changes to the repository with a descriptive message.",
+      "context": [
+        "docs/FILE_ORGANISATION.md",
+        "docs/PROJECTS_GUIDE.md",
+        "docs/LOCAL_SETUP.md",
+        ".env",
+        "scripts/docker/run.sh"
+      ],
+      "acceptance": [
+        "A new documentation file docs/DOCKER_SETUP.md exists.",
+        "The document includes a clear Prerequisites section that explicitly mentions Docker and Docker Compose.",
+        "The document references and explains how to use the scripts/docker/run.sh script to start the agent in Docker.",
+        "The document provides at least one example command that uses scripts/docker/run.sh and demonstrates passing agent arguments, including --agent and --task.",
+        "The document explains that the existing .env file is reused by the Docker setup (or instructs users to create/configure it).",
+        "The document describes that arguments passed to scripts/docker/run.sh are forwarded to the agent inside the container.",
+        "The scripts/docker/run.sh file exists and is executable."
+      ]
+    }
   ]
 }

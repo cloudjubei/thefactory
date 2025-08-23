@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  agent:
+    build:
+      context: ../..
+      dockerfile: scripts/docker/Dockerfile
+    volumes:
+      - ../../.env:/app/.env:ro
+      - ../../projects:/app/projects
+      - ../../tasks:/app/tasks
