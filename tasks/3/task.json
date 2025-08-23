@@ -29,8 +29,7 @@
         "The script provides a --dry-run option that prints planned actions (paths to create, git commands to run) and makes no filesystem or git changes when used.",
         "The script returns exit code 0 on success and non-zero on failure; errors include actionable messages (e.g., missing git, invalid name, non-empty target path).",
         "A help/usage message is available via -h/--help describing arguments, options (including --task-id), examples, and behavior."
-      ],
-      "rejection": "currently the script creates a file `projects/child-project/tasks/000_initial_task.md` - this is not according to spec. It should create a file `projects/child-project/tasks/1/task.json` which can literally have the example task from `docs/tasks/task_example.json`. But there needs to be an extra argument - if a task_id is specified, then that whole task folder will be copied over and set as task 1 in the child project (this means that any references to the task's current id need to be changed to 1)."
+      ]
     },
     {
       "id": "3.2",
