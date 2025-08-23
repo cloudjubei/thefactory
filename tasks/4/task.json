@@ -66,7 +66,13 @@
       "title": "Add documentation for the Docker setup",
       "description": "Create a new file `docs/DOCKER_SETUP.md`. This document will explain the prerequisites (Docker, Docker Compose) and provide clear instructions on how to use the `scripts/docker/run.sh` script to start and interact with the agent in a Docker container.",
       "plan": "1. Create a new file named `DOCKER_SETUP.md` in the `docs` directory.\n\n2. Add a main title to the document, such as '# Docker Setup for the Agent Project'.\n\n3. Create a 'Prerequisites' section:\n   - List Docker as a requirement and provide a brief explanation with a link to the official Docker installation guide (e.g., https://docs.docker.com/get-docker/).\n   - List Docker Compose as a requirement and provide a brief explanation with a link to the official installation guide (e.g., https://docs.docker.com/compose/install/).\n   - Mention any other necessary tools or system requirements if applicable, based on the project guide.\n\n4. Create a 'Setup and Configuration' section:\n   - Explain that the Docker setup reuses existing project data, such as the `.env` file, to minimize user configuration.\n   - Describe any automatic configurations handled by the setup.\n\n5. Create a 'Usage Instructions' section:\n   - Provide step-by-step commands to run the Docker setup, e.g., navigate to the project root and execute `./scripts/docker/run.sh`.\n   - Explain what the script does: builds the Docker image, starts the container, launches the agent, etc.\n   - Include instructions on interacting with the agent in the container, such as accessing logs, entering the container shell (e.g., docker exec), or stopping the container.\n   - Mention that the setup allows running the project and launching an agent with a single command, adhering to the project guide.\n\n6. Add optional sections if needed, such as 'Troubleshooting' for common issues or 'Advanced Configuration' for customizing the Docker setup.\n\n7. Ensure the document is well-formatted with Markdown syntax, clear language, and examples where appropriate.\n\n8. Commit the changes to the repository with a descriptive message.",
-      "context": [],
+      "context": [
+        "docs/FILE_ORGANISATION.md",
+        "docs/PROJECTS_GUIDE.md",
+        "docs/LOCAL_SETUP.md",
+        ".env",
+        "scripts/docker/run.sh"
+      ],
       "acceptance": []
     }
   ]
