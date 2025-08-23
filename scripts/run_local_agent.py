@@ -243,6 +243,7 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
             git_manager.checkout_branch(branch_name)
         except Exception as e:
             print(f"Could not create or checkout branch '{branch_name}': {e}")
+            git_manager.checkout_branch(branch_name, False)
         try:
             git_manager.pull(branch_name)
         except Exception as e:
