@@ -6,7 +6,7 @@
   "features": [
     {
       "id": "3.1",
-      "status": "-",
+      "status": "~",
       "title": "Document submodule workflow for child projects",
       "description": "Create clear documentation detailing how the projects/ folder is used with git submodules, including cloning, initialization, adding, updating, and removing child projects, plus common pitfalls.",
       "plan": "1. **Locate Documentation File**: Identify the correct location for the documentation, which is `docs/PROJECTS_GUIDE.md`, as specified in `docs/FILE_ORGANISATION.md`.\n2. **Review Existing Content**: Read through the existing content of `docs/PROJECTS_GUIDE.md`.\n3. **Verify Requirements Coverage**: Confirm that the document thoroughly covers all the required topics mentioned in the feature description:\n    - Cloning a repository with submodules.\n    - Initializing submodules post-clone.\n    - Adding a new child project as a submodule.\n    - Updating submodules to newer commits.\n    - Removing a submodule.\n    - Common pitfalls and best practices.\n4. **Confirm Completion**: Based on the provided context, the file `docs/PROJECTS_GUIDE.md` already exists and is complete, satisfying all the feature requirements.\n5. **Finalize**: Since the deliverable for this feature is already present and correct in the codebase, no further changes are needed. The feature implementation is complete.",
