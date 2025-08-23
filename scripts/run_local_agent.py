@@ -88,8 +88,10 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
 def construct_system_prompt(agent_type: str, task: Task, feature: Feature, context: str, tool_signatures: List[str]) -> str:
     """Constructs the detailed system prompt, specialized for the agent type."""
     prompt = f"""You are the '{agent_type}' agent.
-CURRENT TASK: {task.get('title')} (ID: {task.get('id')}) - DESCRIPTION: {task.get('description')}\n\n
-{ feature and f"ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')} - DESCRIPTION: {feature.get('description')}\n\n"}
+CURRENT TASK: {task.get('title')} (ID: {task.get('id')}) - DESCRIPTION: {task.get('description')}
+
+{ feature and f"ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')} - DESCRIPTION: {feature.get('description')}"}
+
 The following context files have been provided:
 {context}
 """
