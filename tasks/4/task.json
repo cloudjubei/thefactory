@@ -6,7 +6,7 @@
   "features": [
     {
       "id": "4.1",
-      "status": "~",
+      "status": "+",
       "title": "Create Dockerfile for the agent environment",
       "description": "Create a `Dockerfile` inside `scripts/docker/`. It should use a suitable Python base image (e.g., `python:3.11-slim`), set up a working directory, copy project files, and install dependencies from `requirements.txt`. The context for the build will be the project's root directory.",
       "plan": "1. Navigate to the project's root directory.\n2. If the directory 'scripts/docker' does not exist, create it.\n3. Inside 'scripts/docker', create a new file named 'Dockerfile'.\n4. In the Dockerfile, start with the base image: FROM python:3.11-slim\n5. Set the working directory: WORKDIR /app\n6. Copy the project files from the root context: COPY . /app\n7. Install dependencies: RUN pip install --no-cache-dir -r requirements.txt\n8. Ensure no unnecessary commands are added; this sets up the environment as specified without specifying a default command, as it's for the agent environment setup.\n9. Save and commit the changes to the repository.",
@@ -27,7 +27,7 @@
     },
     {
       "id": "4.2",
-      "status": "-",
+      "status": "~",
       "title": "Create .dockerignore file",
       "description": "Create a `.dockerignore` file in the `scripts/docker/` directory. This file will be used with the Dockerfile from the same directory to prevent unnecessary files and directories (like `.git`, `__pycache__`, `.venv`, `tasks/`) from being copied into the Docker image, keeping it lean. The build context is the project root, so paths in .dockerignore should be relative to the root.",
       "plan": "1. Ensure the `scripts/docker/` directory exists in the project root. If it does not, create it.\n2. In the `scripts/docker/` directory, create a new file named `.dockerignore`.\n3. Open the `.dockerignore` file in a text editor.\n4. Add the following entries to the file, each on a new line, to ignore unnecessary files and directories relative to the project root:\n   - .git\n   - **/__pycache__\n   - .venv\n   - tasks/\n   - *.pyc\n   - *.pyo\n   - .gitignore\n   - README.md (if not needed in the image)\n   - docs/\n   - tests/ (if tests are not required in the Docker image)\n   - Any other project-specific unnecessary files or directories to keep the image lean, but do not ignore `.env` to allow reuse as per the parent task.\n5. Save the file.\n6. Commit the new `.dockerignore` file to the repository with a message like 'Add .dockerignore for Docker builds'.\n7. Note: Since the build context is the project root, ensure any build script in `scripts/docker/` handles using this .dockerignore (e.g., by temporarily copying it to the root during build or adjusting the Docker build command accordingly).",
