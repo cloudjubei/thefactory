@@ -38,7 +38,11 @@
       "title": "Create docker-compose.yml for easy container management",
       "description": "Create a `docker-compose.yml` file in `scripts/docker/`. This file will define an `agent` service that builds from the local Dockerfile. It must mount the project's root `.env` file, the `projects/` directory, and the `tasks/` directory as volumes into the container to ensure the agent has access to necessary configurations and data.",
       "plan": "1. Ensure that a Dockerfile exists in scripts/docker/ (as per parent task ID 4). If not, create one that sets up the environment for running the agent, but assume it's already present based on the feature description.\n2. In the scripts/docker/ directory, create a new file named docker-compose.yml.\n3. In docker-compose.yml, specify the Compose file version, e.g., 'version: \"3\"' or a suitable version.\n4. Define the 'services' section.\n5. Under services, add an 'agent' service.\n6. For the 'agent' service, set 'build: .' to build from the local Dockerfile in scripts/docker/.\n7. Add a 'volumes' section under the 'agent' service.\n8. In volumes, mount the project's root .env file: '../../.env:/app/.env' (assuming the container's working directory is /app; adjust if necessary based on Dockerfile).\n9. Mount the projects/ directory: '../../projects:/app/projects' to provide access to child projects and submodules as per docs/PROJECTS_GUIDE.md.\n10. Mount the tasks/ directory: '../../tasks:/app/tasks' for task data.\n11. Optionally, add other service configurations like 'command' to run the agent, environment variables if needed, or ports if applicable, but keep minimal as per the task's emphasis on simplicity.\n12. Ensure the mounts reuse existing data, especially .env, and allow running with a single command like 'docker-compose up' from scripts/docker/.\n13. Test the docker-compose.yml by running 'docker-compose up --build' to verify the agent service starts and has access to the mounted files/directories.\n14. Commit the new docker-compose.yml file to the repository with an appropriate message.",
-      "context": [],
+      "context": [
+        "docs/PROJECTS_GUIDE.md",
+        ".env",
+        "docs/FILE_ORGANISATION.md"
+      ],
       "acceptance": []
     },
     {
