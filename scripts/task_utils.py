@@ -41,7 +41,6 @@ def update_task_status(task_id: int, status: Status) -> Task:
     task = get_task(task_id)
     task["status"] = status
     save_task(task)
-    print(f"update_task_status: new task: '{task}'.")
     return task
 # --- Developer Agent Tools ---
 
@@ -93,11 +92,8 @@ def update_feature_status(task_id: int, feature_id: str, status: Status) -> Opti
             feature["status"] = status
             updated_feature = feature
             break
-    print(f"update_feature_status: Feature {feature_id} status updated to '{status}'.")
-    print(f"update_feature_status: updated feature is: {updated_feature}")
     if updated_feature:
         save_task(task)
-        print(f"update_feature_status: task saved")
     return updated_feature
 
 def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Feature]:
@@ -148,14 +144,6 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
             feature_title = f.get('title')
             break
 
-    # 1. Stage all unstaged changes in the repository.
-    # This is a robust way to capture all work done by the agent in this turn.
-    try:
-        # Using GitManager to stage all changes. A simple '.' stages everything.
-        git_manager.stage_files(['.'])
-    except Exception as e:
-        print(f"Warning: Could not stage files. Git error: {e}")
-
     if agent_type == 'developer':
         commit_message = f"feat: Complete feature {feature_id} - {feature_title}"
         update_feature_status(task_id, feature_id, "+")
@@ -172,6 +160,10 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
     else:
         raise ValueError(f"Unknown agent_type '{agent_type}' called finish_feature.")
 
+    try:
+        git_manager.stage_files(['.'])
+    except Exception as e:
+        print(f"Warning: Could not stage files. Git error: {e}")
     try:
         git_manager.commit(commit_message)
         print(f"Committed changes with message: '{commit_message}'")
