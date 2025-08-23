@@ -54,8 +54,7 @@
       ],
       "dependencies": [
         "3.1"
-      ],
-      "rejection": "the information about using --task-id is not in the document"
+      ]
     },
     {
       "id": "3.3",
@@ -77,8 +76,7 @@
       ],
       "dependencies": [
         "3.1"
-      ],
-      "rejection": "this whole addition is missing - the parameter for calling `run_local_agent` and `run` with a --project-dir parameter is missing"
+      ]
     }
   ]
 }
