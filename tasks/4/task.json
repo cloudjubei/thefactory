@@ -10,7 +10,12 @@
       "title": "Create Dockerfile for the agent environment",
       "description": "Create a `Dockerfile` inside `scripts/docker/`. It should use a suitable Python base image (e.g., `python:3.11-slim`), set up a working directory, copy project files, and install dependencies from `requirements.txt`. The context for the build will be the project's root directory.",
       "plan": "1. Navigate to the project's root directory.\n2. If the directory 'scripts/docker' does not exist, create it.\n3. Inside 'scripts/docker', create a new file named 'Dockerfile'.\n4. In the Dockerfile, start with the base image: FROM python:3.11-slim\n5. Set the working directory: WORKDIR /app\n6. Copy the project files from the root context: COPY . /app\n7. Install dependencies: RUN pip install --no-cache-dir -r requirements.txt\n8. Ensure no unnecessary commands are added; this sets up the environment as specified without specifying a default command, as it's for the agent environment setup.\n9. Save and commit the changes to the repository.",
-      "context": [],
+      "context": [
+        "docs/PROJECTS_GUIDE.md",
+        "requirements.txt",
+        ".env",
+        ".gitmodules"
+      ],
       "acceptance": []
     },
     {
