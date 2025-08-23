@@ -16,7 +16,14 @@
         ".env",
         ".gitmodules"
       ],
-      "acceptance": []
+      "acceptance": [
+        "The directory 'scripts/docker' exists in the project root.",
+        "A file named 'Dockerfile' exists in 'scripts/docker/'.",
+        "The Dockerfile uses 'python:3.11-slim' or a similar suitable Python base image (e.g., starts with 'FROM python:3.11-slim').",
+        "The Dockerfile sets a working directory (e.g., contains 'WORKDIR /app').",
+        "The Dockerfile copies project files (e.g., contains 'COPY . /app' or equivalent).",
+        "The Dockerfile installs dependencies from 'requirements.txt' (e.g., contains 'RUN pip install -r requirements.txt')."
+      ]
     },
     {
       "id": "4.2",
