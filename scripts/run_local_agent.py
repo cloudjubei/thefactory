@@ -227,11 +227,10 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
     temporary copy of the repository.
     """
     try:
-        # Find the task to work on. The functions now implicitly use PROJECT_ROOT.
         if task_id:
-            current_task = task_utils.get_task(task_id) # No longer pass PROJECT_ROOT
+            current_task = task_utils.get_task(task_id) 
         else:
-            current_task = task_utils.find_next_pending_task() # No longer pass PROJECT_ROOT
+            current_task = task_utils.find_next_pending_task()
 
         if not current_task:
             print("No available tasks to work on in the repository.")
