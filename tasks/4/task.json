@@ -57,7 +57,16 @@
         ".env",
         "docs/FILE_ORGANISATION.md"
       ],
-      "acceptance": []
+      "acceptance": [
+        "The directory 'scripts/docker/' exists in the project root.",
+        "The file 'scripts/docker/docker-compose.yml' exists.",
+        "The 'docker-compose.yml' file is valid YAML and defines a compose version (e.g., '3' or higher).",
+        "The file defines a service named 'agent'.",
+        "The 'agent' service has a build configuration that uses the local Dockerfile (e.g., build: '.' assuming Dockerfile in the same directory, or explicit context and dockerfile).",
+        "The 'agent' service includes a volume mount for the project's root '.env' file (e.g., - ../../.env:/app/.env or similar relative/absolute path).",
+        "The 'agent' service includes a volume mount for the 'projects/' directory (e.g., - ../../projects:/app/projects or similar).",
+        "The 'agent' service includes a volume mount for the 'tasks/' directory (e.g., - ../../tasks:/app/tasks or similar)."
+      ]
     },
     {
       "id": "4.4",
