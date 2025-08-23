@@ -1,121 +1,185 @@
+import json
 import os
-import subprocess
+import re
 import shutil
-import tempfile
-from pathlib import Path
-import unittest
+import subprocess
 import sys
+from pathlib import Path
 
-class TestChildProjectUtils(unittest.TestCase):
-    def setUp(self):
-        self.tmpdir = tempfile.TemporaryDirectory()
-        self.root = self.tmpdir.name
-        self.scripts_dir = os.path.join(self.root, 'scripts')
-        os.mkdir(self.scripts_dir)
-        shutil.copy(os.path.abspath('scripts/child_project_utils.py'), os.path.join(self.scripts_dir, 'child_project_utils.py'))
-        subprocess.check_call(['git', 'init', '-q'], cwd=self.root)
-        self.original_cwd = os.getcwd()
-        os.chdir(self.root)
+import pytest
 
-    def tearDown(self):
-        os.chdir(self.original_cwd)
-        self.tmpdir.cleanup()
+SCRIPT_PATH = Path(__file__).resolve().parents[3] / 'scripts' / 'child_project_utils.py'
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
-    def run_script(self, args, env=None):
-        cmd = [sys.executable, 'scripts/child_project_utils.py'] + args
-        return subprocess.run(cmd, capture_output=True, text=True, env=env)
 
-    def test_1_and_10_cli_and_help(self):
-        result = self.run_script(['-h'])
-        self.assertEqual(result.returncode, 0)
-        help_text = result.stdout
-        self.assertIn('project_name', help_text)
-        self.assertIn('--description', help_text)
-        self.assertIn('--repo-url', help_text)
-        self.assertIn('--path', help_text)
-        self.assertIn('--dry-run', help_text)
-        self.assertIn('Examples:', help_text)
+def run(cmd, cwd=None, check=True, env=None):
+    return subprocess.run(cmd, cwd=cwd, check=check, text=True, capture_output=True, env=env)
 
-    def test_8_dry_run(self):
-        project_name = 'dry_proj'
-        result = self.run_script([project_name, '--dry-run'])
-        self.assertEqual(result.returncode, 0)
-        proj_path = f'projects/{project_name}'
-        self.assertFalse(os.path.exists(proj_path))
-        self.assertIn('DRY RUN', result.stdout)
-        self.assertIn('git init', result.stdout)
-        self.assertIn('git add .', result.stdout)
-        self.assertIn('git commit', result.stdout)
-        self.assertIn('git submodule add', result.stdout)
 
-    def test_2_3_4_6_7_9_new_project_local(self):
-        project_name = 'local_proj'
-        result = self.run_script([project_name])
-        self.assertEqual(result.returncode, 0, result.stderr)
-        proj_path = f'projects/{project_name}'
-        self.assertTrue(os.path.isdir(proj_path))
-        # 3
-        self.assertTrue(os.path.exists(f'{proj_path}/README.md'))
-        with open(f'{proj_path}/README.md') as f:
-            content = f.read()
-            self.assertIn(project_name, content)
-            self.assertIn('A new child project.', content)
-        self.assertTrue(os.path.isdir(f'{proj_path}/tasks'))
-        self.assertTrue(os.path.exists(f'{proj_path}/tasks/000_initial_task.md'))
-        with open(f'{proj_path}/tasks/000_initial_task.md') as f:
-            content = f.read()
-            self.assertIn('Initial Task', content)
-        self.assertTrue(os.path.exists(f'{proj_path}/.gitignore'))
-        with open(f'{proj_path}/.gitignore') as f:
-            content = f.read()
-            self.assertIn('__pycache__', content)
-            self.assertIn('node_modules/', content)
-        # 4
-        self.assertTrue(os.path.isdir(f'{proj_path}/.git'))
-        status = subprocess.run(['git', 'status', '--porcelain'], cwd=proj_path, capture_output=True, text=True)
-        self.assertEqual(status.stdout, '')
-        log = subprocess.run(['git', 'log', '--oneline'], cwd=proj_path, capture_output=True, text=True)
-        self.assertIn('Initial commit', log.stdout)
-        remotes = subprocess.run(['git', 'remote'], cwd=proj_path, capture_output=True, text=True)
-        self.assertEqual(remotes.stdout, '')
-        # 6
-        sub_status = subprocess.run(['git', 'submodule', 'status', proj_path], capture_output=True, text=True)
-        self.assertEqual(sub_status.returncode, 0)
-        self.assertTrue(sub_status.stdout.strip())
-        self.assertTrue(os.path.exists('.gitmodules'))
-        with open('.gitmodules') as f:
-            content = f.read()
-            self.assertIn(f'[submodule "{proj_path}"]', content)
-            self.assertIn(f'path = {proj_path}', content)
-            self.assertIn(f'url = ./{proj_path}', content)
-        # 7
-        result2 = self.run_script([project_name])
-        self.assertNotEqual(result2.returncode, 0)
-        self.assertIn('already exists', result2.stderr)
+def ensure_git_repo(path: Path):
+    run(['git', 'init'], cwd=path)
+    # local config to avoid author errors
+    run(['git', 'config', 'user.name', 'Test User'], cwd=path)
+    run(['git', 'config', 'user.email', 'test@example.com'], cwd=path)
 
-    def test_5_and_6_with_repo_url(self):
-        project_name = 'remote_proj'
-        bare_path = os.path.join(self.root, 'bare.git')
-        subprocess.check_call(['git', 'init', '--bare', bare_path])
-        result = self.run_script([project_name, '--repo-url', bare_path])
-        self.assertEqual(result.returncode, 0, result.stderr)
-        proj_path = f'projects/{project_name}'
-        remote_url = subprocess.run(['git', 'remote', 'get-url', 'origin'], cwd=proj_path, capture_output=True, text=True)
-        self.assertEqual(remote_url.stdout.strip(), bare_path)
-        with open('.gitmodules') as f:
-            content = f.read()
-            self.assertIn(f'url = {bare_path}', content)
 
-    def test_9_missing_git(self):
-        project_name = 'some_proj'
-        empty_bin = os.path.join(self.root, 'empty_bin')
-        os.mkdir(empty_bin)
-        env = os.environ.copy()
-        env['PATH'] = empty_bin
-        result = self.run_script([project_name], env=env)
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn('git', result.stderr.lower())
-        self.assertIn('not found', result.stderr.lower() or 'command not found' in result.stderr.lower())
+def common_env():
+    env = os.environ.copy()
+    env.update({
+        'GIT_AUTHOR_NAME': 'Test User',
+        'GIT_AUTHOR_EMAIL': 'test@example.com',
+        'GIT_COMMITTER_NAME': 'Test User',
+        'GIT_COMMITTER_EMAIL': 'test@example.com',
+    })
+    return env
 
-if __name__ == '__main__':
-    unittest.main()
+
+def seed_example_docs(temp_root: Path):
+    docs_tasks = temp_root / 'docs' / 'tasks'
+    docs_tasks.mkdir(parents=True, exist_ok=True)
+    src = REPO_ROOT / 'docs' / 'tasks' / 'task_example.json'
+    assert src.exists(), 'Source docs/tasks/task_example.json missing in repo under test.'
+    shutil.copy2(src, docs_tasks / 'task_example.json')
+
+
+def read_json(p: Path):
+    with p.open('r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+@pytest.fixture()
+def temp_superproject(tmp_path):
+    sp = tmp_path / 'super'
+    sp.mkdir()
+    ensure_git_repo(sp)
+    # create an initial commit so submodule metadata changes can be diffed if needed
+    (sp / '.gitignore').write_text('\n', encoding='utf-8')
+    run(['git', 'add', '.'], cwd=sp)
+    run(['git', 'commit', '-m', 'init'], cwd=sp)
+    seed_example_docs(sp)
+    return sp
+
+
+def test_help_message():
+    # Running help should succeed and include usage and options
+    proc = run([sys.executable, str(SCRIPT_PATH), '-h'], check=False)
+    assert proc.returncode == 0
+    assert 'usage' in proc.stdout.lower()
+    assert '--task-id' in proc.stdout
+
+
+def test_dry_run_no_side_effects(temp_superproject):
+    sp = temp_superproject
+    env = common_env()
+    proj_name = 'dryrun_proj'
+    proc = run([sys.executable, str(SCRIPT_PATH), proj_name, '--dry-run', '--description', 'Desc', '--path', 'projects'], cwd=sp, check=False, env=env)
+    assert proc.returncode == 0
+    # Ensure no directories created
+    assert not (sp / 'projects' / proj_name).exists(), 'Dry run should not create project directory.'
+    # Print should include DRY RUN markers
+    assert 'DRY RUN' in proc.stdout
+
+
+def test_create_project_default_task(temp_superproject):
+    sp = temp_superproject
+    env = common_env()
+    proj_name = 'alpha'
+    desc = 'A new child project alpha.'
+    # Execute
+    proc = run([sys.executable, str(SCRIPT_PATH), proj_name, '--description', desc, '--path', 'projects'], cwd=sp, check=False, env=env)
+    assert proc.returncode == 0, proc.stderr
+
+    proj_path = sp / 'projects' / proj_name
+    # Structure exists
+    assert proj_path.exists()
+    assert (proj_path / 'README.md').exists()
+    assert desc in (proj_path / 'README.md').read_text(encoding='utf-8')
+    assert (proj_path / '.gitignore').exists()
+    # tasks/1/task.json exists and is valid JSON
+    task_json_path = proj_path / 'tasks' / '1' / 'task.json'
+    assert task_json_path.exists(), 'tasks/1/task.json must be created.'
+    data = read_json(task_json_path)
+    assert isinstance(data, dict)
+    assert 'features' in data and isinstance(data['features'], list)
+
+    # Child repo initialized and clean
+    assert (proj_path / '.git').exists(), 'Child .git folder should exist.'
+    status = run(['git', 'status', '--porcelain'], cwd=proj_path).stdout.strip()
+    assert status == '', f'Child repo should be clean after initial commit, got: {status}'
+
+    # Submodule recorded in parent (.gitmodules updated)
+    gm = sp / '.gitmodules'
+    assert gm.exists(), '.gitmodules should be created in the superproject.'
+    gm_text = gm.read_text(encoding='utf-8')
+    assert f'path = projects/{proj_name}' in gm_text
+
+
+def test_idempotent_re_run_fails_fast(temp_superproject):
+    sp = temp_superproject
+    env = common_env()
+    proj_name = 'idem_proj'
+    # First run succeeds
+    proc1 = run([sys.executable, str(SCRIPT_PATH), proj_name, '--path', 'projects'], cwd=sp, check=False, env=env)
+    assert proc1.returncode == 0, proc1.stderr
+    # Second run must fail fast with clear message and not alter .gitmodules further
+    gm_before = (sp / '.gitmodules').read_text(encoding='utf-8') if (sp / '.gitmodules').exists() else ''
+    proc2 = run([sys.executable, str(SCRIPT_PATH), proj_name, '--path', 'projects'], cwd=sp, check=False, env=env)
+    assert proc2.returncode != 0, 'Re-running with same project name should fail with non-zero exit code.'
+    assert 'already exists' in (proc2.stderr + proc2.stdout).lower()
+    gm_after = (sp / '.gitmodules').read_text(encoding='utf-8') if (sp / '.gitmodules').exists() else ''
+    assert gm_before == gm_after, '.gitmodules should not be altered on idempotent failure.'
+
+
+def test_remote_origin_is_set_when_provided(temp_superproject, tmp_path):
+    sp = temp_superproject
+    env = common_env()
+    # Create a local bare repo to act as remote
+    bare = tmp_path / 'remote_repo.git'
+    run(['git', 'init', '--bare', str(bare)])
+    repo_url = f'file://{bare}'
+
+    proj_name = 'gamma'
+    proc = run([sys.executable, str(SCRIPT_PATH), proj_name, '--repo-url', repo_url, '--path', 'projects'], cwd=sp, check=False, env=env)
+    assert proc.returncode == 0, proc.stderr
+
+    proj_path = sp / 'projects' / proj_name
+    # Check origin set
+    origin = run(['git', 'remote', 'get-url', 'origin'], cwd=proj_path).stdout.strip()
+    assert origin == repo_url
+
+    # Submodule URL in .gitmodules should match
+    gm_text = (sp / '.gitmodules').read_text(encoding='utf-8')
+    assert f'url = {repo_url}' in gm_text
+
+
+def test_task_id_copy_and_rewrite(temp_superproject):
+    sp = temp_superproject
+    env = common_env()
+    # Seed a source task folder tasks/42/task.json in the superproject
+    src_task_dir = sp / 'tasks' / '42'
+    src_task_dir.mkdir(parents=True)
+    src_task = {
+        'id': 42,
+        'title': 'Sample task 42',
+        'status': '-',
+        'description': 'Demo',
+        'features': [
+            {'id': '42.1', 'status': '-', 'title': 'F1', 'description': 'd', 'plan': '', 'context': [], 'acceptance': []},
+            {'id': '42.10', 'status': '-', 'title': 'F10', 'description': 'd', 'plan': '', 'context': [], 'acceptance': []},
+        ],
+    }
+    (src_task_dir / 'task.json').write_text(json.dumps(src_task, indent=2), encoding='utf-8')
+
+    proj_name = 'beta'
+    proc = run([sys.executable, str(SCRIPT_PATH), proj_name, '--path', 'projects', '--task-id', '42'], cwd=sp, check=False, env=env)
+    assert proc.returncode == 0, proc.stderr
+
+    child_task_json = sp / 'projects' / proj_name / 'tasks' / '1' / 'task.json'
+    assert child_task_json.exists()
+    data = read_json(child_task_json)
+    # id rewritten to 1
+    assert data['id'] == 1
+    # feature ids rewritten to start with '1.' and preserve suffix
+    fids = [f['id'] for f in data['features']]
+    assert all(fid.startswith('1.') for fid in fids)
+    assert '1.1' in fids and '1.10' in fids

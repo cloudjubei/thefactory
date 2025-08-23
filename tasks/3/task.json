@@ -18,16 +18,17 @@
         "docs/tasks/task_example.json"
       ],
       "acceptance": [
-        "1. A CLI entry point exists to generate a child project `scripts/child_project_utils.py` that accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), and path (defaulting to projects/).",
-        "2. When invoked with a new project_name, the script creates a directory at projects/{project_name}. If the directory already exists, the script exits with a non-zero code and a clear error message without modifying existing contents.",
-        "3. Inside the new child project, the script creates a minimal structure including: a README.md with the provided name/description, a tasks/ directory containing an initial task file (e.g., tasks/000_initial_task.md) with placeholder content, and a .gitignore with typical Python/node/temp artifacts (or inherits from a template if present).",
-        "4. The script initializes a new git repository inside the child project directory (independent repo): `.git/` exists, `git status` is clean after initial commit, and the initial commit includes the scaffolded files.",
-        "5. If a repo_url is provided, it is set as the `origin` remote in the child project's git repo.",
-        "6. The root repository is updated to include the new child project as a git submodule at projects/{project_name}. The .gitmodules file is updated accordingly with the correct path and URL (if repo_url provided) or with a local path URL if not provided.",
-        "7. Re-running the script for the same project_name is idempotent and fails fast with a clear message without altering existing submodule configuration.",
-        "8. The script provides a `--dry-run` option that prints planned actions (paths to create, git commands to run) and makes no filesystem or git changes when used.",
-        "9. The script returns exit code 0 on success and non-zero on failure; errors include actionable messages (e.g., missing git, invalid name, non-empty target path).",
-        "10. A help/usage message is available via `-h/--help` describing arguments, options, examples, and behavior."
+        "A CLI entry point exists to generate a child project: scripts/child_project_utils.py. It accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), path (defaulting to projects/), and --task-id <int> to seed from an existing task folder.",
+        "When invoked with a new project_name, the script creates a directory at projects/{project_name}. If the directory already exists, the script exits with a non-zero code and a clear error message without modifying existing contents.",
+        "Inside the new child project, the script creates a minimal structure including: README.md with the provided name/description, a .gitignore with typical Python/Node/temp patterns, and a tasks/1/task.json file. By default, tasks/1/task.json is populated from docs/tasks/task_example.json (valid JSON).",
+        "If --repo-url is provided, it is set as the origin remote in the child project's git repo.",
+        "If --task-id <id> is provided, the entire folder tasks/{id}/ from the superproject is copied into the child project as tasks/1/. All references to the original id are rewritten to 1, at minimum: task.json's top-level id becomes 1, and each feature id prefix is rewritten so it starts with '1.' with the original feature suffix preserved.",
+        "The script initializes a new git repository inside the child project directory: a .git/ exists, an initial commit includes the scaffolded files, and 'git status' is clean after the commit.",
+        "The root repository is updated to include the new child project as a git submodule at projects/{project_name}. The .gitmodules file is updated accordingly with the correct path and URL (repo_url if provided; otherwise a local path URL is acceptable).",
+        "Re-running the script for the same project_name fails fast: it is idempotent, exits non-zero with a clear message and does not alter existing submodule configuration or filesystem state.",
+        "The script provides a --dry-run option that prints planned actions (paths to create, git commands to run) and makes no filesystem or git changes when used.",
+        "The script returns exit code 0 on success and non-zero on failure; errors include actionable messages (e.g., missing git, invalid name, non-empty target path).",
+        "A help/usage message is available via -h/--help describing arguments, options (including --task-id), examples, and behavior."
       ],
       "rejection": "currently the script creates a file `projects/child-project/tasks/000_initial_task.md` - this is not according to spec. It should create a file `projects/child-project/tasks/1/task.json` which can literally have the example task from `docs/tasks/task_example.json`. But there needs to be an extra argument - if a task_id is specified, then that whole task folder will be copied over and set as task 1 in the child project (this means that any references to the task's current id need to be changed to 1)."
     },
