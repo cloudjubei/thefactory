@@ -1,62 +1,61 @@
 # Docker Setup Guide
 
-This guide explains how to set up and run the project in a Docker container, allowing you to launch the agent with minimal configuration. It adheres to the guidelines in `docs/PROJECTS_GUIDE.md` for project management.
+This document provides instructions for setting up and running the AI agent in a Docker container. The setup is designed to be minimal, reusing existing configurations like the `.env` file, and allows launching the agent with a single script.
 
 ## Prerequisites
 
-- **Docker**: Ensure Docker is installed on your machine. Download from [docker.com](https://www.docker.com/products/docker-desktop).
+To run the agent in Docker, ensure you have the following installed:
 
-- **Docker Compose**: Required for managing multi-container Docker applications. It is included with Docker Desktop for Windows and Mac, or can be installed separately on Linux from [docs.docker.com/compose/install](https://docs.docker.com/compose/install/).
+- **Docker**: Required for building and running containers. Download from [Docker's official website](https://www.docker.com/products/docker-desktop).
+- **Docker Compose**: Used for defining and running multi-container Docker applications. It is included with Docker Desktop, or install separately from [Docker Compose documentation](https://docs.docker.com/compose/install/).
 
-## Instructions
+## Setup
 
-1. **Clone the Repository**
+All Docker-related files are located in `scripts/docker/`. This includes:
+- `Dockerfile`: Defines the Docker image based on Python 3.11, copies the project files, installs dependencies from `requirements.txt`, and sets the entrypoint to `run.py`.
+- `docker-compose.yml`: Configures the service, builds the image from the project root, and mounts necessary volumes:
+  - `.env` (read-only) for environment variables.
+  - `projects/` and `tasks/` directories for project data.
+- `run.sh`: A bash script to build (if needed), start the container with provided arguments, wait for completion, and clean up.
 
-   If you haven't already, clone the repository to your local machine:
+No additional configuration is needed beyond having a valid `.env` file in the project root, as it is automatically mounted into the container.
 
-   ```
-   git clone <repository_url>
-   cd <repository_directory>
-   ```
+## Running the Agent in Docker
 
-2. **Configure Environment Variables**
+Use the `scripts/docker/run.sh` script to launch the agent. This script:
+1. Builds the Docker image if it doesn't exist.
+2. Creates a temporary `docker-compose.override.yml` to pass your arguments as the container's command.
+3. Starts the container in detached mode using `docker-compose up -d`.
+4. Waits for the container to finish execution.
+5. Cleans up by shutting down the container and removing the override file.
 
-   The Docker setup reuses the existing `.env` file in the repository root. Ensure it is configured as per `docs/LOCAL_SETUP.md`. This includes API keys, Git configuration, and any other necessary variables. Data from the current project, especially the `.env` file, is reused to minimize configuration.
+### Usage
 
-3. **Run the Docker Script**
+Navigate to the `scripts/docker/` directory or run the script from the project root. Pass the same arguments as you would to `run.py` (e.g., `--agent`, `--task`, etc.).
 
-   Use the `scripts/docker/run.sh` script to start and interact with the agent in a Docker container. The script handles building the image if necessary, creates a temporary override file, and passes any arguments you provide to the agent's command inside the container. This allows running the project and launching an agent with a single command.
+```bash
+# Example: Run the developer agent on task 4 using the default model
+./scripts/docker/run.sh --agent developer --task 4
+```
 
-   ### Usage
+Or with more options:
 
-   From the repository root:
+```bash
+./scripts/docker/run.sh --agent developer --model gpt-4-turbo --task 4 --feature 4.5 --mode single
+```
 
-   ```
-   ./scripts/docker/run.sh [arguments]
-   ```
+### Interacting with the Agent
 
-   The arguments are the same as those used for local runs (see `docs/LOCAL_SETUP.md`), such as `--agent`, `--model`, `--task`, `--feature`, `--mode`.
+- The script runs the agent to completion in the background (detached mode).
+- To view real-time logs during execution, open a new terminal and run:
+  ```bash
+  docker-compose -f scripts/docker/docker-compose.yml logs -f agent
+  ```
+- The container automatically stops after the agent finishes, and the script cleans up. Any output or changes (e.g., commits) will be handled as per the agent's logic, with mounted volumes ensuring data persistence.
 
-   ### Example
+### Notes
+- The setup reuses the project's `.env` file, so ensure it is configured with necessary API keys and Git details.
+- If the image needs rebuilding (e.g., after changes to `requirements.txt`), the script will handle it automatically.
+- For troubleshooting, check Docker logs or ensure volumes are correctly mounted.
 
-   To run the developer agent on task 4 using the model gpt-4-turbo:
-
-   ```
-   ./scripts/docker/run.sh --agent developer --model gpt-4-turbo --task 4
-   ```
-
-   This will:
-   - Check if the Docker image exists; build it using `docker-compose build` if not.
-   - Create a `docker-compose.override.yml` with the provided arguments as the command.
-   - Start the container using `docker-compose up`.
-   - The agent will run inside the container with the specified parameters.
-
-4. **Interacting with the Agent**
-
-   Once running, the agent's output will be displayed in the terminal. You can interact as needed if the mode allows (e.g., continuous mode). To stop, press Ctrl+C. The script traps signals for graceful shutdown, running `docker-compose down` and removing the override file.
-
-5. **Notes**
-
-   - The setup mounts necessary volumes (e.g., for `.env` and project files) to reuse existing data and configurations.
-   - For projects managed as submodules under `projects/`, follow `docs/PROJECTS_GUIDE.md`.
-   - If issues arise, verify Docker is running, check logs with `docker-compose logs`, or ensure the `.env` is correctly set up.
+This setup minimizes steps: clone the repo, configure `.env`, and run the script with arguments.

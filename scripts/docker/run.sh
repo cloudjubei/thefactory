@@ -2,28 +2,55 @@
 
 set -e
 
-# Get the image name from docker-compose config
-IMAGE=$(docker-compose config | grep -A 1 'agent:' | grep image | awk '{print $2}')
+# Change to the directory of the script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR"
 
-# Check if image exists, build if not
+# Get the image name from docker-compose
+IMAGE=$(docker-compose config --images | head -1)
+
+# Check if the image is already built
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-  echo "Image not found. Building..."
+  echo "Building Docker image..."
   docker-compose build
 fi
 
-# Create override file with command as list
+# Create temporary override file to pass arguments as command
 OVERRIDE_FILE="docker-compose.override.yml"
 
-echo "version: '3.8'" > "$OVERRIDE_FILE"
-echo "services:" >> "$OVERRIDE_FILE"
-echo "  agent:" >> "$OVERRIDE_FILE"
-echo "    command:" >> "$OVERRIDE_FILE"
+cat > "$OVERRIDE_FILE" <<EOF
+services:
+  agent:
+    command:
+EOF
+
 for arg in "$@"; do
-  printf "      - %s\n" "$arg" >> "$OVERRIDE_FILE"
+  esc_arg="${arg//\"/\\\"}"
+  echo "      - \"$esc_arg\"" >> "$OVERRIDE_FILE"
 done
 
-# Trap for graceful shutdown and cleanup
-trap 'docker-compose down; rm -f "$OVERRIDE_FILE"' SIGINT SIGTERM EXIT
+# Trap signals for graceful shutdown
+trap 'docker-compose down; rm -f "$OVERRIDE_FILE"' SIGINT SIGTERM
 
-# Run the container
-docker-compose up
+# Start the container in detached mode
+echo "Starting the agent container..."
+docker-compose up -d
+
+# Get the container ID
+CONTAINER_ID=$(docker-compose ps -q agent)
+
+if [ -z "$CONTAINER_ID" ]; then
+  echo "Failed to get container ID."
+  docker-compose down
+  rm -f "$OVERRIDE_FILE"
+  exit 1
+fi
+
+# Wait for the container to finish
+docker wait "$CONTAINER_ID"
+
+# Cleanup after completion
+docker-compose down
+rm -f "$OVERRIDE_FILE"
+
+echo "Agent run completed."
