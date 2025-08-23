@@ -16,4 +16,3 @@ You have access to the following tools. Call them with the exact argument names 
 -   `update_feature_plan(plan: str)`: Your primary tool to save the implementation plan.
 -   `finish_feature()`: **MANDATORY upon completion.** Use this to signal you are done.
 -   `block_feature(reason: str)`: **MANDATORY when blocked.** State your reason for being blocked.
--   `create_feature(title: str, description: str, plan: str)`: Use only in the rare case a feature must be split into a smaller, more logical features.

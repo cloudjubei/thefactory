@@ -53,7 +53,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
     # The signatures are simplified for the agent. The orchestrator handles the rest.
     if agent_type == 'speccer':
         agent_tools = {
-            "create_feature": (task_utils.create_feature, "create_feature(title: str, description: str, plan: str)"),
+            "create_feature": (task_utils.create_feature, "create_feature(title: str, description: str)"),
             "finish_spec": (lambda task_id: task_utils.finish_spec(task_id, agent_type, git_manager), "finish_spec()"),
             "block_task": (task_utils.block_task, "block_task()"),
         }
