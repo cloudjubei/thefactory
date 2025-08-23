@@ -127,7 +127,7 @@ def run_agent_on_task(model: str, agent_type: str, task: Task, git_manager: GitM
     context = task_utils.get_context(context_files)
     system_prompt = construct_system_prompt(agent_type, task, None, context, tool_signatures)
 
-    return _run_agent_conversation(model, available_tools, system_prompt, task)
+    return _run_agent_conversation(model, available_tools, system_prompt, task, None)
 
 def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Feature, git_manager: GitManager):
     print(f"\n--- Activating Agent for Feature: [{feature.get('id')}] {feature['title']} ---")
