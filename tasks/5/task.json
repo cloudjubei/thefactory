@@ -16,6 +16,186 @@
       ],
       "acceptance": [],
       "plan": ""
+    },
+    {
+      "id": "5.1",
+      "status": "-",
+      "title": "Electron + React app scaffolding and run/build scripts",
+      "description": "Initialize an Electron + React application with a modern build setup (e.g., Vite or CRA alternative for the renderer) and electron-builder for packaging. Provide npm scripts for: dev (concurrently run renderer and Electron), lint, typecheck (if using TypeScript), test (placeholder), and build/package for Windows/Mac/Linux. Include a minimal main process (main.js/ts) that creates a browser window loading the React app and a preload script to enable secure IPC. Acceptance: `npm run dev` opens the app, `npm run build` produces a packaged app, and window shows a placeholder home screen.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.2",
+      "status": "-",
+      "title": "Workspace selection and persisted app configuration",
+      "description": "Add a first-run workspace selector to pick the repository root. Persist this path and other preferences in an app-level config file (e.g., Electron app.getPath('userData')/config.json). Validate read/write access and detect expected directories (docs/, scripts/, tasks/, projects/). Provide a Settings option to change the workspace later. Acceptance: Selected workspace path is saved and restored across restarts; invalid paths show an error.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.3",
+      "status": "-",
+      "title": "Repository structure validation service",
+      "description": "Implement a main-process service that validates the repository against docs/FILE_ORGANISATION.md conventions (presence of docs/, scripts/, tasks/, projects/). Expose a read-only IPC endpoint: getRepoHealth() returning checks and messages. UI should display a banner if key directories are missing or malformed. Acceptance: With a valid repo, the health check passes; removing a critical directory surfaces a clear warning in the UI.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.4",
+      "status": "-",
+      "title": "Task indexer: scan tasks/{id}/task.json",
+      "description": "Implement a filesystem scanner in the main process that finds tasks/*/task.json, parses JSON, validates basic schema (id, title, features, etc.), and returns a normalized list. Cache results in memory and set up a file watcher to notify the renderer on changes. IPC: listTasks(), getTask(id), and subscribe to task change events. Acceptance: Tasks list reflects current files, including updates and newly created/removed tasks without restarting the app.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.5",
+      "status": "-",
+      "title": "Tasks list UI with status, filters, and search",
+      "description": "Create a React view that displays all tasks from the indexer with key fields (id, title, overall status based on feature completion). Include search by text, filter by status, and sorting (id, title). Clicking an item opens Task Detail view. Acceptance: Users can quickly find tasks via search/filter and navigate to the task details; empty states and error states are handled gracefully.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.6",
+      "status": "-",
+      "title": "Task detail view with editable fields and notes",
+      "description": "Implement a detail view showing task metadata and a table of features (title, description, status). Allow editing of designated editable fields (e.g., notes, assignee, priority) and saving back to tasks/{id}/task.json. Include schema validation and conflict detection (warn if file changed on disk since load). Provide cancel/revert. Acceptance: Editing notes updates the JSON file on disk and reflects in the app; invalid JSON writes are prevented with clear errors.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.7",
+      "status": "-",
+      "title": "Markdown documentation browser",
+      "description": "Add a Docs view that recursively lists Markdown files under docs/ and docs/tasks/. Implement a Markdown renderer supporting headings, code blocks, links (including relative links between docs), and a simple in-page search. File selection updates the view; deep links via URL hash load a doc path directly. Acceptance: Users can browse and read Markdown docs with accurate rendering; relative links resolve within the docs tree.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.8",
+      "status": "-",
+      "title": "Git integration service and UI indicators",
+      "description": "Implement a main-process Git service using child_process to run git commands in the workspace. Expose: getRepoStatus(), getBranch(), getPendingChanges(), and getTaskFileStatus(taskId) mapping to changed files under tasks/{id}. Show global git status (branch, dirty/clean) and per-task change badges in the UI. Acceptance: The UI updates when files change/commits occur; per-task badges reflect changes to that task's files.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.9",
+      "status": "-",
+      "title": "Local agents process manager",
+      "description": "Build a process manager in the main process to launch and monitor local agents (e.g., scripts/run_local_agent.py or similar). Define a registry of known agents with command and args. Provide IPC to start/stop agent, stream logs (stdout/stderr), and report status (starting, running, stopped, exited with code). Track which task an agent is working on via start parameters. Acceptance: Users can start an agent, see live logs, and stop it; status persists until process exit and is reflected in the UI.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.10",
+      "status": "-",
+      "title": "Agent activity and working status in UI",
+      "description": "Create UI components to display agent instances, including which task they are associated with, current state, and recent logs. Show on the Tasks list/detail if an agent is actively working on that task. Provide a quick link to open the agent's log pane. Acceptance: When an agent is launched for Task X, Task X shows 'In progress by Agent <name>'; when stopped, the indicator clears.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.11",
+      "status": "-",
+      "title": "System notifications for agent completion and task changes",
+      "description": "Integrate Electron notifications to alert when an agent finishes (success/failure) or when a watched task file is updated externally (e.g., by a commit). Add per-event toggle in Settings and debounce to avoid spam. Clicking a notification should deep-link to the relevant task or agent log. Acceptance: Completing an agent run triggers a notification respecting user preferences; clicking navigates to the detail view.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.12",
+      "status": "-",
+      "title": "Child projects viewer for Git submodules",
+      "description": "Implement a viewer that lists child projects under projects/ (subdirectories or submodules). For each, show name, path, git status (branch, ahead/behind, dirty), and an open-in-explorer button. Limit to read-only operations initially; optionally add a pull/update button if safe. Acceptance: All subprojects are listed with their status; attempting to access missing directories shows a clear error.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.13",
+      "status": "-",
+      "title": "Secure IPC API boundary and preload bridge",
+      "description": "Define a typed IPC layer: main process exposes only necessary, permission-scoped endpoints (tasks, docs, git, agents, settings). Implement a preload script that exposes a minimal, audited API surface to the renderer via contextBridge. Ensure no direct Node.js APIs are available in the renderer. Acceptance: All renderer operations go through the preload API; security audit confirms no unintended globals or Node access in renderer.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.14",
+      "status": "-",
+      "title": "Settings UI for workspace, notifications, and LLM providers",
+      "description": "Create a Settings view to manage workspace path (with re-scan), notification preferences, and LLM provider configurations (API keys, base URLs, model names). Persist settings in the app config and validate entries (e.g., test provider connectivity). Acceptance: Users can configure providers and see validation results; settings persist across app restarts and drive other features' behavior.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.15",
+      "status": "-",
+      "title": "LLM provider abstraction and adapters",
+      "description": "Design a provider interface supporting chat completions and optional function/tool calling. Implement adapters for: (1) LiteLLM-compatible endpoint, (2) LM Studio local API (e.g., OpenAI-compatible local server). Include timeout, retries, and streaming support. Provide a registry to select active provider by name from Settings. Acceptance: Test calls succeed against at least one configured provider; switching providers updates behavior without code changes.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.16",
+      "status": "-",
+      "title": "Chat UI with model selection and project context",
+      "description": "Build a chat panel with message history, model/provider selector, input box, and streaming assistant responses. Provide quick-insert context buttons (e.g., 'Summarize current task', 'Show repo status') that assemble a system prompt with minimal project context. Persist transcripts per task and a global chat history. Acceptance: Users can converse with the chosen provider, switch models, and see streamed responses; histories load on revisit.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.17",
+      "status": "-",
+      "title": "Read-only tool bridge for LLM chat",
+      "description": "Implement a read-only tool registry accessible to the chat service: functions to list tasks, get task details, read documentation files, and fetch git status. Expose these to the model via function-calling or a structured tool invocation protocol handled in the main process. Enforce read-only by not exposing write endpoints and filtering any write attempts. Acceptance: The assistant can call tools to retrieve information, and no file mutations occur through chat interactions.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.18",
+      "status": "-",
+      "title": "Extensibility hooks for agents and provider connectors",
+      "description": "Define JSON/YAML config schemas for agent definitions (name, command, args, capabilities) and LLM provider connectors (name, type, baseUrl, auth). Load these dynamically at startup. Document the schema under docs/ with examples. Acceptance: Adding a new agent/provider by editing config makes it available in the app without code changes; invalid configs are reported with clear errors.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.19",
+      "status": "-",
+      "title": "Logging and diagnostics console",
+      "description": "Add a Diagnostics panel capturing app logs (renderer and main), IPC errors, provider call summaries, and agent process events. Include log levels, filtering, and the ability to export logs to a file for debugging. Acceptance: When errors occur (e.g., git unavailable), they appear in Diagnostics with stack/metadata; users can export logs as a timestamped file.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.20",
+      "status": "-",
+      "title": "Packaging and distribution setup",
+      "description": "Configure electron-builder targets for Windows, macOS, and Linux with app metadata (name, version, icons). Ensure required native dependencies are bundled and postinstall scripts are correct. Provide CI-friendly build scripts and a README snippet for running in development and producing installers. Acceptance: `npm run build` yields platform installers that launch and function identically to dev mode features.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
     }
   ]
 }
