@@ -105,7 +105,15 @@
         ".env",
         "scripts/docker/run.sh"
       ],
-      "acceptance": []
+      "acceptance": [
+        "A new documentation file docs/DOCKER_SETUP.md exists.",
+        "The document includes a clear Prerequisites section that explicitly mentions Docker and Docker Compose.",
+        "The document references and explains how to use the scripts/docker/run.sh script to start the agent in Docker.",
+        "The document provides at least one example command that uses scripts/docker/run.sh and demonstrates passing agent arguments, including --agent and --task.",
+        "The document explains that the existing .env file is reused by the Docker setup (or instructs users to create/configure it).",
+        "The document describes that arguments passed to scripts/docker/run.sh are forwarded to the agent inside the container.",
+        "The scripts/docker/run.sh file exists and is executable."
+      ]
     }
   ]
 }
