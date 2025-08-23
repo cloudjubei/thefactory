@@ -2,7 +2,7 @@
   "id": 4,
   "status": "-",
   "title": "Running in docker",
-  "description": "adhere to `docs/PROJECTS_GUIDE.md` to create all needed features for any project to be able to run in docker. It must be possible to do this with a minimal amount of steps and configuration. As much as possible should be configured for the user - if possible any data already present in THIS project should be reused.",
+  "description": "adhere to `docs/PROJECTS_GUIDE.md` to create all needed features for any project to be able to run in docker. It must be possible to do this with a minimal amount of steps and configuration. As much as possible should be configured for the user - if possible any data already present in THIS project should be reused - especially the `.env` file. It should be possible to run the current project and launch an agent in docker with a single script or command. All files for this should live in `scripts/docker`",
   "features": [
   ]
 }
