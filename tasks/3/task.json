@@ -41,7 +41,14 @@
         "docs/PROJECTS_GUIDE.md",
         "scripts/child_project_utils.py"
       ],
-      "acceptance": [],
+      "acceptance": [
+        "1. The file 'docs/PROJECTS_GUIDE.md' exists.",
+        "2. The content mentions 'child_project_utils.py'.",
+        "3. The content has a heading (e.g., #, ##, ###) that includes words like 'script', 'child_project_utils', or 'creating new child project'.",
+        "4. The content contains a step-by-step list with at least 3 steps (numbered or bulleted).",
+        "5. The content includes an example like 'python3 scripts/child_project_utils.py'.",
+        "6. The content includes instructions with 'git submodule add', 'git submodule update --remote', and 'git submodule deinit'."
+      ],
       "dependencies": [
         "3.1"
       ]
