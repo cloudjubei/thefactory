@@ -81,7 +81,16 @@
         "requirements.txt",
         "docs/PROJECTS_GUIDE.md"
       ],
-      "acceptance": []
+      "acceptance": [
+        "The file 'scripts/docker/run.sh' exists in the repository.",
+        "The file 'scripts/docker/run.sh' has executable permissions (mode at least 0o755).",
+        "The script checks if the Docker image is already built and builds it if not (e.g., contains logic with 'docker image inspect' or similar and 'docker build').",
+        "The script uses 'docker-compose up' to run the agent container.",
+        "The script accepts command-line arguments and passes them to the agent process inside the container (e.g., forwards $@ to the entrypoint).",
+        "The script handles graceful shutdown, such as trapping SIGINT/SIGTERM and running 'docker-compose down'.",
+        "The script reuses the existing '.env' file, for example by mounting it into the container or sourcing it.",
+        "Running the script launches the agent in Docker with minimal steps, and it can be invoked as a single command."
+      ]
     },
     {
       "id": "4.5",
