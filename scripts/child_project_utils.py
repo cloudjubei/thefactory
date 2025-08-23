@@ -4,6 +4,8 @@ import argparse
 import os
 import subprocess
 import sys
+import json
+import shutil
 from pathlib import Path
 
 # --- Constants ---
@@ -41,11 +43,8 @@ yarn.lock
 *.bak
 *.log
 """
-INITIAL_TASK_CONTENT = """
-# Task 0: Initial Task
 
-This is a placeholder task to get you started. Plan your feature here.
-"""
+EXAMPLE_TASK_JSON_PATH = Path("docs/tasks/task_example.json")
 
 # --- Helper Functions ---
 
@@ -86,18 +85,57 @@ def check_git_installed():
         print("Error: 'git' command not found. Please install Git and ensure it's in your PATH.", file=sys.stderr)
         sys.exit(1)
 
+
+def load_json(path: Path):
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_json(path: Path, data):
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def rewrite_task_ids(task_data: dict, new_id: int = 1) -> dict:
+    """Rewrite a task.json dict so that:
+    - top-level id becomes new_id
+    - each feature.id is rewritten to start with f"{new_id}." preserving the suffix after the first dot.
+      If there is no dot in feature.id, it is left unchanged.
+    Returns the mutated dict for convenience.
+    """
+    task_data = dict(task_data)  # shallow copy
+    task_data["id"] = new_id
+    features = task_data.get("features", [])
+    new_features = []
+    for feat in features:
+        f = dict(feat)
+        fid = f.get("id")
+        if isinstance(fid, str) and "." in fid:
+            _, suffix = fid.split(".", 1)
+            f["id"] = f"{new_id}.{suffix}"
+        # else leave unchanged
+        new_features.append(f)
+    task_data["features"] = new_features
+    return task_data
+
+
 def main():
     """Main entry point for the script."""
     parser = argparse.ArgumentParser(
-        description="Generate a new child project structure, initialize it as a git repository, and add it as a submodule.",
+        description=(
+            "Generate a new child project structure under projects/, initialize it as a git repository, "
+            "and add it as a submodule to the parent repository."
+        ),
         formatter_class=argparse.RawTextHelpFormatter,
         epilog="""
 Examples:
   # Create a new project named 'my-awesome-feature' in the default 'projects/' directory
-  python3 scripts/child_project_utils.py my-awesome-feature --description \"A new awesome feature.\"
+  python3 scripts/child_project_utils.py my-awesome-feature --description "A new awesome feature."
 
-  # Create a project with a remote repository URL
+  # Create a project with a remote repository URL (SSH)
   python3 scripts/child_project_utils.py my-new-service --repo-url git@github.com:user/my-new-service.git
+
+  # Seed the child project with an existing task folder (tasks/{id}/) rewritten to tasks/1/
+  python3 scripts/child_project_utils.py my-seeded-proj --task-id 7
 
   # Perform a dry run to see what would happen without making changes
   python3 scripts/child_project_utils.py my-test-project --dry-run
@@ -122,6 +160,14 @@ Examples:
         help=f"The parent directory for the new project. Defaults to '{DEFAULT_PROJECTS_PATH}/'."
     )
     parser.add_argument(
+        "--task-id",
+        type=int,
+        help=(
+            "Seed the child project's tasks/1/ by copying the superproject's tasks/{id}/ folder and "
+            "rewriting task.json ids to start with 1."
+        )
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print the planned actions without executing them."
@@ -129,48 +175,81 @@ Examples:
 
     args = parser.parse_args()
 
-    if not args.dry_run:
-        check_git_installed()
-    
     # --- 1. Path validation and setup ---
     base_path = Path(args.path)
     project_path = base_path / args.project_name
-    
+    tasks_dir = project_path / "tasks"
+    tasks_one_dir = tasks_dir / "1"
+    readme_path = project_path / "README.md"
+    gitignore_path = project_path / ".gitignore"
+    task_json_path = tasks_one_dir / "task.json"
+
     print(f"Target project path: {project_path.resolve()}")
 
     if project_path.exists():
         print(f"Error: Directory '{project_path}' already exists. Please choose a different project name or path.", file=sys.stderr)
         sys.exit(1)
 
-    # --- 2. Create project structure ---
-    tasks_dir = project_path / "tasks"
-    readme_path = project_path / "README.md"
-    gitignore_path = project_path / ".gitignore"
-    initial_task_path = tasks_dir / "000_initial_task.md"
-    
+    # Only check git once we know we actually need to proceed and not in dry-run
+    if not args.dry_run:
+        check_git_installed()
+
+    # --- 2. Create project structure (plan) ---
     print("\n--- Planning filesystem changes ---")
-    actions = [
-        f"Create directory: {base_path}",
-        f"Create directory: {project_path}",
-        f"Create directory: {tasks_dir}",
-        f"Create file: {readme_path}",
-        f"Create file: {gitignore_path}",
-        f"Create file: {initial_task_path}",
-    ]
-    for action in actions:
+    plan_actions = []
+    plan_actions.append(f"Create directory: {base_path}")
+    plan_actions.append(f"Create directory: {project_path}")
+    plan_actions.append(f"Create directory: {tasks_dir}")
+
+    # When --task-id is provided, we copy tasks/{id} to tasks/1; otherwise, create tasks/1 and task.json
+    if args.task_id is not None:
+        src_task_dir = Path("tasks") / str(args.task_id)
+        plan_actions.append(f"Copy directory: {src_task_dir} -> {tasks_one_dir}")
+        plan_actions.append(f"Rewrite IDs in: {task_json_path}")
+    else:
+        plan_actions.append(f"Create directory: {tasks_one_dir}")
+        plan_actions.append(f"Create file: {task_json_path}")
+
+    plan_actions.append(f"Create file: {readme_path}")
+    plan_actions.append(f"Create file: {gitignore_path}")
+
+    for action in plan_actions:
         print(action)
-    
+
     if not args.dry_run:
         try:
             base_path.mkdir(parents=True, exist_ok=True)
             project_path.mkdir(exist_ok=False)
             tasks_dir.mkdir()
-            
+
+            # README and .gitignore
             readme_content = f"# {args.project_name}\n\n{args.description}\n"
             readme_path.write_text(readme_content, encoding='utf-8')
-            gitignore_path.write_text(GITIGNORE_TEMPLATE.strip(), encoding='utf-8')
-            initial_task_path.write_text(INITIAL_TASK_CONTENT.strip(), encoding='utf-8')
-            
+            gitignore_path.write_text(GITIGNORE_TEMPLATE.strip() + "\n", encoding='utf-8')
+
+            if args.task_id is not None:
+                src_task_dir = Path("tasks") / str(args.task_id)
+                if not src_task_dir.exists() or not src_task_dir.is_dir():
+                    print(f"Error: Source task directory '{src_task_dir}' does not exist.", file=sys.stderr)
+                    sys.exit(1)
+                # Copy entire folder into tasks/1
+                shutil.copytree(src_task_dir, tasks_one_dir)
+                # Rewrite task.json IDs
+                if not task_json_path.exists():
+                    print(f"Error: Expected '{task_json_path}' to exist after copying, but it was not found.", file=sys.stderr)
+                    sys.exit(1)
+                data = load_json(task_json_path)
+                data = rewrite_task_ids(data, new_id=1)
+                save_json(task_json_path, data)
+            else:
+                tasks_one_dir.mkdir()
+                # Seed task.json from example JSON
+                if not EXAMPLE_TASK_JSON_PATH.exists():
+                    print(f"Error: Example task JSON not found at '{EXAMPLE_TASK_JSON_PATH}'.", file=sys.stderr)
+                    sys.exit(1)
+                example_data = load_json(EXAMPLE_TASK_JSON_PATH)
+                save_json(task_json_path, example_data)
+
             print("\nProject structure created successfully.")
         except Exception as e:
             print(f"Error creating project structure: {e}", file=sys.stderr)
@@ -187,18 +266,18 @@ Examples:
     # --- 4. Add as submodule to parent repository ---
     print("\n--- Planning submodule addition to parent repository ---")
     # For git, paths must be relative to the repo root (current directory).
-    # Resolve the path to handle cases where args.path might be ../etc
     relative_project_path = os.path.relpath(project_path.resolve(), Path.cwd().resolve())
 
+    # If no repo-url is provided, use local path URL (acceptable for local workflows)
     submodule_url = args.repo_url if args.repo_url else f"./{relative_project_path}"
     run_command(["git", "submodule", "add", submodule_url, relative_project_path], dry_run=args.dry_run)
-    
+
     print(f"\nSuccessfully {'planned' if args.dry_run else 'created'} project '{args.project_name}'.")
     if not args.dry_run:
         print("\nACTION REQUIRED: Please commit the new submodule to the parent repository:")
         print(f"  git add .gitmodules {relative_project_path}")
         print(f'  git commit -m "feat: Add submodule for project {args.project_name}"')
-        
+
     sys.exit(0)
 
 if __name__ == "__main__":
