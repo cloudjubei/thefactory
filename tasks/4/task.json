@@ -2,23 +2,7 @@
   "id": 4,
   "status": "-",
   "title": "Running in docker",
-  "description": "Workflow for running projects in docker, i.e. isolated environment - all being contained in scripts/docker",
+  "description": "adhere to `docs/PROJECTS_GUIDE.md` to create all needed features for any project to be able to run in docker. It must be possible to do this with a minimal amount of steps and configuration. As much as possible should be configured for the user - if possible any data already present in THIS project should be reused.",
   "features": [
-    {
-      "id": "4.0",
-      "status": "-",
-      "title": "Docker workflow - use the `create_feature` tool to create atomic features for this task",
-      "description": "adhere to `docs/PROJECTS_GUIDE.md` to create all needed features for any project to be able to run in docker. It must be possible to do this with a minimal amount of steps and configuration. As much as possible should be configured for the user - if possible any data already present in THIS project should be reused.",
-      "plan": "",
-      "context": [
-        "docs/FILE_ORGANISATION.md",
-        "docs/LOCAL_SETUP.md",
-        "run.py",
-        "run_local_agent.py",
-        "git_manager.py",
-        "requirements.txt"
-      ],
-      "acceptance": []
-    }
   ]
 }
