@@ -53,12 +53,11 @@ The agent requires API keys to connect to LLM services. These are managed throug
 The primary script for running the agent is scripts/run_local_agent.py. It orchestrates the interaction between the LLM and the project's tools.
 Command-Line Arguments
 The script accepts the following arguments:
-Argument	Required	Description	Example
---model	No	The model name to use, as recognized by litellm.	gpt-4-turbo
---agent	Yes	The agent persona to activate (planner, tester, or developer).	developer
---task	Yes	The numeric ID of the task to work on, corresponding to a directory in tasks/.	2
---feature	No	The specific feature ID to work on. If omitted, the script automatically picks the next pending feature.	2.3
---mode	No	The execution mode: single (runs until finish_feature) or continuous (runs until finish).	single
+Argument	    Required	Description	                                                                        Example
+--model	        No	        The LLM model to use as recognized by litellm. (default: gpt-5)	                                            gemini/gemini-2.5-pro
+--agent	        Yes	        The agent persona to activate (planner, tester, or developer).	                    developer
+--task	        Yes	        The numeric ID of the task to work on, corresponding to a directory in tasks/.	    2
+--project-dir   No	        The path to the directory to work on. (default: ./)                                 ./projects/child-project
 Example Command
 To run the developer agent on task 2, using the gpt-4-turbo model, and have it automatically pick the next pending feature:
 

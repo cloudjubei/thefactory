@@ -23,14 +23,6 @@ def test_mode_options():
     # Note: Actual run might require mocking, but check parsing
     pass  # Expand with mocks if needed
 
-def test_continuous_mode_behavior():
-    # Simulate run in continuous mode, mock agent to call finish
-    # This might require more setup or mocking of LLM responses
-    pass  # Placeholder for integration test
-
-def test_single_mode_behavior():
-    # Similar to above
-    pass  # Placeholder
 
 # Additional tests for protocol compliance, imports, etc., would be added here.
 # For example, check imports:
