@@ -27,11 +27,13 @@ class GitManager:
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Git command failed: {' '.join(command)}\nStderr: {e.stderr}") from e
 
-    def checkout_branch(self, branch_name: str):
+    def checkout_branch(self, branch_name: str, new: bool = True):
         """Creates and checks out a new branch from the current HEAD."""
         print(f"Creating and checking out new branch '{branch_name}'...")
-        # We start from a clean copy, so we always create a new branch.
-        self._run_command(["checkout", "-b", branch_name])
+        if new:
+            self._run_command(["checkout", "-b", branch_name])
+        else:
+            self._run_command(["checkout", branch_name])
 
     def stage_files(self, files: List[str]):
         self._run_command(["add"] + files)
