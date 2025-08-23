@@ -37,7 +37,14 @@
         "docs/FILE_ORGANISATION.md",
         ".env"
       ],
-      "acceptance": []
+      "acceptance": [
+        "The .dockerignore file exists at 'scripts/docker/.dockerignore'.",
+        "The .dockerignore file contains all positive ignore patterns from '.gitignore'.",
+        "The .dockerignore file additionally contains '.git'.",
+        "The .dockerignore file additionally contains '.venv'.",
+        "The .dockerignore file additionally contains 'tasks/'.",
+        "All patterns in the .dockerignore file are relative paths (do not start with '/')."
+      ]
     },
     {
       "id": "4.3",
