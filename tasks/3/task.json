@@ -13,7 +13,9 @@
       "context": [
         "docs/FILE_ORGANISATION.md",
         "docs/PROJECTS_GUIDE.md",
-        "scripts/child_project_utils.py"
+        "scripts/child_project_utils.py",
+        "docs/tasks/task_format.py",
+        "docs/tasks/task_example.json"
       ],
       "acceptance": [
         "A CLI entry point exists to generate a child project `scripts/child_project_utils.py` that accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), and path (defaulting to projects/).",
