@@ -1,12 +1,12 @@
 {
   "id": 3,
-  "status": "+",
+  "status": "-",
   "title": "New child projects structure",
   "description": "Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work.",
   "features": [
     {
       "id": "3.1",
-      "status": "+",
+      "status": "-",
       "title": "Script: Child projects structure generation and other various utils and helpers",
       "description": "The script generates the new child projects within the projects/ folder. It sets up a folder with an initial empty task so that it's possible to start planning the feature out. It also creates a git repository for it and links it via submodules to this project.",
       "plan": "1. Create the test file `tasks/3/tests/test_3_2.py`.\n2. In the test file, set up a test class using the `unittest` module. Use `setUp` and `tearDown` methods with `tempfile.TemporaryDirectory` to create an isolated, temporary workspace for each test run. This workspace will simulate the main project repository.\n3. Initialize a bare git repository in the temporary workspace during setup to act as the 'parent' repository for the submodule tests.\n4. Implement a test case for the script's core functionality. From the temporary parent repo, execute `scripts/child_project_utils.py` using the `subprocess` module.\n5. In this core test case, add assertions to verify:\n    a. The child project directory and its internal structure (e.g., `tasks/`, `README.md`, `.gitignore`) are created correctly.\n    b. The new child project directory is a valid Git repository and contains an initial commit.\n    c. The parent repository now contains a `.gitmodules` file with an entry for the new child project.\n6. Implement a test case for the `--dry-run` flag. Run the script with this flag and assert that no file system modifications are made, and that the script's output correctly lists the planned actions.\n7. Implement a test case for the `--repo-url` argument. Run the script with a test URL and verify that the created child repository has its `origin` remote correctly set.\n8. Add a test for error handling, such as attempting to create a project in a directory that already exists. Assert that the script fails with a non-zero exit code and prints an appropriate error message.",
@@ -16,7 +16,7 @@
         "scripts/child_project_utils.py"
       ],
       "acceptance": [
-        "A CLI entry point exists to generate a child project `scripts.child_project_utils` that accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), and path (defaulting to projects/).",
+        "A CLI entry point exists to generate a child project `scripts/child_project_utils.py` that accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), and path (defaulting to projects/).",
         "When invoked with a new project_name, the script creates a directory at projects/{project_name}. If the directory already exists, the script exits with a non-zero code and a clear error message without modifying existing contents.",
         "Inside the new child project, the script creates a minimal structure including: a README.md with the provided name/description, a tasks/ directory containing an initial task file (e.g., tasks/000_initial_task.md) with placeholder content, and a .gitignore with typical Python/node/temp artifacts (or inherits from a template if present).",
         "The script initializes a new git repository inside the child project directory (independent repo): `.git/` exists, `git status` is clean after initial commit, and the initial commit includes the scaffolded files.",
@@ -36,9 +36,11 @@
       "plan": "",
       "context": [
         "docs/FILE_ORGANISATION.md",
-        "docs/PROJECTS_GUIDE.md"
+        "docs/PROJECTS_GUIDE.md",
+        "scripts/child_project_utils.py"
       ],
-      "acceptance": []
-    }\
+      "acceptance": [],
+      "dependencies": ["3.1"]
+    }
   ]
 }
