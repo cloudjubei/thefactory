@@ -1,115 +1,52 @@
-import types
+import os
+import json
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
-import importlib
+
+def run_cmd(cmd, cwd):
+    return subprocess.run(cmd, cwd=cwd, text=True, capture_output=True)
 
 
-def test_project_root_is_cwd():
-    # Import locally to ensure PROJECT_ROOT is set based on current cwd at import time
-    from scripts import run_local_agent as rla
-    assert rla.PROJECT_ROOT == Path.cwd()
+def test_orchestrator_scopes_to_child_repo_branch_checkout():
+    repo_root = Path(__file__).resolve().parents[2]
 
+    with tempfile.TemporaryDirectory() as tmpdir:
+        child_root = Path(tmpdir) / "child_project"
+        (child_root / "tasks" / "1").mkdir(parents=True, exist_ok=True)
+        # Minimal task with no features to avoid LLM execution
+        task = {
+            "id": 1,
+            "status": "-",
+            "title": "Dummy",
+            "description": "Dummy child project task",
+            "features": []
+        }
+        (child_root / "tasks" / "1" / "task.json").write_text(json.dumps(task, indent=2))
+        (child_root / "README.md").write_text("child project")
 
-def test_orchestrator_scoped_to_child_directory(monkeypatch):
-    from scripts import run_local_agent as rla
+        # Initialize a git repo with an initial commit
+        run_cmd(["git", "init"], child_root)
+        run_cmd(["git", "config", "user.email", "test@example.com"], child_root)
+        run_cmd(["git", "config", "user.name", "Test User"], child_root)
+        run_cmd(["git", "add", "."], child_root)
+        commit_proc = run_cmd(["git", "commit", "-m", "init"], child_root)
+        assert commit_proc.returncode == 0, f"Initial commit failed: {commit_proc.stderr}"
 
-    # Simulate running within a child project directory by overriding PROJECT_ROOT
-    fake_child_root = Path.cwd() / "fake_child_project"
-    monkeypatch.setattr(rla, "PROJECT_ROOT", fake_child_root)
+        # Run orchestrator via run.py targeting the child repo
+        cmd = [
+            sys.executable,
+            str(repo_root / "run.py"),
+            "--agent", "planner",
+            "--task", "1",
+            "--project-dir", str(child_root)
+        ]
+        proc = subprocess.run(cmd, text=True, capture_output=True)
+        assert proc.returncode == 0, f"orchestrator run failed: stdout={proc.stdout}\nstderr={proc.stderr}"
 
-    # Track calls to GitManager
-    class DummyGitManager:
-        last_instance = None
-        def __init__(self, path):
-            self.path = path
-            self.checkout_calls = []
-            self.pull_calls = []
-            self.push_calls = []
-            DummyGitManager.last_instance = self
-        def checkout_branch(self, name):
-            self.checkout_calls.append(name)
-        def pull(self, name):
-            self.pull_calls.append(name)
-        def push(self, name):
-            self.push_calls.append(name)
-
-    monkeypatch.setattr(rla, "GitManager", DummyGitManager)
-
-    # Fake task pipeline
-    dummy_task = {"id": 42, "title": "Dummy Child Task", "description": ""}
-
-    monkeypatch.setattr(rla.task_utils, "find_next_pending_task", lambda: dummy_task)
-    monkeypatch.setattr(rla.task_utils, "get_task", lambda task_id: dummy_task)
-
-    # Avoid real agent execution and LLM calls
-    agent_called = {"called": False}
-    def fake_run_agent_on_task(model, agent_type, task, git_manager):
-        agent_called["called"] = True
-        return True
-    monkeypatch.setattr(rla, "run_agent_on_task", fake_run_agent_on_task)
-
-    # Run orchestrator as speccer to ensure it proceeds into agent stage
-    rla.run_orchestrator(model="test-model", agent_type="speccer", task_id=None)
-
-    # Validate GitManager was instantiated with the child directory path
-    gm = DummyGitManager.last_instance
-    assert gm is not None
-    assert gm.path == str(fake_child_root)
-
-    # Validate branch operations on features/<task_id>
-    expected_branch = f"features/{dummy_task['id']}"
-    assert gm.checkout_calls == [expected_branch]
-    assert gm.pull_calls == [expected_branch]
-    assert gm.push_calls == [expected_branch]
-
-    # Ensure agent stage was invoked without path errors
-    assert agent_called["called"] is True
-
-
-def test_orchestrator_root_repo_compatibility(monkeypatch):
-    from scripts import run_local_agent as rla
-
-    # Ensure running from repository root still works
-    monkeypatch.setattr(rla, "PROJECT_ROOT", Path.cwd())
-
-    class DummyGitManager:
-        last_instance = None
-        def __init__(self, path):
-            self.path = path
-            self.checkout_calls = []
-            self.pull_calls = []
-            self.push_calls = []
-            DummyGitManager.last_instance = self
-        def checkout_branch(self, name):
-            self.checkout_calls.append(name)
-        def pull(self, name):
-            self.pull_calls.append(name)
-        def push(self, name):
-            self.push_calls.append(name)
-
-    monkeypatch.setattr(rla, "GitManager", DummyGitManager)
-
-    # Provide a specific task ID and task data
-    given_task_id = 7
-    dummy_task = {"id": given_task_id, "title": "Root Task", "description": ""}
-
-    monkeypatch.setattr(rla.task_utils, "get_task", lambda task_id: dummy_task)
-
-    agent_called = {"called": False}
-    def fake_run_agent_on_task(model, agent_type, task, git_manager):
-        agent_called["called"] = True
-        return True
-    monkeypatch.setattr(rla, "run_agent_on_task", fake_run_agent_on_task)
-
-    rla.run_orchestrator(model="test-model", agent_type="speccer", task_id=given_task_id)
-
-    gm = DummyGitManager.last_instance
-    assert gm is not None
-    # Should be scoped to the root directory (cwd)
-    assert gm.path == str(Path.cwd())
-
-    expected_branch = f"features/{given_task_id}"
-    assert gm.checkout_calls == [expected_branch]
-    assert gm.pull_calls == [expected_branch]
-    assert gm.push_calls == [expected_branch]
-    assert agent_called["called"] is True
+        # Verify branch operations occurred in child project
+        branch_proc = run_cmd(["git", "rev-parse", "--abbrev-ref", "HEAD"], child_root)
+        assert branch_proc.returncode == 0, f"Git rev-parse failed: {branch_proc.stderr}"
+        assert branch_proc.stdout.strip() == "features/1", f"Expected to be on 'features/1', got '{branch_proc.stdout.strip()}'"

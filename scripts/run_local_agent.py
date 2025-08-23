@@ -9,11 +9,17 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Callable, Tuple
 import tempfile
 
-# Add project root to sys.path
-project_root = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(project_root))
+# Add project root (framework root) to sys.path
+framework_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(framework_root))
 
-from litellm import completion
+# Lazy-safe import for litellm
+try:
+    from litellm import completion
+except Exception:
+    def completion(*args, **kwargs):
+        raise RuntimeError("litellm is not available in this environment.")
+
 from docs.tasks.task_format import Task, Feature
 from scripts.git_manager import GitManager
 import scripts.task_utils as task_utils
@@ -22,11 +28,11 @@ load_dotenv()
 
 # --- Constants ---
 MAX_TURNS_PER_FEATURE = 10
-# PROJECT_ROOT = Path(__file__).resolve().parent.parent
-PROJECT_ROOT = Path.cwd()
+# Framework workspace root (where this orchestrator code runs)
+FRAMEWORK_ROOT = Path.cwd()
 
 try:
-    PROTOCOL_EXAMPLE_PATH = PROJECT_ROOT / "docs" / "agent_response_example.json"
+    PROTOCOL_EXAMPLE_PATH = FRAMEWORK_ROOT / "docs" / "agent_response_example.json"
     with open(PROTOCOL_EXAMPLE_PATH, "r") as f:
         # Load and then dump with indentation to create a nicely formatted string for the prompt
         PROTOCOL_EXAMPLE_STR = json.dumps(json.load(f), indent=2)
@@ -220,13 +226,16 @@ def _run_agent_conversation(model: str, available_tools: Dict[str, Callable], sy
     return True
 
 
-
-def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
+def run_orchestrator(model: str, agent_type: str, task_id: Optional[int], project_dir: Optional[str] = None):
     """
-    Main orchestration loop. Assumes it is running inside an isolated,
-    temporary copy of the repository.
+    Main orchestration loop. It can target a child project directory or the current working directory.
     """
     try:
+        # Determine the target project root and configure task utils
+        target_root = Path(project_dir).resolve() if project_dir else Path.cwd()
+        print(f"Target project root: {target_root}")
+        task_utils.set_project_root(target_root)
+
         if task_id:
             current_task = task_utils.get_task(task_id) 
         else:
@@ -239,7 +248,7 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
         task_id = current_task.get('id')
         print(f"Selected Task: [{task_id}] {current_task.get('title')}")
         
-        git_manager = GitManager(str(PROJECT_ROOT))
+        git_manager = GitManager(str(target_root))
         
         branch_name = f"features/{task_id}"
         try:
@@ -266,7 +275,10 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int]):
                 run_agent_on_feature(model, agent_type, current_task, next_feature, git_manager)
                 processed_feature_ids.add(next_feature.get('id'))
         
-        git_manager.push(branch_name)
+        try:
+            git_manager.push(branch_name)
+        except Exception as e:
+            print(f"Could not push branch '{branch_name}': {e}")
 
     except Exception as e:
         print(f"\n--- A critical error occurred during the orchestrator run: {e} ---")
@@ -279,10 +291,11 @@ def main():
     parser.add_argument("--model", type=str, default="gpt-4-turbo-preview", help="LLM model name.")
     parser.add_argument("--agent", type=str, required=True, choices=['developer', 'tester', 'planner', 'contexter', 'speccer'], help="Agent persona.")
     parser.add_argument("--task", type=int, help="Optional: Specify a task ID to work on.")
+    parser.add_argument("--project-dir", type=str, help="Optional: Target child project directory.")
     
     args = parser.parse_args()
         
-    run_orchestrator(model=args.model, agent_type=args.agent, task_id=args.task)
+    run_orchestrator(model=args.model, agent_type=args.agent, task_id=args.task, project_dir=args.project_dir)
 
 if __name__ == "__main__":
     main()

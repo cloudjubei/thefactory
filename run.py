@@ -18,6 +18,7 @@ def main():
     parser.add_argument("--model", type=str, default="gpt-4-turbo-preview", help="LLM model name.")
     parser.add_argument("--agent", type=str, required=True, choices=['developer', 'tester', 'planner', 'contexter', 'speccer'], help="Agent persona.")
     parser.add_argument("--task", type=int, help="Optional: Specify a task ID to work on.")
+    parser.add_argument("--project-dir", type=str, help="Optional: Target child project directory.")
     args = parser.parse_args()
 
     project_root = Path(__file__).resolve().parent
@@ -47,6 +48,9 @@ def main():
         ]
         if args.task:
             command.extend(["--task", str(args.task)])
+        if args.project_dir:
+            # Pass through the absolute path to the child project directory
+            command.extend(["--project-dir", str(Path(args.project_dir).resolve())])
 
         print(f"Executing command: {' '.join(command)}")
 
