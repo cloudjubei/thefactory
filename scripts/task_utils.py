@@ -85,7 +85,6 @@ def write_file(filename: str, content: str):
 
 def update_feature_status(task_id: int, feature_id: str, status: Status) -> Optional[Feature]:
     """Updates the status of a specific feature."""
-    # ... (implementation from previous message is correct)
     task = get_task(task_id)
     updated_feature = None
     for feature in task.get("features"):
