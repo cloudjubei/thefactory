@@ -89,8 +89,12 @@ def construct_system_prompt(agent_type: str, task: Task, feature: Feature, conte
     """Constructs the detailed system prompt, specialized for the agent type."""
     prompt = f"""You are the '{agent_type}' agent.
 CURRENT TASK: {task.get('title')} (ID: {task.get('id')}) - DESCRIPTION: {task.get('description')}
+{ task.get('rejection') and f"REJECTION REASON: {task.get('rejection')}"}
+
 
 { feature and f"ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')} - DESCRIPTION: {feature.get('description')}"}
+{ feature.get('rejection') and f"REJECTION REASON: {feature.get('rejection')}"}
+
 
 The following context files have been provided:
 {context}
