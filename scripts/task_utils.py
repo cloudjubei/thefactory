@@ -7,22 +7,39 @@ from typing import List, Optional
 from docs.tasks.task_format import Task, Feature, Status
 from scripts.git_manager import GitManager
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# Project root can be dynamically set by the orchestrator to target a child project.
+_PROJECT_ROOT = Path.cwd()
+
+
+def set_project_root(path: str | Path) -> None:
+    """Set the active project root used by task utilities (tasks/, tests/, writes, etc.)."""
+    global _PROJECT_ROOT
+    _PROJECT_ROOT = Path(path).resolve()
+
+
+def get_project_root() -> Path:
+    return _PROJECT_ROOT
+
+
 TASKS_DIR_NAME = "tasks" 
 
 
 def _get_tasks_dir() -> Path:
-    return PROJECT_ROOT / TASKS_DIR_NAME
+    return _PROJECT_ROOT / TASKS_DIR_NAME
+
 def _get_task_dir(task_id: int) -> Path:
     return _get_tasks_dir() / str(task_id)
+
 def _get_task_path(task_id: int) -> Path:
     return _get_task_dir(task_id) / "task.json"
+
 def _get_test_path(task_id: int, feature_id: str) -> Path:
     """Helper to get the conventional path for a feature's test file."""
     feature_number = feature_id.split('.')[-1]
     return _get_task_dir(task_id) / "tests" / f"test_{task_id}_{feature_number}.py"
 
 # --- Core Task I/O ---
+
 def get_task(task_id: int) -> Task:
     task_file = _get_task_path(task_id)
     if not task_file.exists():
@@ -30,11 +47,14 @@ def get_task(task_id: int) -> Task:
     with open(task_file, "r") as f:
         return json.load(f)
 
+
 def save_task(task: Task):
     """Saves a task to its JSON file."""
     task_file = _get_task_path(task.get('id'))
+    task_file.parent.mkdir(parents=True, exist_ok=True)
     with open(task_file, "w") as f:
         json.dump(task, f, indent=2)
+
 
 def update_task_status(task_id: int, status: Status) -> Task:
     """Updates the overall status of a task."""
@@ -42,40 +62,44 @@ def update_task_status(task_id: int, status: Status) -> Task:
     task["status"] = status
     save_task(task)
     return task
+
 # --- Developer Agent Tools ---
 
 def get_context(files: List[str]) -> str:
     """
-    Retrieves the content of specified paths.
+    Retrieves the content of specified paths relative to the current PROJECT ROOT.
     - If a path is a file, its content is returned.
     - If a path is a directory, the names of the files within it are returned as a JSON array string.
+    - Paths outside of the project root are blocked for safety.
     """
     content = {}
     for file_path_str in files:
-        target_file_path = (PROJECT_ROOT / file_path_str).resolve()
+        target_path = (get_project_root() / file_path_str).resolve()
         try:
-            target_file_path.relative_to(PROJECT_ROOT.resolve())
+            # Ensure access stays within project root
+            target_path.relative_to(get_project_root())
 
-            if target_file_path.is_dir():
-                dir_files = [f.name for f in target_file_path.iterdir()]
+            if target_path.is_dir():
+                dir_files = [f.name for f in target_path.iterdir()]
                 content[file_path_str] = dir_files
-            elif target_file_path.is_file():
-                content[file_path_str] = target_file_path.read_text()
+            elif target_path.is_file():
+                content[file_path_str] = target_path.read_text()
             else:
                 content[file_path_str] = "Path not found or is not a regular file/directory."
 
         except (ValueError, PermissionError):
-            content[file_path_str] = f"SECURITY ERROR: Cannot access path outside project directory.\n"
+            content[file_path_str] = "SECURITY ERROR: Cannot access path outside project directory.\n"
         except FileNotFoundError:
             content[file_path_str] = "Path not found or is not a regular file/directory."
         
     return json.dumps(content, indent=0)
 
+
 def write_file(filename: str, content: str):
     """Creates or overwrites a file, ensuring it's safely within the given project root."""
-    target_file_path = (PROJECT_ROOT / filename).resolve()
+    target_file_path = (get_project_root() / filename).resolve()
     try:
-        target_file_path.relative_to(PROJECT_ROOT.resolve())
+        target_file_path.relative_to(get_project_root())
     except ValueError:
         raise PermissionError(f"Security violation: Attempted to write outside of project root: {filename}")
     
@@ -83,9 +107,9 @@ def write_file(filename: str, content: str):
     target_file_path.write_text(content)
     print(f"File securely written to: {filename}")
 
+
 def update_feature_status(task_id: int, feature_id: str, status: Status) -> Optional[Feature]:
     """Updates the status of a specific feature."""
-    # ... (implementation from previous message is correct)
     task = get_task(task_id)
     updated_feature = None
     for feature in task.get("features"):
@@ -97,9 +121,9 @@ def update_feature_status(task_id: int, feature_id: str, status: Status) -> Opti
         save_task(task)
     return updated_feature
 
+
 def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Feature]:
     """Sets a feature's status to '?' Blocked when it's blocked."""
-    # ... (implementation from previous message is correct)
     task = get_task(task_id)
     deferred_feature = None
     for feature in task.get("features"):
@@ -113,6 +137,7 @@ def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Featur
     print(f"Feature {feature_id} blocked. Reason: {reason}")
     return deferred_feature
 
+
 def block_task(task_id: int, reason: str) -> Task:
     """Sets a task's status to '?' Blocked when it's blocked."""
     task = get_task(task_id)
@@ -124,6 +149,7 @@ def block_task(task_id: int, reason: str) -> Task:
     print(f"Task {task_id} blocked. Reason: {reason}")
     return task
 
+
 def _check_and_update_task_completion(task_id: int):
     """Checks if all features in a task are done, and if so, marks the task as done."""
     task = get_task(task_id)
@@ -132,6 +158,7 @@ def _check_and_update_task_completion(task_id: int):
     if all_features_done:
         print(f"All features for task {task_id} are complete. Updating task status to '+'.")
         update_task_status(task_id, "+")
+
 
 def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: GitManager):
     """
@@ -145,20 +172,9 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
             feature_title = f.get('title')
             break
 
-    # 1. Stage all unstaged changes in the repository.
-    # This is a robust way to capture all work done by the agent in this turn.
-    try:
-        # Using GitManager to stage all changes. A simple '.' stages everything.
-        git_manager.stage_files(['.'])
-    except Exception as e:
-        print(f"Warning: Could not stage files. Git error: {e}")
-        # Continue anyway, as the status update is the most critical part.
-
-    # 2. Define commit message and update status based on agent role.
     if agent_type == 'developer':
         commit_message = f"feat: Complete feature {feature_id} - {feature_title}"
         update_feature_status(task_id, feature_id, "+")
-        # After a developer finishes, check if the whole task is done.
         _check_and_update_task_completion(task_id)
     elif agent_type == 'planner':
         commit_message = f"plan: Add plan for feature {feature_id} - {feature_title}"
@@ -172,7 +188,10 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
     else:
         raise ValueError(f"Unknown agent_type '{agent_type}' called finish_feature.")
 
-    # 3. Commit the staged changes.
+    try:
+        git_manager.stage_files(['.'])
+    except Exception as e:
+        print(f"Warning: Could not stage files. Git error: {e}")
     try:
         git_manager.commit(commit_message)
         print(f"Committed changes with message: '{commit_message}'")
@@ -180,6 +199,7 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
         print(f"Warning: Git commit failed. Error: {e}")
         
     return f"Feature {feature_id} finished by {agent_type} and changes committed."
+
 
 def finish_spec(task_id: int, agent_type: str, git_manager: GitManager):
     """
@@ -214,6 +234,7 @@ def get_test(task_id: int, feature_id: str) -> str:
     except FileNotFoundError:
         return f"Test file not found at {test_path}"
 
+
 def update_acceptance_criteria(task_id: int, feature_id: str, criteria: List[str]) -> Optional[Feature]:
     """Replace the feature's acceptance criteria with a new list."""
     task = get_task(task_id)
@@ -227,12 +248,14 @@ def update_acceptance_criteria(task_id: int, feature_id: str, criteria: List[str
         save_task(task)
     return updated_feature
 
+
 def update_test(task_id: int, feature_id: str, test: str):
     """Create or update the test file for the given feature."""
     test_path = _get_test_path(task_id, feature_id)
     test_path.parent.mkdir(exist_ok=True, parents=True)
     test_path.write_text(test)
     return f"Test file updated at {test_path}"
+
 
 def delete_test(task_id: int, feature_id: str):
     """Remove the test file for the given feature."""
@@ -241,6 +264,7 @@ def delete_test(task_id: int, feature_id: str):
         test_path.unlink()
         return f"Test file {test_path} deleted."
     return f"Test file {test_path} not found."
+
 
 def run_test(task_id: int, feature_id: str) -> str:
     """Executes a feature's test script and returns the result."""
@@ -266,6 +290,7 @@ def run_test(task_id: int, feature_id: str) -> str:
         return f"FAIL: An unexpected error occurred while running the test: {e}"
 
 # --- Orchestrator Helpers ---
+
 def find_next_pending_task() -> Optional[Task]:
     """Scans task directories and returns the first task that is pending or in progress."""
     if not _get_tasks_dir().exists(): return None
@@ -334,6 +359,7 @@ def create_feature(task_id: int, title: str, description: str) -> Feature:
     print(f"New feature '{new_id}' created in task {task_id}.")
     return new_feature
 
+
 def update_feature_plan(task_id: int, feature_id: str, plan: any) -> Optional[Feature]:
     """
     Updates the 'plan' field of a specific feature. This is the primary tool for the Planner agent.
@@ -359,6 +385,7 @@ def update_feature_plan(task_id: int, feature_id: str, plan: any) -> Optional[Fe
     if updated_feature:
         save_task(task)
     return updated_feature
+
 
 def update_feature_context(task_id: int, feature_id: str, context: List[str]) -> Optional[Feature]:
     """

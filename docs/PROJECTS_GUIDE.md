@@ -11,6 +11,45 @@ This guide explains how the projects/ folder is used to host child projects as G
 Typical layout:
 - projects/<name>: a submodule checkout pointing to a specific commit of the child project.
 
+## Creating a New Child Project Using child_project_utils.py
+
+To automate the creation and addition of a new child project, use the `scripts/child_project_utils.py` script. This script creates the project directory structure, initializes a local git repository, adds initial files (like README.md, .gitignore, and an initial task), commits them, and adds the project as a git submodule in the main repository.
+
+### Step-by-Step Guide to Using the Script
+
+1. Ensure you are in the root directory of the main project and have Python and Git installed.
+2. Run the script with the project name and optional arguments:
+   - Example: `python3 scripts/child_project_utils.py my-awesome-feature --description "A new awesome feature."`
+   - Optional: `--repo-url git@github.com:user/my-repo.git` to set a remote origin.
+   - Optional: `--path projects` (default) to specify the parent directory.
+   - Optional: `--task-id 7` to seed the child project from the superproject's tasks/7 (see details below).
+   - Optional: `--dry-run` to simulate without making changes.
+3. After the script completes, commit the submodule addition in the main project as prompted:
+   - `git add .gitmodules projects/my-awesome-feature`
+   - `git commit -m "Add new child project my-awesome-feature"`
+4. If a remote URL was provided, navigate to the child project and push:
+   - `cd projects/my-awesome-feature`
+   - `git push origin main`
+   - `cd -`
+
+This sets up the child project linked via git submodules. For manual addition or other operations, see the sections below.
+
+### Seeding a child project from an existing task with --task-id
+
+You can seed the new child project with an existing task from the superproject using the `--task-id` option.
+
+- What it does:
+  - Copies the superproject's `tasks/{id}/` directory into the child project as `tasks/1/`.
+  - Rewrites the `task.json` IDs so that:
+    - The top-level `id` becomes `1`.
+    - Each feature's ID that originally looked like `X.suffix` becomes `1.suffix`.
+- Example invocation:
+  - `python3 scripts/child_project_utils.py my-seeded-proj --task-id 7`
+- Requirements and notes:
+  - The source directory `tasks/7/` must exist in the superproject.
+  - After creation, the child project will contain `tasks/1/task.json` with IDs rewritten to start at `1`.
+  - Proceed to commit and (optionally) push the child project as described in the step-by-step guide above, and commit the submodule pointer in the superproject.
+
 ## Cloning with submodules
 Recommended: clone with all submodules initialized and checked out in a single step.
 

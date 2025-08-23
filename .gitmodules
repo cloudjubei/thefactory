@@ -1,0 +1,3 @@
+[submodule "projects/overseer-local"]
+	path = projects/overseer-local
+	url = ./projects/overseer-local
