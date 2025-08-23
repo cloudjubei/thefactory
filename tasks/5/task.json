@@ -4,5 +4,212 @@
   "title": "Local app",
   "description": "Create a local Electron+React app to handle project management, see tasks and feature status, update task fields/notes, see all the documents in a nice Markdown display, be able to launch/manage agents running locally and overview status in git (i.e. being able to see if an agent is working on something or not), getting notifications when work is done etc., see all child projects and manage them in the future. Ideally this app is the go-to place for anyone to use THIS project (the factory) and wouldn't have to run any scripts or code manually. A big feature of this should also be access to some sort of chat interface so that it should be possible to talk with a chosen LLM about the whole project. It should be possible to give the LLM chat access to the same tools that the agents use but in a restricted manner, so only the ones that are read-only. It should also be possible to configure further ways of connecting to LLMS for chat and for agents other than the currently chosen litellm. For instance, there's an app LM Studio that allows connecting to a locally running LLM via API calls. The project for the local app exists detailing the steps involved in creating a local app for project management. This will be the first project to stem from this one. It should follow the same exact principles as this project, but it will live in its own separate repository. This project is just meant to kickstart the whole scaffolding and specification. If any extra functionality comes into this project, it should be easy to adapt this Local app project to use the exact same ideas. Notes: Currently I'm using VSCode to view the project, run everything, see tasks etc. It would be ideal to have a dedicated app for managing the project, viewing tasks, seeing progress etc. For being able to see how the agents fares etc. Cline the plugin for VSCode does something like this and maybe it makes sense to even built upon a fork on this. One thing to keep in mind is that we want to be really third-party independent. If we can create something ourselves we should. The only question is how it integrates with the project. If maintaining such a service/dependency is too heavy, then using a third party solution makes sense. Each third party solution should be its own tasks, with documented features and explanations as to why it was chosen etc.",
   "features": [
+    {
+      "id": "5.1",
+      "status": "-",
+      "title": "Bootstrap Local App repository and add as submodule",
+      "description": "Create a new repository (e.g., factory-local-app) initialized with standard files (README with scope/goals, LICENSE, .gitignore, .editorconfig, .nvmrc, package.json), docs/ folder with placeholders (ARCHITECTURE.md, DEVELOPMENT.md), and minimal Node project setup. Add it to this factory repo as a Git submodule under projects/local-app. Acceptance: submodule exists under projects/local-app; repo contains the specified files; README explains project purpose and alignment to the factory; dev install command and dev script stub documented.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.2",
+      "status": "-",
+      "title": "Electron + React + TypeScript scaffold",
+      "description": "Initialize the app using a modern toolchain (electron-vite with React + TypeScript). Include scripts: dev, build, lint, format. Ensure secure defaults: contextIsolation=true, sandbox where applicable, separate main, preload, and renderer packages. Acceptance: `pnpm/npm run dev` runs the app with React UI placeholder; `... build` yields a runnable app in dist; TypeScript config present; eslint/prettier configured.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.3",
+      "status": "-",
+      "title": "Typed IPC contract and preload API surface",
+      "description": "Define a minimal IPC contract with typed channels for: settings:get/set, project:select/validate, tasks:list, task:get, task:update, docs:list, docs:read, git:status, agents:list/start/stop/logs, llm:chat. Implement a preload script exposing a narrow, typed API to the renderer. Document IPC schemas in docs/ARCHITECTURE.md. Acceptance: TypeScript types for request/response payloads; runtime validation; renderer can call stubs for each channel; security validated (no Node APIs exposed directly).",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.4",
+      "status": "-",
+      "title": "Local settings storage and project root selector",
+      "description": "Implement a JSON-backed settings store in Electron userData path. Create UI to set and persist the path to the factory project root. Implement project validation against docs/FILE_ORGANISATION.md (check tasks/, docs/, scripts/, etc.). Acceptance: User can pick a folder; app validates and persists; invalid structure yields clear error; settings survive restarts; tested on macOS/Windows/Linux paths.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.5",
+      "status": "-",
+      "title": "Task schema definition and validator",
+      "description": "Create a JSON Schema that mirrors the canonical task format described in docs/tasks/task_format.py and task_example.json. Generate TypeScript interfaces from the schema. Implement a validator used before reading/writing task.json. Acceptance: Validator catches malformed examples; TS types aligned with schema; unit tests cover valid/invalid cases using sample task.json files.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.6",
+      "status": "-",
+      "title": "Tasks indexer and file watcher",
+      "description": "Scan tasks/{id}/ directories under the selected project root to build an in-memory index of tasks and features. Implement a file watcher to refresh the index on changes (create/modify/delete). Cache results for quick UI rendering. Acceptance: Indexing handles 100+ tasks; watcher reliably updates on file changes; performance measured and documented; exposed via IPC: tasks:list and task:get.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.7",
+      "status": "-",
+      "title": "Tasks list UI with filtering and search",
+      "description": "Build a React view listing tasks with id, title, status, and counts of features (done/total). Provide text search and filters (e.g., status). Clicking a row opens details. Acceptance: Renders list from IPC data; filtering/search applied client-side; empty states handled; accessibility basics (labels, keyboard nav) covered.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.8",
+      "status": "-",
+      "title": "Task details view with feature list and editing notes/fields",
+      "description": "Create a detail page showing the task metadata and its features with statuses. Implement controlled editing for permitted fields (e.g., description, notes, status) with schema validation and disk write-back via task:update IPC. Provide change preview and basic error handling. Acceptance: Edits persist to task.json on disk, schema-valid; changes reflected in UI and index; guard rails prevent schema-breaking updates; unit/e2e tests simulate common edits.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.9",
+      "status": "-",
+      "title": "Markdown documentation explorer and renderer",
+      "description": "Implement a docs browser that lists Markdown files under docs/ (including docs/tasks/*). Render Markdown with basic extensions (tables, code highlighting), safe HTML sanitization, and internal link navigation. Acceptance: Sidebar shows directory tree; renderer supports anchors and code blocks; clicking internal links navigates within the app; large files render efficiently; tested with provided docs/*.md.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.10",
+      "status": "-",
+      "title": "Read-only Git status panel",
+      "description": "Expose project Git status via IPC by invoking the git CLI or a lightweight library. Show current branch, ahead/behind, changed files, and submodule summary. No write operations from this panel. Acceptance: Works across platforms; handles repositories with submodules; performance acceptable; unit tests stub git outputs; UI displays clear status indicators.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.11",
+      "status": "-",
+      "title": "Agent process manager (start/stop/list, logs)",
+      "description": "Implement process orchestration to run local agents via scripts/run_local_agent.py (or equivalent). Configurable Python interpreter path. Provide UI to start/stop agents, view running processes, and stream stdout/stderr logs with persistence. Acceptance: Start/stop works with sample agent; logs stream and are saved to file; broken interpreter path yields clear error; protected from multiple accidental starts; IPC: agents:list/start/stop/logs implemented.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.12",
+      "status": "-",
+      "title": "Agent activity detection and completion notifications",
+      "description": "Detect agent progress by monitoring process lifecycle and file changes in tasks/ (e.g., updated task.json or tests). When an agent finishes or triggers notable changes, show OS notifications and add to an in-app notifications center. Acceptance: File watcher identifies relevant changes; notification includes agent name and summary; user can mute/disable; tested with simulated runs; no duplicate spam.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.13",
+      "status": "-",
+      "title": "Notifications center UI and preferences",
+      "description": "Add a notifications panel listing recent events (agent started/stopped, edits saved, git changes). Provide settings to enable/disable OS notifications and categories. Acceptance: Notifications persist across reloads; can be marked as read; preferences stored in settings; OS notifications use Electron Notification with fallbacks.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.14",
+      "status": "-",
+      "title": "Chat interface UI (sessions, messages, basic send/receive)",
+      "description": "Create a chat UI with session list, message view, composer with multiline input, and send action. Persist conversation locally. Pluggable model selector. Acceptance: New session, rename session, message history persists; keyboard shortcuts (Shift+Enter for newline, Enter to send configurable); empty/error states handled; uses llm:chat IPC stub.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.15",
+      "status": "-",
+      "title": "LLM connector abstraction and providers (LiteLLM, OpenAI-compatible)",
+      "description": "Design an abstraction for chat providers. Implement connectors for: (1) LiteLLM-compatible HTTP endpoint, (2) OpenAI-compatible custom base URL to support LM Studio / Ollama. Configurable API key, base URL, model name, timeouts. Acceptance: Provider interface documented; connectors unit-tested with mocked servers; UI to add/edit providers; failing requests produce actionable errors.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.16",
+      "status": "-",
+      "title": "Read-only tool adapters for chat",
+      "description": "Implement tools accessible from chat with strict read-only capabilities: read_file, list_dir (scoped to project root), docs_index, read_doc, tasks_index, get_task, git_status, list_agents, agent_log_tail. Enforce allowlists and path sandboxing. Acceptance: Tools cannot write to disk; attempts to escape sandbox blocked; usage audited/logged; tool registry exposes metadata; covered by security unit tests.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.17",
+      "status": "-",
+      "title": "Chat tool permissions and admin gating",
+      "description": "Add UI and backend enforcement for enabling/disabling tools per session. Provide a clear indicator in the chat UI of which tools are enabled. Acceptance: Disabled tools are not invocable; permissions persist; attempting to call a disabled tool returns a controlled error; tests verify enforcement at IPC and provider levels.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.18",
+      "status": "-",
+      "title": "Context retrieval for chat (RAG-lite)",
+      "description": "Implement simple keyword-based search over project docs and tasks. Allow user to attach retrieved snippets into context before sending. Optionally auto-attach top-k snippets with a toggle. Acceptance: Search returns ranked results quickly; selected snippets previewed; tokens limited by model configuration; unit tests confirm deterministic retrieval on fixed corpora.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.19",
+      "status": "-",
+      "title": "Child projects overview (submodules browser)",
+      "description": "List submodules under projects/ with name, URL, current commit, and dirty status. Provide quick links to open in file explorer or terminal. Acceptance: Handles absent submodules gracefully; data sourced via git plumbing; UI updates when submodule pointers change; read-only operations only.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.20",
+      "status": "-",
+      "title": "Cross-platform packaging configuration",
+      "description": "Configure electron-builder to produce distributables for macOS (dmg), Windows (nsis), and Linux (AppImage). Include app icons and code signing placeholders. Acceptance: CI-local builds produce artifacts; metadata correct (name, version, copyright); app auto-updates disabled initially.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.21",
+      "status": "-",
+      "title": "CI pipeline for build and release",
+      "description": "Add GitHub Actions workflows to lint, type-check, build, and produce release artifacts on tags. Cache dependencies for speed. Optionally draft release with artifacts attached. Acceptance: CI green on main; tag push triggers build for all OS targets; artifacts downloadable; secrets managed securely (no plaintext keys).",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.22",
+      "status": "-",
+      "title": "Developer documentation and runbook",
+      "description": "Complete docs: ARCHITECTURE.md (process boundaries, IPC contract), DEVELOPMENT.md (setup, scripts), SECURITY.md (IPC, sandbox, tool restrictions), PROVIDERS.md (LLM connectors), AGENTS.md (how agent processes are managed), and a quickstart. Acceptance: Docs pass link check; examples tested; contributors can set up locally following docs without assistance.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5.23",
+      "status": "-",
+      "title": "Third-party evaluation and decision record (Cline and others)",
+      "description": "Author a document that evaluates building from scratch vs. forking/extending third-party tools like VSCode Cline. Detail features, trade-offs, maintenance costs, and reasons for choices. Each third-party option is its own subsection with features and rationale. Acceptance: Document lives under docs/DECISIONS/; referenced from README; clearly states chosen path and reevaluation criteria.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    }
   ]
 }
