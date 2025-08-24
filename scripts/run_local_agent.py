@@ -99,7 +99,7 @@ CURRENT TASK: {task.get('title')} (ID: {task.get('id')}) - DESCRIPTION: {task.ge
 
 
 { feature and f"ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')} - DESCRIPTION: {feature.get('description')}"}
-{ feature.get('rejection') and f"REJECTION REASON: {feature.get('rejection')}"}
+{ feature and feature.get('rejection') and f"REJECTION REASON: {feature.get('rejection')}"}
 
 
 The following context files have been provided:
