@@ -262,7 +262,7 @@ Examples:
     run_command(["git", "commit", "-m", "Initial commit from scaffolding script"], cwd=project_path, dry_run=args.dry_run)
 
     if args.repo_url:
-        run_command(["git", "remote" "add", "origin", args.repo_url], cwd=project_path, dry_run=args.dry_run)
+        run_command(["git", "remote", "add", "origin", args.repo_url], cwd=project_path, dry_run=args.dry_run)
         run_command(["git", "branch", "-M", "main"], cwd=project_path, dry_run=args.dry_run)
         run_command(["git", "push", "-u", "origin" "main"], cwd=project_path, dry_run=args.dry_run)
 
