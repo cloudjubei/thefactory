@@ -258,10 +258,13 @@ Examples:
     # --- 3. Initialize child git repository ---
     print("\n--- Planning child git repository initialization ---")
     run_command(["git", "init"], cwd=project_path, dry_run=args.dry_run)
-    if args.repo_url:
-        run_command(["git", "remote", "add", "origin", args.repo_url], cwd=project_path, dry_run=args.dry_run)
     run_command(["git", "add", "."], cwd=project_path, dry_run=args.dry_run)
     run_command(["git", "commit", "-m", "Initial commit from scaffolding script"], cwd=project_path, dry_run=args.dry_run)
+
+    if args.repo_url:
+        run_command(["git", "remote" "add", "origin", args.repo_url], cwd=project_path, dry_run=args.dry_run)
+        run_command(["git", "branch", "-M", "main"], cwd=project_path, dry_run=args.dry_run)
+        run_command(["git", "push", "-u", "origin" "main"], cwd=project_path, dry_run=args.dry_run)
 
     # --- 4. Add as submodule to parent repository ---
     print("\n--- Planning submodule addition to parent repository ---")
