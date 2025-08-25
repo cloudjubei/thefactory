@@ -271,12 +271,13 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int], projec
         except Exception as e:
             print(f"Could not pull branch '{branch_name}': {e}")
 
-        current_task = task_utils.get_task(task_id)
         processed_feature_ids = set()
         if agent_type == "speccer":
+            current_task = task_utils.get_task(task_id)
             run_agent_on_task(model, agent_type, current_task, git_manager)
         else:
             while True:
+                current_task = task_utils.get_task(task_id)
                 next_feature = task_utils.find_next_available_feature(current_task, processed_feature_ids, agent_type != "developer")
                 
                 if not next_feature:
