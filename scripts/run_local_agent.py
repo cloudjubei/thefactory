@@ -144,9 +144,8 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
         task_utils.update_feature_status(task.get('id'), feature.get('id'), '~')
 
     feature_context_files = [f"docs/AGENT_{agent_type.upper()}.md"] + feature.get("context", [])
-    if agent_type == 'contexter':
-        if "docs/FILE_ORGANISATION.md" not in feature_context_files:
-            feature_context_files.append("docs/FILE_ORGANISATION.md")
+    if "docs/FILE_ORGANISATION.md" not in feature_context_files:
+        feature_context_files.append("docs/FILE_ORGANISATION.md")
 
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
     context = task_utils.get_context(feature_context_files)

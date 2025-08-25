@@ -23,6 +23,7 @@ Notes:
   - Tests are named per-feature: tasks/{task_id}/tests/test_{task_id}_{feature_number}.py (e.g., tasks/15/tests/test_15_3.py).
 - Python modules: snake_case.py (e.g., task_format.py, run_local_agent.py).
 - Documentation files: UPPERCASE or Title_Case for project-wide specs (e.g., TESTING.md, FILE_ORGANISATION.md). Place task-related docs under docs/tasks/.
+- Javascript modules: camelCase.js (e.g., taskFormat.js, runLocalAgent.js).
 - JSON examples/templates: Use .json with clear, descriptive names (e.g., task_example.json).
 
 ## Evolution Guidance
