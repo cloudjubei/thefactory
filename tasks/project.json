@@ -1,0 +1,33 @@
+{
+    "id": "the-factory",
+    "title": "The Factory",
+    "description": "",
+    "path": "./",
+    "repo_url": "https://github.com/cloudjubei/the-factory.git",
+    "requirements": [
+        {
+            "id": 1,
+            "status": "-",
+            "description": "There is documentation explaining the project and how to use it.",
+            "tasks": [1]
+        },
+        {
+            "id": 2,
+            "status": "-",
+            "description": "The project allows launching agents that will perform tasks that are further broken down as features.",
+            "tasks": [1,2]
+        },
+        {
+            "id": 3,
+            "status": "-",
+            "description": "The project allows creating child projects that inherit the whole tasks methodology from this project.",
+            "tasks": [1,2,3]
+        },
+        {
+            "id": 4,
+            "status": "-",
+            "description": "The project allows launching agents on the child projects without the children having to define their own tasks.",
+            "tasks": [1,2,3]
+        }
+    ]
+}

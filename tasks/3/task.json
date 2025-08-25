@@ -2,13 +2,13 @@
   "id": 3,
   "status": "-",
   "title": "New child projects structure",
-  "description": "Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is linked backed to this projct via git-submodules so that all the child projects are automatically updated whenever this project updates. This project drives the child projects and then the child projects can also be cloned independently if needed and will drive their own implementation work.",
+  "description": "Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is stored as a configuration .json under /projects.",
   "features": [
     {
       "id": "3.1",
       "status": "+",
       "title": "Script: Child projects structure generation and other various utils and helpers",
-      "description": "The script generates the new child projects within the projects/ folder. It sets up a folder with an initial empty task so that it's possible to start planning the feature out. It also creates a git repository for it and links it via submodules to this project.",
+      "description": "The script generates the new child projects within the provided path. It sets up a folder with an initial empty task so that it's possible to start planning the feature out. It also creates a git repository for it.",
       "plan": "1. In 'scripts/child_project_utils.py', add imports for required modules: import json, import shutil, import os.\n2. Add a new argument to the argparse parser: parser.add_argument('--init-task-id', type=int, default=None, help='Optional task ID to copy and renumber from tasks/<id>/ for the child project's initial task.').\n3. Remove the INITIAL_TASK_CONTENT constant and the line that writes to initial_task_path.\n4. After creating the tasks_dir, add logic to set up the initial task:\n   - target_dir = tasks_dir / '1'\n   - target_dir.mkdir(exist_ok=True)\n   - if args.init_task_id is not None:\n     - source_dir = Path(f'tasks/{args.init_task_id}')\n     - if not source_dir.exists():\n       - print(f'Error: Task {args.init_task_id} does not exist.', file=sys.stderr)\n       - sys.exit(1)\n     - shutil.copytree(source_dir, target_dir)\n     - task_file = target_dir / 'task.json'\n     - with open(task_file, 'r', encoding='utf-8') as f:\n       - task = json.load(f)\n     - old_id = task['id']\n     - task['id'] = 1\n     - for feature in task.get('features', []):\n       - if '.' in feature['id']:\n         - base, sub = feature['id'].split('.', 1)\n         - if base == str(old_id):\n           - feature['id'] = f'1.{sub}'\n     - with open(task_file, 'w', encoding='utf-8') as f:\n       - json.dump(task, f, indent=2)\n     - tests_dir = target_dir / 'tests'\n     - if tests_dir.exists():\n       - for file in tests_dir.iterdir():\n         - if file.is_file() and file.name.startswith(f'test_{old_id}_'):\n           - new_name = f'test_1_' + file.name[len(f'test_{old_id}_'):]\n           - os.rename(file, tests_dir / new_name)\n   - else:\n     - example_path = Path('docs/tasks/task_example.json')\n     - if not example_path.exists():\n       - print('Error: Example task file does not exist.', file=sys.stderr)\n       - sys.exit(1)\n     - task_file = target_dir / 'task.json'\n     - shutil.copy(example_path, task_file)\n     - with open(task_file, 'r', encoding='utf-8') as f:\n       - task = json.load(f)\n     - old_id = task['id']\n     - task['id'] = 1\n     - for feature in task.get('features', []):\n       - if '.' in feature['id']:\n         - base, sub = feature['id'].split('.', 1)\n         - if base == str(old_id):\n           - feature['id'] = f'1.{sub}'\n     - with open(task_file, 'w', encoding='utf-8') as f:\n       - json.dump(task, f, indent=2)\n5. Optionally, create an empty 'tests/' directory in target_dir for the default case: (target_dir / 'tests').mkdir(exist_ok=True), but only if desired to match structure.\n6. Ensure the git add . in the child repo includes the new files.",
       "context": [
         "docs/FILE_ORGANISATION.md",
@@ -18,13 +18,12 @@
         "docs/tasks/task_example.json"
       ],
       "acceptance": [
-        "A CLI entry point exists to generate a child project: scripts/child_project_utils.py. It accepts at minimum: project_name (required), and optionally: description, repo_url (for remote origin), path (defaulting to projects/), and --task-id <int> to seed from an existing task folder.",
-        "When invoked with a new project_name, the script creates a directory at projects/{project_name}. If the directory already exists, the script exits with a non-zero code and a clear error message without modifying existing contents.",
+        "A CLI entry point exists to generate a child project: scripts/child_project_utils.py. It accepts at minimum: project_name (required),: description (required), project_path (required), repo_url (optionally, for remote origin), and task-id (optionally, integer) to seed from an existing task folder.",
         "Inside the new child project, the script creates a minimal structure including: README.md with the provided name/description, a .gitignore with typical Python/Node/temp patterns, and a tasks/1/task.json file. By default, tasks/1/task.json is populated from docs/tasks/task_example.json (valid JSON).",
         "If --repo-url is provided, it is set as the origin remote in the child project's git repo.",
         "If --task-id <id> is provided, the entire folder tasks/{id}/ from the superproject is copied into the child project as tasks/1/. All references to the original id are rewritten to 1, at minimum: task.json's top-level id becomes 1, and each feature id prefix is rewritten so it starts with '1.' with the original feature suffix preserved.",
         "The script initializes a new git repository inside the child project directory: a .git/ exists, an initial commit includes the scaffolded files, and 'git status' is clean after the commit.",
-        "The root repository is updated to include the new child project as a git submodule at projects/{project_name}. The .gitmodules file is updated accordingly with the correct path and URL (repo_url if provided; otherwise a local path URL is acceptable).",
+        "The root repository is updated to include the new child project as a config file at projects/{project_name}.json.",
         "Re-running the script for the same project_name fails fast: it is idempotent, exits non-zero with a clear message and does not alter existing submodule configuration or filesystem state.",
         "The script provides a --dry-run option that prints planned actions (paths to create, git commands to run) and makes no filesystem or git changes when used.",
         "The script returns exit code 0 on success and non-zero on failure; errors include actionable messages (e.g., missing git, invalid name, non-empty target path).",
@@ -48,7 +47,6 @@
         "The content has a heading (e.g., #, ##, ###) that includes words like 'script', 'child_project_utils', or 'creating new child project'.",
         "The content contains a step-by-step list with at least 3 steps (numbered or bulleted).",
         "The content includes an example like 'python3 scripts/child_project_utils.py'.",
-        "The content includes instructions with 'git submodule add', 'git submodule update --remote', and 'git submodule deinit'.",
         "The content documents the '--task-id' option (or '--task_id'), including an example invocation using it.",
         "The content clearly explains what '--task-id' does (e.g., that it seeds the child project's tasks/1 from tasks/{id} and rewrites task.json IDs to start with 1)."
       ],

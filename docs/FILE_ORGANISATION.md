@@ -5,12 +5,12 @@ This document describes how files and directories are organised in this reposito
 ## Top-Level Directory Layout
 - docs/: Project documentation and specifications.
   - docs/tasks/: Canonical task schema and examples.
-  - docs/PROJECTS_GUIDE.md: How child projects under projects/ are managed as Git submodules.
+  - docs/PROJECTS_GUIDE.md: How child projects under projects/ are managed.
 - scripts/: Executables and tools used by the agent and CI.
 - tasks/: Per-task workspaces containing task metadata and tests.
   - tasks/{id}/task.json: Canonical task definition for a single task.
   - tasks/{id}/tests/: Deterministic tests validating each feature in the task.
-- projects/: Child projects managed as Git submodules. See docs/PROJECTS_GUIDE.md for the full workflow.
+- projects/: Child project configurations.
 - .github/, .env, and other setup files may exist as needed.
 
 Notes:
@@ -63,7 +63,7 @@ repo_root/
 │  ├─ run_tests.py
 │  └─ task_utils.py
 ├─ projects/
-│  └─ <child_submodules>
+│  └─ child-project-1.json
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
@@ -74,4 +74,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including where tests for each feature live and where child project submodules reside under projects/.
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including where tests for each feature live and where child project configs reside under projects/.

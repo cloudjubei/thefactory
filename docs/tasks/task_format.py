@@ -32,3 +32,18 @@ class Task(TypedDict):
     description: str
     features: List[Feature]
     rejection: NotRequired[str]
+
+class ProjectRequirement(TypedDict):
+    id: int
+    status: Status
+    description: str
+    tasks: List[int]
+
+class ProjectSpec(TypedDict):
+    id: str
+    title: str
+    description: str
+    path: str
+    repo_url: str
+    requirements: List[ProjectRequirement]
+
