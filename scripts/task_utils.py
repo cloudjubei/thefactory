@@ -335,6 +335,9 @@ def find_next_available_feature(task: Task, exclude_ids: set = set(), ignore_dep
     """
 
     completed_feature_ids = {f.get("id") for f in task.get("features") if f.get("status") == "+"}
+    print(f"find_next_available_feature task: {task}")
+    print(f"find_next_available_feature exclude_ids: {exclude_ids}")
+    print(f"find_next_available_feature ignore_depedencies: {ignore_depedencies}")
     
     for feature in task["features"]:
         if feature.get("id") in exclude_ids:
