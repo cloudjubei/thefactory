@@ -15,6 +15,8 @@ Typical layout:
 
 To automate the creation and addition of a new child project, use the `scripts/child_project_utils.py` script. This script creates the project directory structure, initializes a local git repository, adds initial files (like README.md, .gitignore, and an initial task), commits them, and adds the project as a git submodule in the main repository.
 
+The .env is copied from the parent and GIT_REPO_URL is overridden if --repo-url is used, including an example in the script usage section.
+
 ### Step-by-Step Guide to Using the Script
 
 1. Ensure you are in the root directory of the main project and have Python and Git installed.
