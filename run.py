@@ -50,7 +50,7 @@ def main():
             command.extend(["--task", str(args.task)])
         if args.project_dir:
             project_dir = workspace_path / args.project_dir
-            command.extend(["--project-dir", project_dir])
+            command.extend(["--project-dir", str(project_dir)])
 
         print(f"Executing command: {' '.join(command)}")
 
