@@ -82,10 +82,11 @@
       "id": "3.4",
       "status": "-",
       "title": "The `.env` file",
-      "description": "The `.env` file needs to be copied to the child project but with the child repo url as `GIT_REPO_URL`",
+      "description": "When creating a new child project the `.env` file needs to be copied to the child project but with the child repo url as `GIT_REPO_URL`",
       "plan": "",
       "context": [
         "docs/FILE_ORGANISATION.md",
+        "scripts/child_project_utils.py",
         ".env"
       ],
       "acceptance": [],
@@ -98,12 +99,13 @@
     {
       "id": "3.5",
       "status": "-",
-      "title": "Prepare a `FILE_ORGANISATION.md` template and include it with every child project",
-      "description": "Each child project requires a `FILE_ORGANISATION.md` document that works the same as this project's `docs/FILE_ORGANISATION.md`. It needs to explain the starting project structure. Look at the current child project's file for reference.",
+      "title": "A `FILE_ORGANISATION.md` template is included with every child project",
+      "description": "When creating a new child project, it creates a `FILE_ORGANISATION.md` document that works the same as this project's `docs/FILE_ORGANISATION.md`. It needs to explain the starting project structure. Look at the current child project's file for reference.",
       "plan": "",
       "context": [
         "docs/FILE_ORGANISATION.md",
-        "projects/overseer-local/docs/FILE_ORGANISATION.md"
+        "projects/overseer-local/docs/FILE_ORGANISATION.md",
+        "scripts/child_project_utils.py"
       ],
       "acceptance": [],
       "dependencies": [
