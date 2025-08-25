@@ -122,7 +122,7 @@ def update_feature_status(task_id: int, feature_id: str, status: Status) -> Opti
     return updated_feature
 
 
-def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Feature]:
+def block_feature(task_id: int, feature_id: str, reason: str, agent_type: str, git_manager: GitManager) -> Optional[Feature]:
     """Sets a feature's status to '?' Blocked when it's blocked."""
     task = get_task(task_id)
     deferred_feature = None
@@ -130,10 +130,33 @@ def block_feature(task_id: int, feature_id: str, reason: str) -> Optional[Featur
         if feature.get("id") == feature_id:
             feature["status"] = "?"
             feature["rejection"] = f"Blocked: {reason}"
+            feature_title = feature.get('title', '')
             deferred_feature = feature
             break
+    feature_title = ""
     if deferred_feature:
         save_task(task)
+
+    if agent_type == 'developer':
+        commit_message = f"BLOCKED feat: Complete feature {feature_id} - {feature_title}"
+    elif agent_type == 'planner':
+        commit_message = f"BLOCKED plan: Add plan for feature {feature_id} - {feature_title}"
+    elif agent_type == 'tester':
+        commit_message = f"BLOCKED test: Add tests for feature {feature_id} - {feature_title}"
+    elif agent_type == 'contexter': 
+        commit_message = f"BLOCKED context: Set context for feature {feature_id} - {feature_title}"
+    else:
+        raise ValueError(f"Unknown agent_type '{agent_type}' called block_feature.")
+    try:
+        git_manager.stage_files(['.'])
+    except Exception as e:
+        print(f"Warning: Could not stage files. Git error: {e}")
+    try:
+        git_manager.commit(commit_message)
+        print(f"Committed changes with message: '{commit_message}'")
+    except Exception as e:
+        print(f"Warning: Git commit failed. Error: {e}")
+
     print(f"Feature {feature_id} blocked. Reason: {reason}")
     return deferred_feature
 
