@@ -304,7 +304,7 @@ def find_next_pending_task() -> Optional[Task]:
     return None
 
 
-def find_next_available_feature(task: Task, exclude_ids: set = set()) -> Optional[Feature]:
+def find_next_available_feature(task: Task, exclude_ids: set = set(), ignore_depedencies: bool = False) -> Optional[Feature]:
     """
     Finds the first pending feature in a task whose dependencies are all met,
     EXCLUDING any feature IDs passed in the `exclude_ids` set.
@@ -317,7 +317,7 @@ def find_next_available_feature(task: Task, exclude_ids: set = set()) -> Optiona
             continue
         if feature.get("status") == "-":
             dependencies = feature.get("dependencies", [])
-            if all(dep_id in completed_feature_ids for dep_id in dependencies):
+            if ignore_depedencies or all(dep_id in completed_feature_ids for dep_id in dependencies):
                 return feature
     return None
 
