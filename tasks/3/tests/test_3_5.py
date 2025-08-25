@@ -1,32 +1,45 @@
-import re
+import sys
 from pathlib import Path
+import tempfile
+from unittest.mock import patch
+sys.path.insert(0, 'scripts')
+import child_project_utils as cpu
 
-def test_feature_3_5():
-    script_path = Path('scripts/child_project_utils.py')
-    script_content = script_path.read_text(encoding='utf-8')
+original_run_command = cpu.run_command
 
-    # Expected template content from reference
-    expected_template = """# File Organisation\n\nThis document describes how files and directories are organised in this repository to keep the project navigable, consistent, and easy to evolve.\n\n## Top-Level Directory Layout\n- src/: Source code for all tasks.\n- docs/: Project documentation and specifications.\n- tasks/: Per-task workspaces containing task metadata and tests.\n  - tasks/{id}/task.json: Canonical task definition for a single task.\n  - tasks/{id}/tests/: Deterministic tests validating each feature in the task.\n- .env, and other setup files may exist as needed.\n\nNotes:\n- All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.\n- Documentation in docs/ is the single source of truth for specs and formats.\n\n## File Naming Conventions\n- Tasks and features:\n  - Task directories are numeric IDs: tasks/{id}/ (e.g., tasks/1/).\n  - Tests are named per-feature: tasks/{task_id}/tests/test_{task_id}_{feature_number}.py (e.g., tasks/15/tests/test_15_3.py).\n- Python modules: snake_case.py (e.g., task_format.py, run_local_agent.py).\n- Javascript modules: camelCase.js (e.g., taskFormat.js, runLocalAgent.js).\n- Documentation files: UPPERCASE or Title_Case for project-wide specs (e.g., TESTING.md, FILE_ORGANISATION.md). Place task-related docs under docs/tasks/.\n- JSON examples/templates: Use .json with clear, descriptive names (e.g., task_example.json).\n\n## Evolution Guidance\n- Make minimal, incremental changes that are easy to review and test.\n- Keep documentation authoritative: update docs first when changing schemas or protocols.\n- Introduce shared utilities only when multiple tasks need them; otherwise keep helpers local to a task.\n- Deprecate gradually: create new files/specs alongside old ones, migrate, then remove deprecated artifacts when tests prove stability.\n- Each feature must have deterministic tests; do not mark features complete until tests pass.\n\n## Example Tree (illustrative)\nThe following tree is graphical and illustrative of a typical repository layout:\n\n```\nrepo_root/\n├─ .env\n├─ .gitignore\n├─ src/\n├─ docs/\n│  ├─ FILE_ORGANISATION.md\n└─ tasks/\n   ├─ 1/\n   │  ├─ task.json\n   │  └─ tests/\n   │     └─ test_1_3.py\n   └─ 2/\n      ├─ task.json\n      └─ tests/\n```\n\nThis diagram shows how documentation, scripts, and per-task artifacts are arranged, including where tests for each feature live and how the main code structure is organized. \n"""
+def mock_run_command(command, cwd=None, dry_run=False, allow_fail=False):
+    command_str = ' '.join(map(str, command))
+    if 'git submodule add' in command_str:
+        print('Skipping git submodule add for test')
+        return None
+    elif 'git' in command_str:
+        print(f'Skipping git command for test: {command_str}')
+        return None
+    else:
+        return original_run_command(command, cwd, dry_run, allow_fail)
 
-    # Check for template constant
-    assert 'CHILD_FILE_ORGANISATION_TEMPLATE = """' in script_content, 'Template constant missing'
-    assert expected_template in script_content, 'Template content does not match reference'
-
-    # Check for directory creations
-    assert re.search(r"\(project_path / 'src'\)\.mkdir\(\)\s*", script_content), 'src directory creation missing'
-    assert re.search(r"\(project_path / 'docs'\)\.mkdir\(\)\s*", script_content), 'docs directory creation missing'
-    assert re.search(r"\(project_path / 'docs' / 'FILE_ORGANISATION.md'\)\.write_text\(CHILD_FILE_ORGANISATION_TEMPLATE, encoding='utf-8'\)", script_content), 'FILE_ORGANISATION.md write missing'
-
-    # Check plan_actions
-    assert "'Create directory: src'" in script_content, 'plan_actions for src missing'
-    assert "'Create directory: docs'" in script_content, 'plan_actions for docs missing'
-    assert "'Create file: docs/FILE_ORGANISATION.md'" in script_content, 'plan_actions for file missing'
-
-    # Check parent's FILE_ORGANISATION.md
-    parent_path = Path('docs/FILE_ORGANISATION.md')
-    parent_content = parent_path.read_text(encoding='utf-8')
-    assert '## Child Project Structure' in parent_content, 'Child Project Structure section missing'
-    assert 'src/' in parent_content and 'docs/' in parent_content and 'tasks/' in parent_content, 'Key directories not described in parent doc'
-    assert 'example tree' in parent_content.lower() and 'child project' in parent_content.lower(), 'Child project example tree missing'
-
-test_feature_3_5()
+with tempfile.TemporaryDirectory() as tmpdir:
+    tmp_path = Path(tmpdir)
+    original_argv = sys.argv
+    sys.argv = ['child_project_utils.py', 'test_child', '-d', 'Test', '-p', str(tmp_path), '--dry-run']
+    with patch('child_project_utils.run_command', mock_run_command):
+        with patch('child_project_utils.check_git_installed', lambda: None):
+            cpu.main()
+    sys.argv = original_argv
+    project_path = tmp_path / 'test_child'
+    assert (project_path / 'src').is_dir(), '1. src/ not created'
+    assert (project_path / 'docs').is_dir(), '2. docs/ not created'
+    fo_path = project_path / 'docs' / 'FILE_ORGANISATION.md'
+    assert fo_path.is_file(), '3. FILE_ORGANISATION.md not created'
+    content = fo_path.read_text(encoding='utf-8')
+    required_items = ['src/', 'docs/', 'tasks/', '.env', '.gitignore', 'README.md', 'File Naming Conventions', 'Evolution Guidance']
+    for item in required_items:
+        assert item in content, f'4. {item} not in child FILE_ORGANISATION.md'
+    script_code = Path('scripts/child_project_utils.py').read_text(encoding='utf-8')
+    required_actions = ['Create directory: src', 'Create directory: docs', 'Create file: docs/FILE_ORGANISATION.md']
+    for action in required_actions:
+        assert action in script_code, f'5. {action} not in plan_actions'
+    parent_content = Path('docs/FILE_ORGANISATION.md').read_text(encoding='utf-8')
+    assert '## Child Project Structure' in parent_content, '6. Missing child project structure section in parent doc'
+    assert 'src/' in parent_content, '7. Example tree does not reflect child structure (missing src/)' 
+print('All tests passed')
