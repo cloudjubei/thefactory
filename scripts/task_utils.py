@@ -296,6 +296,7 @@ def run_test(task_id: int, feature_id: str) -> str:
         return "FAIL: Test file not found."
     
     try:
+        print(f"Running test at {test_path}")
         result = subprocess.run(
             ["python3", str(test_path)],
             capture_output=True,
