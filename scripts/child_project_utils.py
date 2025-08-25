@@ -283,7 +283,7 @@ Examples:
 
     # If no repo-url is provided, use local path URL (acceptable for local workflows)
     submodule_url = args.repo_url if args.repo_url else f"./{relative_project_path}"
-    run_command(["git", "submodule", "add", submodule_url, relative_project_path], dry_run=args.dry_run)
+    run_command(["git", "submodule", " -b", "main", "add", submodule_url, relative_project_path], dry_run=args.dry_run)
 
     print(f"\nSuccessfully {'planned' if args.dry_run else 'created'} project '{args.project_name}'.")
     if not args.dry_run:
