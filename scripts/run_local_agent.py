@@ -38,7 +38,6 @@ except (FileNotFoundError, json.JSONDecodeError) as e:
     PROTOCOL_EXAMPLE_STR = '{\n  "thoughts": "Your reasoning here...",\n  "tool_calls": [ ... ]\n}'
 
 PROTOCOL_INSTRUCTIONS = f"""
-#RESPONSE FORMAT INSTRUCTIONS:
 You **MUST** respond in a single, valid JSON object. This object must adhere to the following structure:
 ```json
 {PROTOCOL_EXAMPLE_STR}
@@ -47,6 +46,7 @@ The thoughts field is for your reasoning, and tool_calls is a list of actions to
 Your response will be parsed as JSON. Do not include any text outside of this JSON object.
 """
 
+NEWLINE = "\n"
 # --- Tool Mapping ---
 
 def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[str, Callable], List[str]]:
@@ -97,12 +97,12 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
     
     return tool_functions, tool_signatures
 
-def construct_system_prompt(agent_type: str, task: Task, feature: Feature, context: str, tool_signatures: List[str]) -> str:
+def construct_system_prompt(agent_type: str, task: Task, feature: Feature, agent_system_prompt: str, context: str, tool_signatures: List[str]) -> str:
     """Constructs the detailed system prompt, specialized for the agent type."""
 
     plan = ""
     if feature and agent_type in ['developer', 'tester', 'contexter', 'planner']:
-        plan = f"{feature.get("plan", "EMPTY")}"
+        plan = f"{feature.get('plan', 'EMPTY')}"
 
     acceptance_criteria = ""
     if feature and agent_type in ['developer', 'tester']:
@@ -110,60 +110,59 @@ def construct_system_prompt(agent_type: str, task: Task, feature: Feature, conte
 
     tool_signatures_str = "\n".join(f"- {sig}" for sig in tool_signatures)
 
-    prompt = f"""You are the '{agent_type}' agent.
-###CURRENT TASK (ID: {task.get('id')})
-#TITLE:
+    prompt = f"""{agent_system_prompt}
+#CURRENT TASK (ID: {task.get('id')})
+##TITLE:
 {task.get('title')}
-#DESCRIPTION:
+##DESCRIPTION:
 {task.get('description')}
-{ task.get('rejection') and f"#REJECTION REASON:\n{task.get('rejection')}"}
+{ task.get('rejection') and f"##REJECTION REASON:{NEWLINE}{task.get('rejection')}"}
 
+{ feature and f"#ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')}{NEWLINE}##DESCRIPTION: {feature.get('description')}{NEWLINE}"}
+{ feature and feature.get('rejection') and f"##REJECTION REASON:{NEWLINE}{feature.get('rejection')}{NEWLINE}"}
 
-{ feature and f"###ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')}\n#DESCRIPTION: {feature.get('description')}\n"}
-{ feature and feature.get('rejection') and f"#REJECTION REASON:\n{feature.get('rejection')}\n"}
-
-###CONTEXT FILES PROVIDED:
-{context}
-
-###THE PLAN
+#THE PLAN
 {plan}
 
-###ACCEPTANCE CRITERIA:
+#ACCEPTANCE CRITERIA:
 {acceptance_criteria}
 
-#TOOLS:
-Your available tools are defined below. Call them with the exact function and argument names.
+#TOOL SIGNATURES:
 '{tool_signatures_str}'
 
+#RESPONSE FORMAT INSTRUCTIONS:
 {PROTOCOL_INSTRUCTIONS}
+
+#CONTEXT FILES PROVIDED:
+{context}
 
 Begin now.
 """
     return prompt
 
 def run_agent_on_task(model: str, agent_type: str, task: Task, git_manager: GitManager):
-    print(f"\n--- Activating Agent for task: [{task.get('id')}] {task.get('title')} ---")
+    print(f"\n--- Activating Agent {agent_type} for task: [{task.get('id')}] {task.get('title')} ---")
 
-    context_files = [f"docs/AGENT_{agent_type.upper()}.md", "docs/FILE_ORGANISATION.md"]
+    agent_system_prompt = f"{FRAMEWORK_ROOT}/docs/AGENT_{agent_type.upper()}.md"
+    context_files = ["docs/FILE_ORGANISATION.md"]
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
     context = task_utils.get_context(context_files)
-    system_prompt = construct_system_prompt(agent_type, task, None, context, tool_signatures)
+    system_prompt = construct_system_prompt(agent_type, task, None, agent_system_prompt, context, tool_signatures)
 
     return _run_agent_conversation(model, available_tools, system_prompt, task, None)
 
 def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Feature, git_manager: GitManager):
-    print(f"\n--- Activating Agent for Feature: [{feature.get('id')}] {feature['title']} ---")
+    print(f"\n--- Activating Agent {agent_type} for Feature: [{feature.get('id')}] {feature['title']} ---")
 
     if agent_type == 'developer':
         task_utils.update_feature_status(task.get('id'), feature.get('id'), '~')
 
-    feature_context_files = [f"docs/AGENT_{agent_type.upper()}.md"] + feature.get("context", [])
-    if "docs/FILE_ORGANISATION.md" not in feature_context_files:
-        feature_context_files.append("docs/FILE_ORGANISATION.md")
+    agent_system_prompt = f"{FRAMEWORK_ROOT}/docs/AGENT_{agent_type.upper()}.md"
+    feature_context_files = ["docs/FILE_ORGANISATION.md"] + feature.get("context", [])
 
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
     context = task_utils.get_context(feature_context_files)
-    system_prompt = construct_system_prompt(agent_type, task, feature, context, tool_signatures)
+    system_prompt = construct_system_prompt(agent_type, task, feature, agent_system_prompt, context, tool_signatures)
 
     if agent_type == 'developer':
         task_utils.update_feature_status(task.get('id'), feature.get('id'), '~')
