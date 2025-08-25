@@ -114,7 +114,15 @@
         "scripts/child_project_utils.py",
         "projects/overseer-local/docs/FILE_ORGANISATION.md"
       ],
-      "acceptance": [],
+      "acceptance": [
+        "The child project creation script creates a 'src/' directory in new child projects.",
+        "The child project creation script creates a 'docs/' directory in new child projects.",
+        "The child project creation script creates a 'docs/FILE_ORGANISATION.md' file in new child projects with content based on the reference template.",
+        "The content of 'docs/FILE_ORGANISATION.md' in child projects describes the structure including 'src/', 'docs/', 'tasks/', '.env', '.gitignore', 'README.md', file naming conventions, and evolution guidance.",
+        "The plan_actions in the script are updated to include the creation of 'src', 'docs', and 'docs/FILE_ORGANISATION.md'.",
+        "The parent's 'docs/FILE_ORGANISATION.md' includes a new section describing the standard child project structure.",
+        "The parent's 'docs/FILE_ORGANISATION.md' includes or updates an example tree to reflect the child project structure."
+      ],
       "dependencies": [
         "3.1",
         "3.2",
