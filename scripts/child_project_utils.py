@@ -7,6 +7,9 @@ import sys
 import json
 import shutil
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --- Constants ---
 DEFAULT_PROJECTS_PATH = "projects"
@@ -178,6 +181,7 @@ Examples:
     # --- 1. Path validation and setup ---
     base_path = Path(args.path)
     project_path = base_path / args.project_name
+    env_path = project_path / ".env"
     tasks_dir = project_path / "tasks"
     tasks_one_dir = tasks_dir / "1"
     readme_path = project_path / "README.md"
@@ -212,6 +216,7 @@ Examples:
 
     plan_actions.append(f"Create file: {readme_path}")
     plan_actions.append(f"Create file: {gitignore_path}")
+    plan_actions.append(f"Create file: {env_path}")
 
     for action in plan_actions:
         print(action)
@@ -228,6 +233,7 @@ Examples:
             readme_content = f"# {args.project_name}\n\n{args.description}\n"
             readme_path.write_text(readme_content, encoding='utf-8')
             gitignore_path.write_text(GITIGNORE_TEMPLATE.strip() + "\n", encoding='utf-8')
+            env_path.write_text("\n".join(['GIT_REPO_URL="'+args.repo_url+'"', 'GIT_USER_NAME="'+os.getenv("GIT_USER_NAME")+'"', 'GIT_USER_EMAIL="'+os.getenv("GIT_USER_EMAIL")+'"', 'GIT_PAT="'+os.getenv("GIT_PAT")+'"']), encoding='utf-8')
 
             if args.task_id is not None:
                 src_task_dir = Path("tasks") / str(args.task_id)

@@ -24,8 +24,6 @@ from docs.tasks.task_format import Task, Feature
 from scripts.git_manager import GitManager
 import scripts.task_utils as task_utils
 
-load_dotenv()
-
 # --- Constants ---
 MAX_TURNS_PER_FEATURE = 10
 # Framework workspace root (where this orchestrator code runs)
@@ -295,6 +293,10 @@ def main():
     parser.add_argument("--project-dir", type=str, help="Optional: Target child project directory.")
     
     args = parser.parse_args()
+    if args.project_dir:
+        load_dotenv(args.project_dir + "/.env")
+    else:
+        load_dotenv()
         
     run_orchestrator(model=args.model, agent_type=args.agent, task_id=args.task, project_dir=args.project_dir)
 
