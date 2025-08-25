@@ -272,6 +272,10 @@ Examples:
     if args.repo_url:
         run_command(["git", "push"], cwd=project_path, dry_run=args.dry_run)
 
+    # TODO: create the github repo
+    # invite AI agent as collaborator
+    # accept invitation as AI agent
+
     # --- 4. Add as submodule to parent repository ---
     print("\n--- Planning submodule addition to parent repository ---")
     # For git, paths must be relative to the repo root (current directory).

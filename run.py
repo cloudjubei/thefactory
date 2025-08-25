@@ -49,8 +49,8 @@ def main():
         if args.task:
             command.extend(["--task", str(args.task)])
         if args.project_dir:
-            # Pass through the absolute path to the child project directory
-            command.extend(["--project-dir", str(Path(args.project_dir).resolve())])
+            project_dir = workspace_path / args.project_dir
+            command.extend(["--project-dir", project_dir])
 
         print(f"Executing command: {' '.join(command)}")
 
