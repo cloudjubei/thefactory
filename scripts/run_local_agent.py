@@ -67,7 +67,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
         agent_tools = {
             "create_feature": (task_utils.create_feature, "create_feature(title: str, description: str)"),
             "finish_spec": (lambda task_id: task_utils.finish_spec(task_id, agent_type, git_manager), "finish_spec()"),
-            "block_task": (task_utils.block_task, "block_task()"),
+            "block_task": (lambda task_id: task_utils.block_task(task_id, agent_type, git_manager), "block_task()"),
         }
     elif agent_type == 'developer':
         agent_tools = {
@@ -149,7 +149,7 @@ def run_agent_on_task(model: str, agent_type: str, task: Task, git_manager: GitM
     context = task_utils.get_context(context_files)
     system_prompt = construct_system_prompt(agent_type, task, None, agent_system_prompt, context, tool_signatures)
 
-    return _run_agent_conversation(model, available_tools, system_prompt, task, None)
+    return _run_agent_conversation(model, available_tools, system_prompt, task, None, agent_type, git_manager)
 
 def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Feature, git_manager: GitManager):
     print(f"\n--- Activating Agent {agent_type} for Feature: [{feature.get('id')}] {feature['title']} ---")
@@ -167,9 +167,9 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     if agent_type == 'developer':
         task_utils.update_feature_status(task.get('id'), feature.get('id'), '~')
 
-    return _run_agent_conversation(model, available_tools, system_prompt, task, feature)
+    return _run_agent_conversation(model, available_tools, system_prompt, task, feature, agent_type, git_manager)
 
-def _run_agent_conversation(model: str, available_tools: Dict[str, Callable], system_prompt: str, task: Task, feature: Feature | None) -> bool:
+def _run_agent_conversation(model: str, available_tools: Dict[str, Callable], system_prompt: str, task: Task, feature: Feature | None, agent_type: str, git_manager: GitManager) -> bool:
     messages = [{"role": "user", "content": system_prompt}]
 
     for i in range(MAX_TURNS_PER_FEATURE):
@@ -221,18 +221,18 @@ def _run_agent_conversation(model: str, available_tools: Dict[str, Callable], sy
             traceback.print_exc()
             print("------------------------\n")
             if (not (feature is None)):
-                task_utils.block_feature(task.get('id'), feature.get('id'), f"Agent loop failed: {e}")
+                task_utils.block_feature(task.get('id'), feature.get('id'), f"Agent loop failed: {e}", agent_type, git_manager)
             else:
-                task_utils.block_task(task.get('id'), f"Agent loop failed: {e}")
+                task_utils.block_task(task.get('id'), f"Agent loop failed: {e}", agent_type, git_manager)
                 
             return True
             
     if (not (feature is None)):
         print(f"Max turns reached for feature {feature.get('id')}. Blocking.")
-        task_utils.block_feature(task.get('id'), feature.get('id'), f"Agent loop failed: {e}")
+        task_utils.block_feature(task.get('id'), feature.get('id'), f"Agent loop failed: {e}", agent_type, git_manager)
     else:
         print(f"Max turns reached for task {task.get('id')}. Blocking.")
-        task_utils.block_task(task.get('id'), f"Agent loop failed: {e}")
+        task_utils.block_task(task.get('id'), f"Agent loop failed: {e}", agent_type, git_manager)
     return True
 
 

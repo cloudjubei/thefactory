@@ -165,13 +165,28 @@ def block_feature(task_id: int, feature_id: str, reason: str, agent_type: str, g
     return deferred_feature
 
 
-def block_task(task_id: int, reason: str) -> Task:
+def block_task(task_id: int, reason: str, agent_type: str, git_manager: GitManager) -> Task:
     """Sets a task's status to '?' Blocked when it's blocked."""
     task = get_task(task_id)
     
     task["status"] = "?"
     task["rejection"] = f"Blocked: {reason}"
     save_task(task)
+
+    commit_message = f"BLOCKED task: {task_id} - {task.get('title')}"
+    try:
+        git_manager.stage_files(['.'])
+    except Exception as e:
+        print(f"Warning: Could not stage files. Git error: {e}")
+    try:
+        git_manager.commit(commit_message)
+        print(f"Committed changes with message: '{commit_message}'")
+    except Exception as e:
+        print(f"Warning: Git commit failed. Error: {e}")
+    try:
+        git_manager.push()
+    except Exception as e:
+        print(f"Could not push': {e}")
 
     print(f"Task {task_id} blocked. Reason: {reason}")
     return task
@@ -251,6 +266,10 @@ def finish_spec(task_id: int, agent_type: str, git_manager: GitManager):
         print(f"Committed changes with message: '{commit_message}'")
     except Exception as e:
         print(f"Warning: Git commit failed. Error: {e}")
+    try:
+        git_manager.push()
+    except Exception as e:
+        print(f"Could not push': {e}")
         
     return f"Task {task_id} finished spec by {agent_type} and changes committed."
 
