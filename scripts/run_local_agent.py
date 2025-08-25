@@ -143,7 +143,7 @@ Begin now.
 def run_agent_on_task(model: str, agent_type: str, task: Task, git_manager: GitManager):
     print(f"\n--- Activating Agent {agent_type} for task: [{task.get('id')}] {task.get('title')} ---")
 
-    agent_system_prompt = f"{FRAMEWORK_ROOT}/docs/AGENT_{agent_type.upper()}.md"
+    agent_system_prompt = (FRAMEWORK_ROOT / f"docs/AGENT_{agent_type.upper()}.md").read_text()
     context_files = ["docs/FILE_ORGANISATION.md"]
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
     context = task_utils.get_context(context_files)
@@ -157,7 +157,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     if agent_type == 'developer':
         task_utils.update_feature_status(task.get('id'), feature.get('id'), '~')
 
-    agent_system_prompt = f"{FRAMEWORK_ROOT}/docs/AGENT_{agent_type.upper()}.md"
+    agent_system_prompt = (FRAMEWORK_ROOT / f"docs/AGENT_{agent_type.upper()}.md").read_text()
     feature_context_files = ["docs/FILE_ORGANISATION.md"] + feature.get("context", [])
 
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
