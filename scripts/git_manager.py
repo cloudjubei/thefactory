@@ -8,8 +8,9 @@ from urllib.parse import urlparse
 class GitManager:
     """A class to interact with a git repository in its current directory."""
 
-    def __init__(self, repo_path: str):
+    def __init__(self, repo_path: str, branch_name: str | None):
         self.repo_path = Path(repo_path)
+        self.branch_name = branch_name
 
         if not all([os.getenv("GIT_USER_NAME"), os.getenv("GIT_USER_EMAIL")]):
             print("ERROR: GIT_USER_NAME and GIT_USER_EMAIL must be set in your .env file.")
@@ -34,6 +35,7 @@ class GitManager:
             self._run_command(["checkout", "-b", branch_name])
         else:
             self._run_command(["checkout", branch_name])
+        self.branch_name = branch_name
 
     def stage_files(self, files: List[str]):
         self._run_command(["add"] + files)
@@ -41,10 +43,10 @@ class GitManager:
     def commit(self, message: str):
         self._run_command(["commit", "-m", message])
 
-    def pull(self, branch_name: str, remote_name: str = "origin"):
-        self._run_command(["pull", remote_name, branch_name])
+    def pull(self, branch_name: str | None,  remote_name: str = "origin"):
+        self._run_command(["pull", remote_name, branch_name if branch_name else self.branch_name])
 
-    def push(self, branch_name: str, remote_name: str = "origin"):
+    def push(self, branch_name: str | None, remote_name: str = "origin"):
         """Pushes the specified branch to the remote, using credentials from .env."""
         repo_url = os.getenv("GIT_REPO_URL")
         username = os.getenv("GIT_USER_NAME")
@@ -60,7 +62,5 @@ class GitManager:
         # Set the remote URL to the authenticated one for this push command
         self._run_command(["remote", "set-url", remote_name, authenticated_url])
         
-        # print(f"Pushing branch '{branch_name}' to remote repository...")
-        # self._run_command(["push", "-u", remote_name, branch_name])
-        print(f"Pushing to remote repository...")
-        self._run_command(["push"])
+        print(f"Pushing branch '{branch_name if branch_name else self.branch_name}' to remote repository...")
+        self._run_command(["push", "-u", remote_name, branch_name if branch_name else self.branch_name])
