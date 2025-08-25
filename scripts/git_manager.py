@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 class GitManager:
     """A class to interact with a git repository in its current directory."""
 
-    def __init__(self, repo_path: str, branch_name: str | None):
+    def __init__(self, repo_path: str, branch_name: str | None = None):
         self.repo_path = Path(repo_path)
         self.branch_name = branch_name
 
@@ -43,10 +43,10 @@ class GitManager:
     def commit(self, message: str):
         self._run_command(["commit", "-m", message])
 
-    def pull(self, branch_name: str | None,  remote_name: str = "origin"):
+    def pull(self, branch_name: str | None = None,  remote_name: str = "origin"):
         self._run_command(["pull", remote_name, branch_name if branch_name else self.branch_name])
 
-    def push(self, branch_name: str | None, remote_name: str = "origin"):
+    def push(self, branch_name: str | None = None, remote_name: str = "origin"):
         """Pushes the specified branch to the remote, using credentials from .env."""
         repo_url = os.getenv("GIT_REPO_URL")
         username = os.getenv("GIT_USER_NAME")
