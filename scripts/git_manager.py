@@ -42,7 +42,7 @@ class GitManager:
         self._run_command(["commit", "-m", message])
 
     def pull(self, branch_name: str, remote_name: str = "origin"):
-        self._run_command(["push", remote_name, branch_name])
+        self._run_command(["pull", remote_name, branch_name])
 
     def push(self, branch_name: str, remote_name: str = "origin"):
         """Pushes the specified branch to the remote, using credentials from .env."""
@@ -60,5 +60,7 @@ class GitManager:
         # Set the remote URL to the authenticated one for this push command
         self._run_command(["remote", "set-url", remote_name, authenticated_url])
         
-        print(f"Pushing branch '{branch_name}' to remote repository...")
-        self._run_command(["push", "-u", remote_name, branch_name])
+        # print(f"Pushing branch '{branch_name}' to remote repository...")
+        # self._run_command(["push", "-u", remote_name, branch_name])
+        print(f"Pushing to remote repository...")
+        self._run_command(["push"])

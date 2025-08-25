@@ -156,6 +156,10 @@ def block_feature(task_id: int, feature_id: str, reason: str, agent_type: str, g
         print(f"Committed changes with message: '{commit_message}'")
     except Exception as e:
         print(f"Warning: Git commit failed. Error: {e}")
+    try:
+        git_manager.push()
+    except Exception as e:
+        print(f"Could not push': {e}")
 
     print(f"Feature {feature_id} blocked. Reason: {reason}")
     return deferred_feature
@@ -220,6 +224,10 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
         print(f"Committed changes with message: '{commit_message}'")
     except Exception as e:
         print(f"Warning: Git commit failed. Error: {e}")
+    try:
+        git_manager.push()
+    except Exception as e:
+        print(f"Could not push': {e}")
         
     return f"Feature {feature_id} finished by {agent_type} and changes committed."
 

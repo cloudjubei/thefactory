@@ -286,11 +286,6 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int], projec
                 
                 run_agent_on_feature(model, agent_type, current_task, next_feature, git_manager)
                 processed_feature_ids.add(next_feature.get('id'))
-        
-        try:
-            git_manager.push(branch_name)
-        except Exception as e:
-            print(f"Could not push branch '{branch_name}': {e}")
 
     except Exception as e:
         print(f"\n--- A critical error occurred during the orchestrator run: {e} ---")
