@@ -32,12 +32,20 @@ FRAMEWORK_ROOT = Path.cwd()
 try:
     PROTOCOL_EXAMPLE_PATH = FRAMEWORK_ROOT / "docs" / "agent_response_example.json"
     with open(PROTOCOL_EXAMPLE_PATH, "r") as f:
-        # Load and then dump with indentation to create a nicely formatted string for the prompt
         PROTOCOL_EXAMPLE_STR = json.dumps(json.load(f), indent=2)
 except (FileNotFoundError, json.JSONDecodeError) as e:
     print(f"FATAL: Could not load or parse agent_response_example.json: {e}")
-    # Provide a safe fallback if the file is missing or corrupt
     PROTOCOL_EXAMPLE_STR = '{\n  "thoughts": "Your reasoning here...",\n  "tool_calls": [ ... ]\n}'
+
+PROTOCOL_INSTRUCTIONS = f"""
+#RESPONSE FORMAT INSTRUCTIONS:
+You **MUST** respond in a single, valid JSON object. This object must adhere to the following structure:
+```json
+{PROTOCOL_EXAMPLE_STR}
+```
+The thoughts field is for your reasoning, and tool_calls is a list of actions to execute.
+Your response will be parsed as JSON. Do not include any text outside of this JSON object.
+"""
 
 # --- Tool Mapping ---
 
@@ -91,40 +99,46 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
 
 def construct_system_prompt(agent_type: str, task: Task, feature: Feature, context: str, tool_signatures: List[str]) -> str:
     """Constructs the detailed system prompt, specialized for the agent type."""
+
+    plan = ""
+    if feature and agent_type in ['developer', 'tester', 'contexter', 'planner']:
+        plan = f"{feature.get("plan", "EMPTY")}"
+
+    acceptance_criteria = ""
+    if feature and agent_type in ['developer', 'tester']:
+        acceptance_criteria = "\n".join(f"{i}. {criterion}" for i, criterion in enumerate(feature.get('acceptance', []), 1))
+
+    tool_signatures_str = "\n".join(f"- {sig}" for sig in tool_signatures)
+
     prompt = f"""You are the '{agent_type}' agent.
-CURRENT TASK: {task.get('title')} (ID: {task.get('id')}) - DESCRIPTION: {task.get('description')}
-{ task.get('rejection') and f"REJECTION REASON: {task.get('rejection')}"}
+###CURRENT TASK (ID: {task.get('id')})
+#TITLE:
+{task.get('title')}
+#DESCRIPTION:
+{task.get('description')}
+{ task.get('rejection') and f"#REJECTION REASON:\n{task.get('rejection')}"}
 
 
-{ feature and f"ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')} - DESCRIPTION: {feature.get('description')}"}
-{ feature and feature.get('rejection') and f"REJECTION REASON: {feature.get('rejection')}"}
+{ feature and f"###ASSIGNED FEATURE: {feature['title']} (ID: {feature.get('id')}\n#DESCRIPTION: {feature.get('description')}\n"}
+{ feature and feature.get('rejection') and f"#REJECTION REASON:\n{feature.get('rejection')}\n"}
 
-
-The following context files have been provided:
+###CONTEXT FILES PROVIDED:
 {context}
-"""
-    if agent_type in ['developer', 'tester']:
-        prompt += "ACCEPTANCE CRITERIA:\n"
-        for i, criterion in enumerate(feature.get('acceptance', []), 1):
-            prompt += f"{i}. {criterion}\n"
 
-    prompt += f"""
-You **MUST** respond in a single, valid JSON object. This object must adhere to the following structure:
-```json
-{PROTOCOL_EXAMPLE_STR}
-```
-The thoughts field is for your reasoning, and tool_calls is a list of actions to execute.
-Your response will be parsed as JSON. Do not include any text outside of this JSON object.
-"""
-    prompt += """
+###THE PLAN
+{plan}
+
+###ACCEPTANCE CRITERIA:
+{acceptance_criteria}
+
+#TOOLS:
 Your available tools are defined below. Call them with the exact function and argument names.
---- TOOL SIGNATURES ---
+'{tool_signatures_str}'
+
+{PROTOCOL_INSTRUCTIONS}
+
+Begin now.
 """
-    for sig in tool_signatures:
-        prompt += f"- {sig}\n"
-        prompt += "--- END OF TOOL SIGNATURES ---\n"
-        
-    prompt += "\nBegin now."
     return prompt
 
 def run_agent_on_task(model: str, agent_type: str, task: Task, git_manager: GitManager):
