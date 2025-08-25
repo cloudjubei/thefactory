@@ -277,7 +277,7 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[int], projec
             run_agent_on_task(model, agent_type, current_task, git_manager)
         else:
             while True:
-                next_feature = task_utils.find_next_available_feature(current_task, exclude_ids=processed_feature_ids)
+                next_feature = task_utils.find_next_available_feature(current_task, processed_feature_ids if agent_type == "developer" else set())
                 
                 if not next_feature:
                     print(f"\nNo more available features for task {task_id}.")
