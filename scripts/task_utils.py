@@ -107,6 +107,34 @@ def write_file(filename: str, content: str):
     target_file_path.write_text(content)
     print(f"File securely written to: {filename}")
 
+def rename_file(filename: str, new_filename: str):
+    """Renames or moves a file, ensuring it's safely within the given project root."""
+    target_file_path = (get_project_root() / new_filename).resolve()
+    try:
+        target_file_path.relative_to(get_project_root())
+    except ValueError:
+        raise PermissionError(f"Security violation: Attempted to write outside of project root: {new_filename}")
+    
+    src_file_path = (get_project_root() / filename).resolve()
+    try:
+        src_file_path.relative_to(get_project_root())
+    except ValueError:
+        raise PermissionError(f"Security violation: Attempted to read outside of project root: {filename}")
+    
+    src_file_path.rename(target_file_path)
+    print(f"File {filename} securely renamed to: {new_filename}")
+
+def delete_file(filename: str):
+    """Deletes a file, ensuring it's safely within the given project root."""
+    target_file_path = (get_project_root() / filename).resolve()
+    try:
+        target_file_path.relative_to(get_project_root())
+    except ValueError:
+        raise PermissionError(f"Security violation: Attempted to delete outside of project root: {filename}")
+    
+    target_file_path.unlink(True)
+    print(f"File securely deleted: {filename}")
+
 
 def update_feature_status(task_id: int, feature_id: str, status: Status) -> Optional[Feature]:
     """Updates the status of a specific feature."""

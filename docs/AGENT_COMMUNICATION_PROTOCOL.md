@@ -27,6 +27,14 @@ Example shape:
       "arguments": { "path": "docs/EXAMPLE.md", "content": "..." }
     },
     {
+      "tool_name": "rename_file",
+      "arguments": { "path": "docs/EXAMPLE.md", "new_path": "somewhere/else/NEW_EXAMPLE.md" }
+    },
+    {
+      "tool_name": "delete_file",
+      "arguments": { "path": "docs/EXAMPLE.md" }
+    },
+    {
       "tool_name": "run_tests",
       "arguments": {}
     },
@@ -49,5 +57,5 @@ Example shape:
 - The key for tool parameters must be named exactly "arguments" to ensure deterministic parsing.
 
 ## Notes
-- The set of available tools and their argument shapes are defined by the orchestrator and may include: write_file, retrieve_context_files, rename_files, run_tests, finish_feature, submit_for_review, ask_question, finish.
+- The set of available tools and their argument shapes are defined by the orchestrator and may include: write_file, rename_file, delete_file, retrieve_context_files, rename_files, run_tests, finish_feature, submit_for_review, ask_question, finish.
 - The Agent should follow repository-specific guidance in docs/TOOL_ARCHITECTURE.md for the authoritative list and semantics of tools.

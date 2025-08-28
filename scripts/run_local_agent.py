@@ -72,6 +72,8 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
     elif agent_type == 'developer':
         agent_tools = {
             "write_file": (task_utils.write_file, "write_file(filename: str, content: str)"),
+            "rename_file": (task_utils.rename_file, "rename_file(filename: str, new_filename: str)"),
+            "delete_file": (task_utils.delete_file, "delete_file(filename: str)"),
             "run_test": (task_utils.run_test, "run_test() -> str"),
         }
     elif agent_type == 'planner':
