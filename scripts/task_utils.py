@@ -132,7 +132,10 @@ def delete_file(filename: str):
     except ValueError:
         raise PermissionError(f"Security violation: Attempted to delete outside of project root: {filename}")
     
-    target_file_path.unlink(True)
+    if target_file_path.is_dir():
+        target_file_path.rmdir()
+    else:
+        target_file_path.unlink(True)
     print(f"File securely deleted: {filename}")
 
 
