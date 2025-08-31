@@ -1,6 +1,6 @@
 {
   "id": 2,
-  "status": "-",
+  "status": "+",
   "title": "Agent tools and scripts",
   "description": "",
   "features": [
@@ -137,7 +137,7 @@
     },
     {
       "id": "2.7",
-      "status": "-",
+      "status": "+",
       "title": "Delete file tool",
       "description": "The agent requires a delete file tool.\nThe file must be within project scope",
       "plan": "",
@@ -147,7 +147,7 @@
     },
     {
       "id": "2.8",
-      "status": "-",
+      "status": "+",
       "title": "A rename tool",
       "description": "The agent requires a rename tool (which also works as a move tool). Still needs to remain within project scope",
       "plan": "",
