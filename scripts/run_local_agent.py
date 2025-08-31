@@ -187,7 +187,7 @@ def _run_agent_conversation(model: str, available_tools: Dict[str, Callable], sy
             tool_calls = response_json.get("tool_calls", [])
             print(f"Agent Thoughts: {thoughts}")
 
-            if not tool_calls: continue
+            if not tool_calls or len(tool_calls) == 0: continue
 
             tool_outputs = []
             for call in tool_calls:
