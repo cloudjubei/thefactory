@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import uuid
 from pathlib import Path
 from typing import List, Optional
 
@@ -27,20 +28,19 @@ TASKS_DIR_NAME = "tasks"
 def _get_tasks_dir() -> Path:
     return _PROJECT_ROOT / TASKS_DIR_NAME
 
-def _get_task_dir(task_id: int) -> Path:
-    return _get_tasks_dir() / str(task_id)
+def _get_task_dir(task_id: str) -> Path:
+    return _get_tasks_dir() / task_id
 
-def _get_task_path(task_id: int) -> Path:
+def _get_task_path(task_id: str) -> Path:
     return _get_task_dir(task_id) / "task.json"
 
-def _get_test_path(task_id: int, feature_id: str) -> Path:
+def _get_test_path(task_id: str, feature_id: str) -> Path:
     """Helper to get the conventional path for a feature's test file."""
-    feature_number = feature_id.split('.')[-1]
-    return _get_task_dir(task_id) / "tests" / f"test_{task_id}_{feature_number}.py"
+    return _get_task_dir(task_id) / "tests" / f"test_{task_id}_{feature_id}.py"
 
 # --- Core Task I/O ---
 
-def get_task(task_id: int) -> Task:
+def get_task(task_id: str) -> Task:
     task_file = _get_task_path(task_id)
     if not task_file.exists():
         raise FileNotFoundError(f"Task file not found for task_id: {task_id}")
@@ -56,7 +56,7 @@ def save_task(task: Task):
         json.dump(task, f, indent=2)
 
 
-def update_task_status(task_id: int, status: Status) -> Task:
+def update_task_status(task_id: str, status: Status) -> Task:
     """Updates the overall status of a task."""
     task = get_task(task_id)
     task["status"] = status
@@ -139,7 +139,7 @@ def delete_file(filename: str):
     print(f"File securely deleted: {filename}")
 
 
-def update_feature_status(task_id: int, feature_id: str, status: Status) -> Optional[Feature]:
+def update_feature_status(task_id: str, feature_id: str, status: Status) -> Optional[Feature]:
     """Updates the status of a specific feature."""
     task = get_task(task_id)
     updated_feature = None
@@ -153,7 +153,7 @@ def update_feature_status(task_id: int, feature_id: str, status: Status) -> Opti
     return updated_feature
 
 
-def block_feature(task_id: int, feature_id: str, reason: str, agent_type: str, git_manager: GitManager) -> Optional[Feature]:
+def block_feature(task_id: str, feature_id: str, reason: str, agent_type: str, git_manager: GitManager) -> Optional[Feature]:
     """Sets a feature's status to '?' Blocked when it's blocked."""
     task = get_task(task_id)
     deferred_feature = None
@@ -223,7 +223,7 @@ def block_task(task_id: int, reason: str, agent_type: str, git_manager: GitManag
     return task
 
 
-def _check_and_update_task_completion(task_id: int):
+def _check_and_update_task_completion(task_id: str):
     """Checks if all features in a task are done, and if so, marks the task as done."""
     task = get_task(task_id)
     all_features_done = all(f.get("status") == "+" for f in task.get("features"))
@@ -233,7 +233,7 @@ def _check_and_update_task_completion(task_id: int):
         update_task_status(task_id, "+")
 
 
-def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: GitManager):
+def finish_feature(task_id: str, feature_id: str, agent_type: str, git_manager: GitManager):
     """
     Handles the finishing logic for any agent. It stages all current changes,
     commits them, and updates the feature status according to the agent's role.
@@ -278,7 +278,7 @@ def finish_feature(task_id: int, feature_id: str, agent_type: str, git_manager: 
     return f"Feature {feature_id} finished by {agent_type} and changes committed."
 
 
-def finish_spec(task_id: int, agent_type: str, git_manager: GitManager):
+def finish_spec(task_id: str, agent_type: str, git_manager: GitManager):
     """
     Handles the finishing logic for any agent. It stages all current changes.
     """
@@ -307,7 +307,7 @@ def finish_spec(task_id: int, agent_type: str, git_manager: GitManager):
 # --- Tester Agent Tools ---
 
 
-def get_test(task_id: int, feature_id: str) -> str:
+def get_test(task_id: str, feature_id: str) -> str:
     """Retrieves the current test content for a feature."""
     test_path = _get_test_path(task_id, feature_id)
     try:
@@ -316,7 +316,7 @@ def get_test(task_id: int, feature_id: str) -> str:
         return f"Test file not found at {test_path}"
 
 
-def update_acceptance_criteria(task_id: int, feature_id: str, criteria: List[str]) -> Optional[Feature]:
+def update_acceptance_criteria(task_id: str, feature_id: str, criteria: List[str]) -> Optional[Feature]:
     """Replace the feature's acceptance criteria with a new list."""
     task = get_task(task_id)
     updated_feature = None
@@ -330,7 +330,7 @@ def update_acceptance_criteria(task_id: int, feature_id: str, criteria: List[str
     return updated_feature
 
 
-def update_test(task_id: int, feature_id: str, test: str):
+def update_test(task_id: str, feature_id: str, test: str):
     """Create or update the test file for the given feature."""
     test_path = _get_test_path(task_id, feature_id)
     test_path.parent.mkdir(exist_ok=True, parents=True)
@@ -338,7 +338,7 @@ def update_test(task_id: int, feature_id: str, test: str):
     return f"Test file updated at {test_path}"
 
 
-def delete_test(task_id: int, feature_id: str):
+def delete_test(task_id: str, feature_id: str):
     """Remove the test file for the given feature."""
     test_path = _get_test_path(task_id, feature_id)
     if test_path.exists():
@@ -347,7 +347,7 @@ def delete_test(task_id: int, feature_id: str):
     return f"Test file {test_path} not found."
 
 
-def run_test(task_id: int, feature_id: str) -> str:
+def run_test(task_id: str, feature_id: str) -> str:
     """Executes a feature's test script and returns the result."""
     test_path = _get_test_path(task_id, feature_id)
     if not test_path.exists():
@@ -373,13 +373,13 @@ def run_test(task_id: int, feature_id: str) -> str:
 
 # --- Orchestrator Helpers ---
 
-def find_next_pending_task() -> Optional[Task]:
+def find_next_pending_task() -> Optional[Task]: # TODO needs to be updated to take into account project.json ordering
     """Scans task directories and returns the first task that is pending or in progress."""
     if not _get_tasks_dir().exists(): return None
     for task_dir in sorted(_get_tasks_dir().iterdir(), key=lambda x: int(x.name)):
         if task_dir.is_dir():
             try:
-                task_id = int(task_dir.name)
+                task_id = task_dir.name
                 task = get_task(task_id)
                 if task.get("status") in ["-", "~"]: return task
             except (ValueError, FileNotFoundError): continue
@@ -391,6 +391,8 @@ def find_next_available_feature(task: Task, exclude_ids: set = set(), ignore_dep
     Finds the first pending feature in a task whose dependencies are all met,
     EXCLUDING any feature IDs passed in the `exclude_ids` set.
     """
+
+    # TODO: use task.featureIdToDisplayIndex for ordering
 
     completed_feature_ids = {f.get("id") for f in task.get("features") if f.get("status") == "+"}
     
@@ -404,28 +406,19 @@ def find_next_available_feature(task: Task, exclude_ids: set = set(), ignore_dep
     return None
 
 
-def create_feature(task_id: int, title: str, description: str) -> Feature:
+def create_feature(task_id: str, title: str, description: str) -> Feature:
     """
     Creates a new feature with a given title, description, and adds it to the specified task.
     This tool automatically generates a new feature ID.
     """
     task = get_task(task_id)
+
     features = task.get("features", [])
-    
-    highest_sub_id = 0
-    for f in features:
-        try:
-            sub_id = int(f['id'].split('.')[-1])
-            if sub_id > highest_sub_id:
-                highest_sub_id = sub_id
-        except (ValueError, IndexError):
-            continue
-    
-    new_sub_id = highest_sub_id + 1
-    new_id = f"{task_id}.{new_sub_id}"
+
+    id = uuid.uuid4()
 
     new_feature: Feature = {
-        "id": new_id,
+        "id": id,
         "status": "-",
         "title": title,
         "description": description,
@@ -433,16 +426,19 @@ def create_feature(task_id: int, title: str, description: str) -> Feature:
         "context": [],
         "acceptance": [],
     }
-    
     features.append(new_feature)
     task["features"] = features
+
+    featureIdToDisplayIndex = task.get("featureIdToDisplayIndex", {})
+    featureIdToDisplayIndex[id] = len(features) + 1 # offset by 1 as users seeit start at 1
+    task["featureIdToDisplayIndex"] = featureIdToDisplayIndex
     save_task(task)
     
-    print(f"New feature '{new_id}' created in task {task_id}.")
+    print(f"New feature '{id}' created in task {task_id}.")
     return new_feature
 
 
-def update_feature_plan(task_id: int, feature_id: str, plan: any) -> Optional[Feature]:
+def update_feature_plan(task_id: str, feature_id: str, plan: any) -> Optional[Feature]:
     """
     Updates the 'plan' field of a specific feature. This is the primary tool for the Planner agent.
     It gracefully handles the plan being passed as a list of strings.
@@ -469,7 +465,7 @@ def update_feature_plan(task_id: int, feature_id: str, plan: any) -> Optional[Fe
     return updated_feature
 
 
-def update_feature_context(task_id: int, feature_id: str, context: List[str]) -> Optional[Feature]:
+def update_feature_context(task_id: str, feature_id: str, context: List[str]) -> Optional[Feature]:
     """
     Updates the 'context' field of a specific feature. This is the primary tool for the Contexter agent.
     """

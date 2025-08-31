@@ -7,6 +7,7 @@ import sys
 import json
 import shutil
 from pathlib import Path
+import uuid
 from dotenv import load_dotenv, find_dotenv, set_key
 
 load_dotenv()
@@ -100,22 +101,6 @@ def save_json(path: Path, data):
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
-def rewrite_task_ids(task_data: dict, new_id: int = 1) -> dict:
-    task_data = dict(task_data)
-    task_data["id"] = new_id
-    features = task_data.get("features", [])
-    new_features = []
-    for feat in features:
-        f = dict(feat)
-        fid = f.get("id")
-        if isinstance(fid, str) and "." in fid:
-            _, suffix = fid.split(".", 1)
-            f["id"] = f"{new_id}.{suffix}"
-        new_features.append(f)
-    task_data["features"] = new_features
-    return task_data
-
-
 def main():
     parser = argparse.ArgumentParser(
         description=(
@@ -131,7 +116,7 @@ Examples:
   # Create a project with a remote repository URL (SSH)
   python3 scripts/child_project_utils.py my-new-service --repo-url git@github.com:user/my-new-service.git
 
-  # Seed the child project with an existing task folder (tasks/{id}/) rewritten to tasks/1/
+  # Seed the child project with an existing task folder (tasks/{id}/) rewritten to tasks/{newId}
   python3 scripts/child_project_utils.py my-seeded-proj --task-id 7
 
   # Perform a dry run to see what would happen without making changes
@@ -229,7 +214,7 @@ Examples:
                 set_key(str(env_path), "GIT_REPO_URL", args.repo_url)
 
             if args.task_id is not None:
-                src_task_dir = Path("tasks") / str(args.task_id)
+                src_task_dir = Path("tasks") / args.task_id
                 if not src_task_dir.exists() or not src_task_dir.is_dir():
                     print(f"Error: Source task directory '{src_task_dir}' does not exist.", file=sys.stderr)
                     sys.exit(1)
@@ -238,7 +223,7 @@ Examples:
                     print(f"Error: Expected '{task_json_path}' to exist after copying, but it was not found.", file=sys.stderr)
                     sys.exit(1)
                 data = load_json(task_json_path)
-                data = rewrite_task_ids(data, new_id=1)
+                data["id"] = uuid.uuid4() # new id to make sure no clashes between projects
                 save_json(task_json_path, data)
             else:
                 tasks_one_dir.mkdir(exist_ok=True)

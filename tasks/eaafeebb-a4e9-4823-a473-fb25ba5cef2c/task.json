@@ -1,11 +1,11 @@
 {
-  "id": 4,
+  "id": "eaafeebb-a4e9-4823-a473-fb25ba5cef2c",
   "status": "+",
   "title": "Running in docker",
   "description": "adhere to `docs/PROJECTS_GUIDE.md` to create all needed features for any project to be able to run in docker. It must be possible to do this with a minimal amount of steps and configuration. As much as possible should be configured for the user - if possible any data already present in THIS project should be reused - especially the `.env` file. It should be possible to run the current project and launch an agent in docker with a single script or command. All files for this should live in `scripts/docker`",
   "features": [
     {
-      "id": "4.1",
+      "id": "295f348e-d291-4885-96b1-9e16497b7a57",
       "status": "+",
       "title": "Create Dockerfile for the agent environment",
       "description": "Create a `Dockerfile` inside `scripts/docker/`. It should use a suitable Python base image (e.g., `python:3.11-slim`), set up a working directory, copy project files, and install dependencies from `requirements.txt`. The context for the build will be the project's root directory.",
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "id": "4.2",
+      "id": "258ad92d-0aa3-4cba-9e9d-28d4ef56a249",
       "status": "+",
       "title": "Create .dockerignore file",
       "description": "Create a `.dockerignore` file in the `scripts/docker/` directory. This file will be used with the Dockerfile from the same directory to prevent unnecessary files and directories (like `.git`, `__pycache__`, `.venv`, `tasks/`) from being copied into the Docker image, keeping it lean. The build context is the project root, so paths in .dockerignore should be relative to the root.",
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "id": "4.3",
+      "id": "3c89c1ce-e551-4cbf-b608-8854bd5cbabc",
       "status": "+",
       "title": "Create docker-compose.yml for easy container management",
       "description": "Create a `docker-compose.yml` file in `scripts/docker/`. This file will define an `agent` service that builds from the local Dockerfile. It must mount the project's root `.env` file, the `projects/` directory, and the `tasks/` directory as volumes into the container to ensure the agent has access to necessary configurations and data.",
@@ -69,7 +69,7 @@
       ]
     },
     {
-      "id": "4.4",
+      "id": "3af906c4-5fbe-4335-b0e2-8ced7a30766f",
       "status": "+",
       "title": "Create a run script to launch the agent in Docker",
       "description": "Create an executable shell script `scripts/docker/run.sh`. This script will serve as the single command to build the Docker image (if not already built) and run the agent container using `docker-compose`. It should accept arguments and pass them to the agent process inside the container. It should also handle graceful shutdown.",
@@ -93,7 +93,7 @@
       ]
     },
     {
-      "id": "4.5",
+      "id": "2d9bc717-887a-4604-b89f-ef784afa927f",
       "status": "+",
       "title": "Add documentation for the Docker setup",
       "description": "Create a new file `docs/DOCKER_SETUP.md`. This document will explain the prerequisites (Docker, Docker Compose) and provide clear instructions on how to use the `scripts/docker/run.sh` script to start and interact with the agent in a Docker container.",
@@ -115,5 +115,12 @@
         "The scripts/docker/run.sh file exists and is executable."
       ]
     }
-  ]
+  ],
+  "featureIdToDisplayIndex": {
+    "295f348e-d291-4885-96b1-9e16497b7a57": 1,
+    "258ad92d-0aa3-4cba-9e9d-28d4ef56a249": 2,
+    "3c89c1ce-e551-4cbf-b608-8854bd5cbabc": 3,
+    "3af906c4-5fbe-4335-b0e2-8ced7a30766f": 4,
+    "2d9bc717-887a-4604-b89f-ef784afa927f": 5
+  }
 }

@@ -1,8 +1,9 @@
 {
-  "id": 6,
+  "id": "389fd811-7fe6-4937-a33d-03c3e15d99e4",
   "status": "?",
   "title": "Create a way to easily launch MCP servers",
   "action": "Our agents will need to access functionality that isn't local, it seems MCP servers are the current best way of doing so. Let's have a methodology/workflow to launch these easily.",
   "acceptance": [],
-  "features": []
+  "features": [],
+  "featureIdToDisplayIndex": {}
 }

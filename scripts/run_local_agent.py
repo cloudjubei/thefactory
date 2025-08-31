@@ -238,7 +238,7 @@ def _run_agent_conversation(model: str, available_tools: Dict[str, Callable], sy
     return True
 
 
-def run_orchestrator(model: str, agent_type: str, task_id: Optional[int], project_dir: Optional[str] = None):
+def run_orchestrator(model: str, agent_type: str, task_id: Optional[str], project_dir: Optional[str] = None):
     """
     Main orchestration loop. It can target a child project directory or the current working directory.
     """
