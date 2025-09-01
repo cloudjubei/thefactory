@@ -3,5 +3,168 @@
   "status": "-",
   "title": "Combine with Overseer-Local",
   "description": "This project has a child project overseer-local (Overseer) which created an Electron app (TypeScript, React + Vite) for managing tasks for any project. It makes it very easy for a user to manage tasks of any kind. \nIt's done by each project under the projects folder having a config json file of the form '{project_id}.json' that specifies some basic information, such as the relative path of the project, a list of its tasks (which are located in that project's folder under tasks).\n\nCurrently, this project - TheFactory (python) - orchestrates and runs agents to carry out the tasks that are specified in these json files for these projects. We want to combine it in some way so the following requirements are possible:\n- allow launching agents from within the Overseer on a specific feature or task (currently LLMConfigs are specified for chat - those can be reused)\n- allow monitoring their progress and performance (speed, token usage and cost).\n- we require as much history and information as possible about each agent, so that a user can share if a given run was satisfactory or not. This way a user will be able to gauge the performance of an agent in terms of work done.\n- most of the time the agents perform file changes (writes, deletions, renames, moves) and we want to allow a user to accept or reject the changes that an agent has submitted. Currently, this is done by utilising git and feature branches - it works well, but requires an external terminal or app setup for it - whereas it would have to be integrated into the Overseer.\n\nAdditional info:\nLaunching agents right now in TheFactory is done by executing a python script from the console. It allows running these agents on arbitrary project paths that have the appropriate task schemas.\n\nClearly we cannot easily combine a python console project and a ts Electron app. So the first thing to do is to create a doc that outlines all possible angles of approaching this. The thing to keep in mind is that in the future, there could be other child projects completely incompatible environment wise with these (think different language like Rust or C++) but TheFactory or Overseer will need them.\nWe require to have a few solutions outlined that will work completely locally (like it does now) and we can also have ones that would use some backend infrastructure.",
-  "features": []
+  "features": [
+    {
+      "id": "1e69e9f2-9a02-477c-92ea-504c74397902",
+      "status": "-",
+      "title": "Author integration strategy doc: Overseer + TheFactory",
+      "description": "Create docs/OVERSEER_INTEGRATION_OPTIONS.md outlining multiple approaches to integrate TheFactory (Python) with Overseer (Electron, TS/React):\n- Local CLI spawn + NDJSON event stream (no daemon)\n- Local microservice (HTTP+SSE or WebSocket) that Overseer talks to\n- gRPC service\n- Shared filesystem event log model (watch .jsonl files)\n- Backend gateway/server (optional remote mode)\nFor each, provide pros/cons, security implications, local-only feasibility, multi-language future compatibility (Rust/C++), dev ergonomics, and migration path. Conclude with a recommended phased approach: start with CLI+NDJSON + local file storage; optionally add local HTTP/SSE server.\nAcceptance: File exists with clear sections, decision matrix (bulleted), and explicit recommendations and migration plan.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "0e443080-c03b-420f-9f2f-4c86130abfbb",
+      "status": "-",
+      "title": "Define Agent Run Protocol v1 (schemas + spec)",
+      "description": "Create a protocol spec to unify run control and observability.\n- Add docs/AGENT_RUN_PROTOCOL.md describing request/response and event model, event types, and framing rules (NDJSON line-delimited with top-level keys: type, timestamp, run_id, data, level, seq).\n- Define JSON Schemas under docs/schemas/agent_run_protocol/ for:\n  - RunRequest (task/feature selection, project path, llm config, env, flags)\n  - RunStarted, StepStarted, StepCompleted, LLMCall, TokenUsage, Metric, Log, FileChangeProposed, FileChangeApplied, FileChangeRejected, FileChangesetReady, RunSummary, RunFailed, Heartbeat\n  - Exit codes and terminal summary format\n- Include a version field and backward compatibility guidance.\nAcceptance: Spec and schemas present; examples included in the spec; schemas validate with a standard JSON Schema validator.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "7718a6e9-44dd-407d-b635-3c9d208d66da",
+      "status": "-",
+      "title": "Event emission library for TheFactory (Python)",
+      "description": "Introduce a small internal library to emit structured protocol events:\n- Add scripts/protocol/events.py with an EventEmitter class supporting NDJSON stream emission to stdout and/or file, sequence numbering, timestamps, and schema-conformant structures.\n- Convenience methods: run_started, step_started/completed, llm_call, token_usage, metric, log, file_change_proposed/applied/rejected, changeset_ready, run_summary, run_failed, heartbeat.\n- Support silent (no stdout) and dual-output modes (stdout + file path) and a --protocol-version check.\nAcceptance: Unit tests in tasks/{task_id}/tests validate event objects for a minimal scenario and that NDJSON lines are well-formed and include required fields.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "239907b3-6739-40d2-ac1d-e742cccdf862",
+      "status": "-",
+      "title": "Update run_local_agent.py to support structured NDJSON protocol",
+      "description": "Modify scripts/run_local_agent.py to support structured mode:\n- New flags: --protocol v1, --ndjson, --run-id (default: UUID4), --events-out <path>, --changeset-out <dir>, --price-table <json>.\n- Wire in EventEmitter to emit lifecycle events and logs in addition to current console output.\n- Preserve current behavior when not in --ndjson mode.\n- Ensure clean exit codes and RunSummary/RunFailed are always emitted in structured mode.\nAcceptance: Running a minimal dry-run emits a valid sequence of events to stdout or events file; existing usages without flags remain unaffected.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "fdecc7a6-c8e4-40b8-a99a-fc6ab65bae4c",
+      "status": "-",
+      "title": "Local run storage layout and index",
+      "description": "Standardize local storage for runs under .thefactory/runs/{run_id}/:\n- Create directories and write: events.jsonl, summary.json, stdout.log, stderr.log, and metadata.json.\n- Maintain .thefactory/runs/index.jsonl with one-line JSON per run (run_id, project_id, task_id/feature, start/end times, status, llm config, metrics summary).\n- Add helper functions in scripts to append and query the index.\nAcceptance: After a run, the directory contains expected files; index.jsonl receives an entry; tests assert presence and correctness.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "4706c87b-b60e-4e55-9122-e93cc126f475",
+      "status": "-",
+      "title": "Git changeset export utility",
+      "description": "Implement scripts/git_changeset.py to capture agent-produced file changes for review:\n- Commands: export (produce unified diff patch and metadata), status (list changed files), apply (apply patch to target branch/worktree), discard (revert or delete branch), verify (check patch applies cleanly).\n- On export, write to .thefactory/runs/{run_id}/changes/{timestamp}/: changeset.diff, files.json, summary.json.\n- Integrate with EventEmitter to emit FileChangesetReady with paths when export occurs.\n- Work with current feature branch strategy; default to diff from base branch name provided or detected.\nAcceptance: Tests create a temp git repo, simulate file changes, run export, and verify patch content and metadata; verify apply/discard work cleanly.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "d75c1209-e078-4796-98ec-8443726eda2b",
+      "status": "-",
+      "title": "Accept/Reject changes CLI commands",
+      "description": "Add CLI subcommands to scripts/run_local_agent.py or a new script scripts/run_changeset.py:\n- accept --run-id [--changeset-path]: apply patch to current working tree or merge feature branch.\n- reject --run-id [--changeset-path]: discard changes (reset branch or revert patch).\n- Emit FileChangeApplied or FileChangeRejected events accordingly and update run summary.\nAcceptance: Tests verify accept applies the patch and reject removes changes; events emitted and run summary updated.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "8597181b-30f2-49c0-b3bc-63cf52c38519",
+      "status": "-",
+      "title": "Optional local HTTP server with SSE event streaming",
+      "description": "Implement scripts/agent_runner_server.py to provide a local microservice for Overseer:\n- Endpoints: POST /runs (start with RunRequest), GET /runs (list), GET /runs/{id} (status), GET /runs/{id}/events (SSE stream), POST /runs/{id}/cancel, POST /runs/{id}/accept, POST /runs/{id}/reject.\n- Spawns run_local_agent.py processes, tails their events.jsonl, and forwards them over SSE.\n- CORS enabled for localhost; no auth for local-only.\n- Graceful shutdown and run process management.\nAcceptance: Tests (integration) start the server, launch a trivial run, receive SSE events, and cancel successfully; accept/reject endpoints trigger actions and events.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "e8af94dc-eb24-4e4d-9352-524f74bfe9bb",
+      "status": "-",
+      "title": "Metrics and token/cost accounting module",
+      "description": "Create scripts/metrics.py to compute and aggregate token usage and costs:\n- Parse usage from providers when available (OpenAI, Anthropic, etc.).\n- Fallback token estimation using tiktoken or heuristics.\n- Price table JSONs under docs/price_tables/ (e.g., openai_2025_05.json) mapping models to input/output token prices.\n- Integrate with EventEmitter via TokenUsage and Metric events; accumulate and write totals into summary.json.\nAcceptance: Unit tests verify token aggregation and cost computation given synthetic LLMCall/TokenUsage events; respects configured price table.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "fb3707e4-ab16-4cfc-82cf-f26770ac3b18",
+      "status": "-",
+      "title": "Run history registry and feedback",
+      "description": "Add ability to record user feedback per run:\n- scripts/run_feedback.py: commands rate --run-id <1-5> --note \"text\"; tag --run-id key=value; annotate --run-id --note.\n- Update runs index.jsonl with feedback fields and maintain runs/{run_id}/feedback.json.\n- If server is used, add POST /runs/{id}/feedback.\nAcceptance: Tests set rating and notes, and verify index and feedback.json reflect them; server endpoint writes the same.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "27736c0a-86ae-4a4b-bc25-83939f0001b0",
+      "status": "-",
+      "title": "Overseer adapter: TypeScript types and example client",
+      "description": "Provide a small TS adapter example for Overseer:\n- docs/examples/ts/overseer-adapter/types.ts: TS interfaces mirroring Agent Run Protocol v1 (RunRequest, events, summaries).\n- client examples: clientSpawnCli.ts (spawns run_local_agent.py in --ndjson mode and parses lines), clientHttpSse.ts (connects to agent_runner_server SSE and REST).\n- README.md explaining usage and integration hints.\nAcceptance: Example compiles (tsc) and includes instructions; sample NDJSON lines parse into typed objects in a simple script.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "cc3bd6d9-fefd-45b4-84c7-9e2d401b2ee2",
+      "status": "-",
+      "title": "Project config schema extensions for Overseer",
+      "description": "Extend project configuration documentation to support agent runner integration:\n- Add docs/schemas/overseer_project_extension.json specifying optional fields: agentRunner.mode (cli|server), runStoragePath, defaultLlmConfigRef, baseBranch, priceTablePath, env.\n- Update docs/PROJECTS_GUIDE.md with guidance on these fields and examples.\nAcceptance: Schema validates sample config; documentation updated with concrete JSON examples.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "9efb53e6-63c2-474f-9075-6e6d3b52e05a",
+      "status": "-",
+      "title": "Local security and sandboxing guidance",
+      "description": "Create docs/LOCAL_SANDBOXING.md with recommended practices for safe local agent execution:\n- Directory allowlisting, environment variable filtering, safe subprocess policies, resource limits, and secrets handling.\n- Git hygiene and branch protections for acceptance workflow.\n- Optional OS-level sandbox suggestions (venvs, containers) and how they interact with the CLI/server options.\nAcceptance: Document present with actionable checklists and links from OVERSEER_INTEGRATION_OPTIONS.md.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "f4a1ee1d-c996-4c2b-b7fb-5d522b2fe581",
+      "status": "-",
+      "title": "Tests: NDJSON event emission happy path",
+      "description": "Add deterministic tests under tasks/{task_id}/tests for the structured run flow:\n- Create a dummy agent run that emits a minimal sequence of events via run_local_agent.py in --ndjson mode (use a trivial task).\n- Assert events.jsonl exists, is parseable, and contains required event types in order (RunStarted -> RunSummary).\n- Validate index.jsonl updated and summary.json present with basic fields.\nAcceptance: Tests pass locally and in CI using a temp workspace and without external network calls.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "045799c1-1be0-4f0e-b6f2-c83b652f9e4c",
+      "status": "-",
+      "title": "Tests: Git changeset export and accept/reject",
+      "description": "Add tests under tasks/{task_id}/tests to validate changeset workflow:\n- Initialize a temp git repo, create a change, run git_changeset.py export, and check changeset files.\n- Run accept to apply to a clean worktree and verify file contents.\n- Run reject to revert changes and verify clean state.\n- Check that FileChangesetReady and FileChangeApplied/Rejected events are produced when integrated through the runner.\nAcceptance: All assertions pass; patches apply and revert cleanly.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "4dfc6b86-f1fd-40d5-aea4-05411d2d995e",
+      "status": "-",
+      "title": "Tests: HTTP server SSE and control endpoints",
+      "description": "Add integration tests under tasks/{task_id}/tests for the optional local server:\n- Start agent_runner_server.py on a random local port.\n- POST /runs to start a simple run; connect to /runs/{id}/events and assert reception of ordered events.\n- Issue cancel; verify run terminates and status reflects cancellation.\n- Test accept/reject endpoints on a run that produced a changeset.\nAcceptance: Server handles end-to-end run lifecycle; SSE stream is well-formed; control endpoints work as expected.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    }
+  ],
+  "featureIdToDisplayIndex": {
+    "1e69e9f2-9a02-477c-92ea-504c74397902": 1,
+    "0e443080-c03b-420f-9f2f-4c86130abfbb": 2,
+    "7718a6e9-44dd-407d-b635-3c9d208d66da": 3,
+    "239907b3-6739-40d2-ac1d-e742cccdf862": 4,
+    "fdecc7a6-c8e4-40b8-a99a-fc6ab65bae4c": 5,
+    "4706c87b-b60e-4e55-9122-e93cc126f475": 6,
+    "d75c1209-e078-4796-98ec-8443726eda2b": 7,
+    "8597181b-30f2-49c0-b3bc-63cf52c38519": 8,
+    "e8af94dc-eb24-4e4d-9352-524f74bfe9bb": 9,
+    "fb3707e4-ab16-4cfc-82cf-f26770ac3b18": 10,
+    "27736c0a-86ae-4a4b-bc25-83939f0001b0": 11,
+    "cc3bd6d9-fefd-45b4-84c7-9e2d401b2ee2": 12,
+    "9efb53e6-63c2-474f-9075-6e6d3b52e05a": 13,
+    "f4a1ee1d-c996-4c2b-b7fb-5d522b2fe581": 14,
+    "045799c1-1be0-4f0e-b6f2-c83b652f9e4c": 15,
+    "4dfc6b86-f1fd-40d5-aea4-05411d2d995e": 16
+  }
 }
