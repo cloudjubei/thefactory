@@ -223,7 +223,7 @@ Examples:
                     print(f"Error: Expected '{task_json_path}' to exist after copying, but it was not found.", file=sys.stderr)
                     sys.exit(1)
                 data = load_json(task_json_path)
-                data["id"] = uuid.uuid4() # new id to make sure no clashes between projects
+                data["id"] = str(uuid.uuid4())
                 save_json(task_json_path, data)
             else:
                 tasks_one_dir.mkdir(exist_ok=True)

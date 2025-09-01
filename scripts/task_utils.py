@@ -94,6 +94,15 @@ def get_context(files: List[str]) -> str:
         
     return json.dumps(content, indent=0)
 
+def list_files(path: str):
+    target_path = (get_project_root() / path).resolve()
+
+    try:
+        target_path.relative_to(get_project_root())
+        if target_path.is_dir():
+            return [f.name for f in target_path.iterdir()]
+    except:
+        return []
 
 def write_file(filename: str, content: str):
     """Creates or overwrites a file, ensuring it's safely within the given project root."""
@@ -415,7 +424,7 @@ def create_feature(task_id: str, title: str, description: str) -> Feature:
 
     features = task.get("features", [])
 
-    id = uuid.uuid4()
+    id = str(uuid.uuid4())
 
     new_feature: Feature = {
         "id": id,
@@ -430,7 +439,7 @@ def create_feature(task_id: str, title: str, description: str) -> Feature:
     task["features"] = features
 
     featureIdToDisplayIndex = task.get("featureIdToDisplayIndex", {})
-    featureIdToDisplayIndex[id] = len(features) + 1 # offset by 1 as users seeit start at 1
+    featureIdToDisplayIndex[id] = len(features)
     task["featureIdToDisplayIndex"] = featureIdToDisplayIndex
     save_task(task)
     
