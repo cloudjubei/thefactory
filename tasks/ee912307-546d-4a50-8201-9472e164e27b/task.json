@@ -1,6 +1,6 @@
 {
   "id": "ee912307-546d-4a50-8201-9472e164e27b",
-  "status": "-",
+  "status": "+",
   "title": "New child projects structure",
   "description": "Create a new structure for child projects that stems from this project. This will be done by creating a new repository for each child project. Each child project is stored as a configuration .json under /projects.",
   "features": [
@@ -51,7 +51,7 @@
         "The content clearly explains what '--task-id' does (e.g., that it seeds the child project's tasks/1 from tasks/{id} and rewrites task.json IDs to start with 1)."
       ],
       "dependencies": [
-        "137f2025-1e50-46dc-9985-c3df847fcb96"
+        "ee912307-546d-4a50-8201-9472e164e27b.137f2025-1e50-46dc-9985-c3df847fcb96"
       ]
     },
     {
@@ -73,12 +73,12 @@
         "Backwards compatibility: When run from the repository root, the orchestrator still scopes Git operations to the repository root and uses the same features/<task_id> branching convention."
       ],
       "dependencies": [
-        "137f2025-1e50-46dc-9985-c3df847fcb96"
+        "ee912307-546d-4a50-8201-9472e164e27b.137f2025-1e50-46dc-9985-c3df847fcb96"
       ]
     },
     {
       "id": "56727ea4-a0bf-4d4f-a524-0c69e54602b0",
-      "status": "?",
+      "status": "+",
       "title": "The `.env` file",
       "description": "When creating a new child project the `.env` file needs to be copied to the child project but with the child repo url as `GIT_REPO_URL`",
       "plan": "1. In scripts/child_project_utils.py, import the necessary modules if not already present: from pathlib import Path, import os, from dotenv import load_dotenv, find_dotenv (or handle manually).\n2. After parsing arguments and setting project_path, locate the parent's .env file: parent_env_path = Path(find_dotenv()) or Path('.env') resolved from the script's cwd.\n3. If parent_env_path exists, copy it to env_path = project_path / '.env' using shutil.copy(parent_env_path, env_path).\n4. If parent_env_path does not exist, create a default .env at env_path with minimal content, e.g., GIT_REPO_URL=\"\" and warn the user.\n5. If args.repo_url is provided, read the content of env_path, replace or add the line for GIT_REPO_URL with the new value (e.g., use string replacement or parse as dict with dotenv and rewrite).\n6. If args.repo_url is not provided, optionally set GIT_REPO_URL to a default like the relative path or leave as is from the copy.\n7. Ensure the .env is included in the git add . command for the child repo initialization.\n8. Update docs/PROJECTS_GUIDE.md to mention that the .env is copied from the parent and GIT_REPO_URL is overridden if --repo-url is used, including an example in the script usage section.\n9. Add error handling: if copying fails, print an error and exit non-zero.\n10. Test the change by running the script with and without --repo-url, verifying the child's .env matches the parent except for GIT_REPO_URL.",
@@ -96,15 +96,14 @@
         "If an error occurs during the .env file copying process, the script prints an error message and exits with a non-zero exit code."
       ],
       "dependencies": [
-        "137f2025-1e50-46dc-9985-c3df847fcb96",
-        "3e98a331-db72-455b-8c6f-a6c87d72e7e2",
-        "91500a98-7d6e-4075-9560-95e9c14a2420"
-      ],
-      "rejection": "Blocked: The test script clones the repository to a temporary directory before running, meaning it tests the committed state, not the local modifications made via write_file. As a result, my changes to scripts/child_project_utils.py and docs/PROJECTS_GUIDE.md are not reflected in the test execution, causing persistent failures on the old code. Since finish_feature is only to be called after tests pass, I cannot commit the changes to make them visible to the test, creating a circular dependency that prevents progress."
+        "ee912307-546d-4a50-8201-9472e164e27b.137f2025-1e50-46dc-9985-c3df847fcb96",
+        "ee912307-546d-4a50-8201-9472e164e27b.3e98a331-db72-455b-8c6f-a6c87d72e7e2",
+        "ee912307-546d-4a50-8201-9472e164e27b.91500a98-7d6e-4075-9560-95e9c14a2420"
+      ]
     },
     {
       "id": "d7a3468f-fff2-4c4d-9a06-d0635612cf19",
-      "status": "-",
+      "status": "+",
       "title": "A `FILE_ORGANISATION.md` template is included with every child project",
       "description": "When creating a new child project, it creates a `FILE_ORGANISATION.md` document that works the same as this project's `docs/FILE_ORGANISATION.md`. It needs to explain the starting project structure. Look at the current child project's file for reference.",
       "plan": "1. Open the file `scripts/child_project_utils.py` for editing.\n2. Add a new constant near the top of the file, e.g., `CHILD_FILE_ORGANISATION_TEMPLATE`, and set it to a multi-line string containing the content from the reference child project's `docs/FILE_ORGANISATION.md` (as provided in the context). Adapt the content if necessary to include any new directories or files created by the script, such as README.md.\n3. In the `main()` function, after creating the `project_path`, add code to create the 'src/' directory: `(project_path / 'src').mkdir()`.\n4. Add code to create the 'docs/' directory: `(project_path / 'docs').mkdir()`.\n5. Add code to write the template content to the file: `(project_path / 'docs' / 'FILE_ORGANISATION.md').write_text(CHILD_FILE_ORGANISATION_TEMPLATE, encoding='utf-8')`.\n6. Update the `plan_actions` list to include these new creations (e.g., 'Create directory: src', 'Create directory: docs', 'Create file: docs/FILE_ORGANISATION.md').\n7. Ensure that the git commands in the script (like 'git add .') will include these new directories and files.\n8. Open the parent's `docs/FILE_ORGANISATION.md` for editing.\n9. Add a new section, e.g., '## Child Project Structure', describing the standard layout of child projects (including src/, docs/, tasks/, .env, .gitignore, README.md, and the purpose of FILE_ORGANISATION.md).\n10. Update the '## Example Tree (illustrative)' section or add a separate child project example tree to reflect the new structure.\n11. Save all changes and commit them with a message like 'feat: Add FILE_ORGANISATION.md to child projects'.",
@@ -123,10 +122,10 @@
         "The parent's 'docs/FILE_ORGANISATION.md' includes or updates an example tree to reflect the child project structure."
       ],
       "dependencies": [
-        "137f2025-1e50-46dc-9985-c3df847fcb96",
-        "3e98a331-db72-455b-8c6f-a6c87d72e7e2",
-        "91500a98-7d6e-4075-9560-95e9c14a2420",
-        "56727ea4-a0bf-4d4f-a524-0c69e54602b0"
+        "ee912307-546d-4a50-8201-9472e164e27b.137f2025-1e50-46dc-9985-c3df847fcb96",
+        "ee912307-546d-4a50-8201-9472e164e27b.3e98a331-db72-455b-8c6f-a6c87d72e7e2",
+        "ee912307-546d-4a50-8201-9472e164e27b.91500a98-7d6e-4075-9560-95e9c14a2420",
+        "ee912307-546d-4a50-8201-9472e164e27b.56727ea4-a0bf-4d4f-a524-0c69e54602b0"
       ]
     }
   ],
