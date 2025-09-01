@@ -56,7 +56,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
     2. A list of formatted tool signature strings for the prompt.
     """
     base_tools = {
-        "get_context": (task_utils.get_context, "get_context(files: list[str]) -> list[str]"),
+        "read_files": (task_utils.read_files, "read_files(paths: list[str]) -> list[str]"),
         "block_feature": (lambda task_id, feature_id, reason: task_utils.block_feature(task_id, feature_id, reason, agent_type, git_manager), "block_feature(reason: str)"),
         "finish_feature": (lambda task_id, feature_id: task_utils.finish_feature(task_id, feature_id, agent_type, git_manager), "finish_feature()"),
         "list_files": (lambda path: task_utils.list_files(path), "list_files(path: str)")
@@ -149,7 +149,7 @@ def run_agent_on_task(model: str, agent_type: str, task: Task, git_manager: GitM
     agent_system_prompt = (FRAMEWORK_ROOT / f"docs/AGENT_{agent_type.upper()}.md").read_text()
     context_files = ["docs/FILE_ORGANISATION.md"]
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
-    context = task_utils.get_context(context_files)
+    context = task_utils.read_files(context_files)
     system_prompt = construct_system_prompt(agent_type, task, None, agent_system_prompt, context, tool_signatures)
 
     return _run_agent_conversation(model, available_tools, system_prompt, task, None, agent_type, git_manager)
@@ -164,7 +164,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
     feature_context_files = ["docs/FILE_ORGANISATION.md"] + feature.get("context", [])
 
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
-    context = task_utils.get_context(feature_context_files)
+    context = task_utils.read_files(feature_context_files)
     system_prompt = construct_system_prompt(agent_type, task, feature, agent_system_prompt, context, tool_signatures)
 
     if agent_type == 'developer':

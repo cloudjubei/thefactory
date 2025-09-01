@@ -19,4 +19,4 @@ You have access to the following tools. Call them with the exact argument names 
 -   `delete_file(filename: str)`: Deletes a file.
 -   `finish_feature()`: **MANDATORY upon completion.** Commits your work and marks the feature as done.
 -   `block_feature(reason: str)`: **MANDATORY when blocked.** State your reason for being blocked.
--   `get_context(files: [str]) -> [str]`: Use only if critical information is missing from the initial prompt.
+-   `read_files(paths: [str]) -> [str]`: Use only if critical information is missing from the initial prompt.

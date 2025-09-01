@@ -65,7 +65,7 @@ def update_task_status(task_id: str, status: Status) -> Task:
 
 # --- Developer Agent Tools ---
 
-def get_context(files: List[str]) -> str:
+def read_files(paths: List[str]) -> str:
     """
     Retrieves the content of specified paths relative to the current PROJECT ROOT.
     - If a path is a file, its content is returned.
@@ -73,7 +73,7 @@ def get_context(files: List[str]) -> str:
     - Paths outside of the project root are blocked for safety.
     """
     content = {}
-    for file_path_str in files:
+    for file_path_str in paths:
         target_path = (get_project_root() / file_path_str).resolve()
         try:
             # Ensure access stays within project root
