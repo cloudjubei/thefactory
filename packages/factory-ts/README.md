@@ -1,6 +1,6 @@
 # @overseer/factory
 
-TypeScript library for Overseer to manage AI agents that execute project tasks/features. This package is the TS port and foundation for integrating agent orchestration directly into the Overseer app.
+TypeScript library for Overseer to manage AI agents that execute project tasks/features. 
 
 Features (initial scaffold):
 - ESM + CJS outputs
