@@ -7,6 +7,7 @@ export * from './telemetry/telemetry';
 export * from './domain';
 export * from './utils/path';
 export * from './files';
+export * from './git';
 
 // Persistence store
 export * from './db/store';

@@ -39,6 +39,10 @@ This document describes how files and directories are organised in this reposito
           - 0001_init.sql: Initial schema for runs, steps, messages, usage, file proposals, and git commit metadata.
       - files/: File change proposals and diffs (in-memory patchsets; no workspace mutation).
         - fileChangeManager.ts: Accepts proposed changes (writes/renames/deletes), validates path safety under a project root, and computes diffs against the working tree using git plumbing when available (git diff --no-index), with a simple unified diff fallback. Exposes API createProposal, getProposalDiff, updateProposal, discardProposal, and emits file:proposal and file:diff events.
+        - index.ts: Barrel export for files module.
+      - git/: Git integration layer used by Overseer to manage feature branches and apply/commit/revert changes.
+        - gitService.ts: Provides ensureRepo, createFeatureBranch(runId), applyProposalToBranch(proposalId), commitProposal(proposalId, message, metadata), revertProposal(proposalId). It uses simple-git (dynamic import) and records commit SHAs to the HistoryStore when provided.
+        - index.ts: Barrel export for git module.
 
 Notes:
 - All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
@@ -123,8 +127,12 @@ repo_root/
 │        │  ├─ store.ts
 │        │  └─ migrations/
 │        │     └─ 0001_init.sql
-│        └─ files/
-│           └─ fileChangeManager.ts
+│        ├─ files/
+│        │  ├─ fileChangeManager.ts
+│        │  └─ index.ts
+│        └─ git/
+│           ├─ gitService.ts
+│           └─ index.ts
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
@@ -135,4 +143,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/files module which implements in-memory file change proposals and diff generation.
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/git module which implements feature-branch workflows and proposal application/commit/revert integrated with run history.

@@ -87,7 +87,7 @@
     },
     {
       "id": "b7987994-041b-4431-9f44-55db68a634cf",
-      "status": "-",
+      "status": "+",
       "title": "Git integration layer for feature branches and staging",
       "description": "Integrate with Git using simple-git (Node) or isomorphic-git to support feature branch creation per run, applying patchsets to a branch, staging, and committing upon acceptance. Functions: ensureRepo(projectPath), createFeatureBranch(runId), applyProposalToBranch(proposalId), commitProposal(proposalId, message, metadata), revertProposal(proposalId). Track commit SHAs and link to run history records. Handle detached head and unclean working tree safely.",
       "plan": "",
