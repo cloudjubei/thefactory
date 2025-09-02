@@ -38,7 +38,7 @@ from scripts.git_manager import GitManager
 import scripts.task_utils as task_utils
 
 # --- Constants ---
-MAX_TURNS_PER_FEATURE = 10
+MAX_TURNS_PER_FEATURE = 100
 # Framework workspace root (where this orchestrator code runs)
 FRAMEWORK_ROOT = Path.cwd()
 
