@@ -168,7 +168,7 @@
     },
     {
       "id": "d0dd42b6-dfa6-43a5-8773-75f65a087c0d",
-      "status": "-",
+      "status": "+",
       "title": "Documentation: Factory TS overview and migration guide",
       "description": "Add docs/FACTORY_TS_OVERVIEW.md describing architecture, APIs, event model, and integration steps for Overseer. Create docs/MIGRATION_FROM_PY_FACTORY.md guiding the transition from the Python script to the TS library/CLI, including example commands and how to map LLMConfigs. Update docs/PROJECTS_GUIDE.md to reference the new TS orchestrator and any schema clarifications if needed.",
       "plan": "",
