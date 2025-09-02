@@ -15,6 +15,12 @@ This document describes how files and directories are organised in this reposito
   - packages/factory-ts/: TypeScript library for Overseer agent orchestration (build via tsup, ESM+CJS).
     - src/
       - index.ts: Public entry point exporting the library API.
+      - llm/: Provider-agnostic LLM client interfaces and adapters.
+        - types.ts: Core types (LLMClient, streaming, usage, costs utils).
+        - config.ts: Overseer LLMConfig and normalization helpers.
+        - costs.ts: Model cost tables (OpenAI to start).
+        - openaiClient.ts: OpenAI adapter using official SDK (dynamic import).
+        - factory.ts: makeLLMClient that adapts LLMConfig -> LLMClient and supports DI.
       - domain.ts: Zod schemas and types for ProjectConfig and TaskDefinition.
       - utils/path.ts: Cross-platform path helpers, root resolution.
       - loaders/projectLoader.ts: Project and task loader with validation.
@@ -77,10 +83,14 @@ repo_root/
 │     ├─ tsconfig.json
 │     ├─ tsup.config.ts
 │     ├─ vitest.config.ts
-│     ├─ .eslintrc.cjs
-│     ├─ .prettierrc
 │     └─ src/
 │        ├─ index.ts
+│        ├─ llm/
+│        │  ├─ types.ts
+│        │  ├─ config.ts
+│        │  ├─ costs.ts
+│        │  └─ openaiClient.ts
+│        │  └─ factory.ts
 │        ├─ domain.ts
 │        ├─ utils/
 │        │  └─ path.ts
@@ -97,4 +107,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/ directory containing the TypeScript-based @overseer/factory library used by Overseer.
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/llm directory containing the provider-agnostic LLM client and the OpenAI adapter used by Overseer.

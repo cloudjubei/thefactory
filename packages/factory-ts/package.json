@@ -1,49 +1,34 @@
 {
   "name": "@overseer/factory",
   "version": "0.1.0",
-  "description": "TypeScript library to power Overseer tasks: launching and monitoring agents.",
+  "description": "Provider-agnostic LLM orchestration and agent tooling for Overseer.",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-org/your-repo.git"
-  },
-  "author": "Overseer Team",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
+  "sideEffects": false,
   "files": [
     "dist"
   ],
   "scripts": {
-    "clean": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "dependencies": {
-    "zod": "^3.23.8"
+    "test": "vitest run"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "prettier": "^3.2.5",
-    "rimraf": "^5.0.5",
     "tsup": "^8.0.1",
-    "typescript": "^5.4.5",
-    "vitest": "^1.5.0"
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "peerDependencies": {
+    "openai": "^4.52.0"
   }
 }

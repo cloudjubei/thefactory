@@ -33,7 +33,7 @@
     },
     {
       "id": "5b410176-489e-4f57-9fc5-a97ed1ec47e6",
-      "status": "-",
+      "status": "+",
       "title": "LLMConfig adapter for Overseer and provider-agnostic client",
       "description": "Define a provider-agnostic LLMClient interface (chatCompletionStream, chatCompletionOnce, getUsage). Implement an adapter that consumes Overseer LLMConfig to construct the appropriate client. Provide an OpenAI adapter initially (using official SDK) with token usage reporting and model cost metadata. Design the interface to accept external clients (dependency injection) if Overseer provides one directly.",
       "plan": "",
