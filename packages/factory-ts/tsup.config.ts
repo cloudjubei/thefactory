@@ -1,11 +1,11 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: ['src/index.ts'],
-  dts: true,
-  clean: true,
+  splitting: false,
   sourcemap: true,
+  clean: true,
   format: ['esm', 'cjs'],
-  target: 'es2020',
-  treeshake: true,
-});
+  dts: true,
+  target: 'es2022'
+})

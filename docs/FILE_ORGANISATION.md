@@ -26,6 +26,8 @@ This document describes how files and directories are organised in this reposito
         - costs.ts: Model cost tables (OpenAI to start).
         - openaiClient.ts: OpenAI adapter using official SDK (dynamic import).
         - factory.ts: makeLLMClient that adapts LLMConfig -> LLMClient and supports DI.
+      - telemetry/: Telemetry and budgets.
+        - telemetry.ts: Tracks token usage (prompt/completion), requests, duration timestamps, and computes costs from provider pricing (OpenAI). Supports streaming updates and budget enforcement with AbortController and typed events.
       - domain.ts: Zod schemas and types for ProjectConfig and TaskDefinition.
       - utils/path.ts: Cross-platform path helpers, root resolution.
       - loaders/projectLoader.ts: Project and task loader with validation.
@@ -101,6 +103,8 @@ repo_root/
 │        │  ├─ costs.ts
 │        │  └─ openaiClient.ts
 │        │  └─ factory.ts
+│        ├─ telemetry/
+│        │  └─ telemetry.ts
 │        ├─ domain.ts
 │        ├─ utils/
 │        │  └─ path.ts
@@ -117,4 +121,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/orchestrator.ts module which exposes runTask and runFeature that integrate the event bus and LLM client for Overseer.
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/telemetry/telemetry.ts module which tracks telemetry and enforces budgets.

@@ -60,7 +60,7 @@
     },
     {
       "id": "fd833159-3bb2-4ccc-b019-8213ee28cb60",
-      "status": "-",
+      "status": "+",
       "title": "Telemetry collection and cost tracking",
       "description": "Add a Telemetry module to measure durations per step, tokens in/out, requests, and compute costs using provider pricing tables (starting with OpenAI). Update telemetry on streamed tokens and end-of-call usage. Support configurable budgets per run (maxTokens, maxCost); enforce early stop when exceeding budgets and emit appropriate events and statuses.",
       "plan": "",

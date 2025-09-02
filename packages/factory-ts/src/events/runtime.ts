@@ -1,140 +1,63 @@
-// Runtime implementation of a small typed event bus and RunHandle
-import { EventBus, EventListener, EventName, EventPayload, RunControl, RunHandle, RunId } from "./types";
+import { EventBus, RunEvent, RunHandle, UUID } from './types'
 
-// Lightweight, framework-agnostic event emitter (no Node built-ins)
-export class TypedEventBus implements EventBus {
-  private listeners: Map<EventName, Set<EventListener<any>>> = new Map();
-  private onceListeners: Map<EventName, Set<EventListener<any>>> = new Map();
+export class SimpleEventBus implements EventBus<RunEvent> {
+  private listeners = new Map<string, Set<Function>>()
 
-  on<K extends EventName>(event: K, listener: EventListener<K>) {
-    let set = this.listeners.get(event);
+  on<T extends RunEvent['type']>(type: T, listener: (event: Extract<RunEvent, { type: T }>) => void): () => void {
+    let set = this.listeners.get(type)
     if (!set) {
-      set = new Set();
-      this.listeners.set(event, set);
+      set = new Set()
+      this.listeners.set(type, set)
     }
-    set.add(listener as EventListener<any>);
-    return () => this.off(event, listener);
+    set.add(listener)
+    return () => {
+      set!.delete(listener)
+    }
   }
 
-  once<K extends EventName>(event: K, listener: EventListener<K>) {
-    let set = this.onceListeners.get(event);
-    if (!set) {
-      set = new Set();
-      this.onceListeners.set(event, set);
-    }
-    set.add(listener as EventListener<any>);
-    return () => this.offOnce(event, listener);
-  }
-
-  off<K extends EventName>(event: K, listener: EventListener<K>) {
-    const set = this.listeners.get(event);
+  emit(event: RunEvent): void {
+    const set = this.listeners.get(event.type)
     if (set) {
-      set.delete(listener as EventListener<any>);
-      if (set.size === 0) this.listeners.delete(event);
-    }
-    this.offOnce(event, listener);
-  }
-
-  private offOnce<K extends EventName>(event: K, listener: EventListener<K>) {
-    const setOnce = this.onceListeners.get(event);
-    if (setOnce) {
-      setOnce.delete(listener as EventListener<any>);
-      if (setOnce.size === 0) this.onceListeners.delete(event);
-    }
-  }
-
-  emit<K extends EventName>(event: K, payload: EventPayload<K>) {
-    const nowListeners = this.listeners.get(event);
-    if (nowListeners) {
-      for (const l of Array.from(nowListeners)) {
+      for (const l of Array.from(set)) {
         try {
-          const res = l(payload as any);
-          if (res instanceof Promise) {
-            // fire-and-forget to avoid unhandled rejections at callsite
-            res.catch(() => {});
-          }
-        } catch {
-          // swallow listener errors to avoid breaking bus
+          ;(l as any)(event)
+        } catch (err) {
+          // avoid breaking emitter due to listener error
+          // eslint-disable-next-line no-console
+          console.error('Event listener error', err)
         }
       }
     }
-
-    const onceSet = this.onceListeners.get(event);
-    if (onceSet) {
-      for (const l of Array.from(onceSet)) {
-        try {
-          const res = l(payload as any);
-          if (res instanceof Promise) {
-            res.catch(() => {});
-          }
-        } catch {
-          // ignore
-        }
-      }
-      this.onceListeners.delete(event);
-    }
-  }
-
-  removeAllListeners() {
-    this.listeners.clear();
-    this.onceListeners.clear();
   }
 }
-
-export type RunControllerHooks = {
-  onPause?: () => void;
-  onResume?: () => void;
-  onCancel?: () => void;
-};
 
 export class DefaultRunHandle implements RunHandle {
-  public readonly runId: RunId;
-  public readonly bus: EventBus;
+  runId: UUID
+  bus: EventBus<RunEvent>
+  private controller: AbortController
 
-  private paused = false;
-  private cancelled = false;
-
-  private hooks: RunControllerHooks;
-
-  constructor(runId: RunId, bus?: EventBus, hooks?: RunControllerHooks) {
-    this.runId = runId;
-    this.bus = bus ?? new TypedEventBus();
-    this.hooks = hooks ?? {};
+  constructor(runId?: UUID, bus?: EventBus<RunEvent>, controller?: AbortController) {
+    this.runId = runId ?? randomId()
+    this.bus = bus ?? new SimpleEventBus()
+    this.controller = controller ?? new AbortController()
   }
 
-  on = this.bus.on.bind(this.bus);
-  once = this.bus.once.bind(this.bus);
-
-  pause(): void {
-    if (this.cancelled || this.paused) return;
-    this.paused = true;
-    this.hooks.onPause?.();
+  get signal(): AbortSignal {
+    return this.controller.signal
   }
 
-  resume(): void {
-    if (this.cancelled || !this.paused) return;
-    this.paused = false;
-    this.hooks.onResume?.();
-  }
-
-  cancel(): void {
-    if (this.cancelled) return;
-    this.cancelled = true;
-    this.hooks.onCancel?.();
-  }
-
-  // Helpers for agent engines: inspect current state
-  get isPaused() {
-    return this.paused;
-  }
-  get isCancelled() {
-    return this.cancelled;
+  stop(reason?: string): void {
+    if (!this.controller.signal.aborted) {
+      try {
+        // @ts-expect-error reason is supported in newer runtimes
+        this.controller.abort(reason ?? 'aborted')
+      } catch {
+        this.controller.abort()
+      }
+    }
   }
 }
 
-// Factory to create a run handle and event bus for a new agent run
-export function createRunHandle(runId: RunId, hooks?: RunControllerHooks) {
-  const bus = new TypedEventBus();
-  const handle = new DefaultRunHandle(runId, bus, hooks);
-  return { handle, bus } as const;
+export function randomId(): UUID {
+  return 'run_' + Math.random().toString(36).slice(2, 10)
 }
