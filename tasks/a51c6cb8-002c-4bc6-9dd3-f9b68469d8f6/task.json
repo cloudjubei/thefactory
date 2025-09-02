@@ -51,7 +51,7 @@
     },
     {
       "id": "c5efe54b-5b8a-4eb9-9e68-fdfeeae5d563",
-      "status": "-",
+      "status": "+",
       "title": "Agent orchestrator API (runTask, runFeature)",
       "description": "Implement an Orchestrator that can run a task or a specific feature for a project. API: runTask({projectId, taskId, llmConfig, options}), runFeature({projectId, taskId, featureId, llmConfig, options}). The orchestrator wires loaders, LLM client, and event bus. Support concurrency-safe execution and return a RunHandle. Include cancellation via AbortController.",
       "plan": "",
