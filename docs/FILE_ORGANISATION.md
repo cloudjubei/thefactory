@@ -32,6 +32,11 @@ This document describes how files and directories are organised in this reposito
       - utils/path.ts: Cross-platform path helpers, root resolution.
       - loaders/projectLoader.ts: Project and task loader with validation.
       - loaders/projectLoader.test.ts: Vitest tests for the loader.
+      - db/: Persistent run history (SQLite) module.
+        - sqlite.ts: DB connection, migrations runner, and HistoryStore implementation.
+        - store.ts: Convenience factory for creating the store with an opened DB handle.
+        - migrations/
+          - 0001_init.sql: Initial schema for runs, steps, messages, usage, file proposals, and git commit metadata.
 
 Notes:
 - All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
@@ -108,9 +113,14 @@ repo_root/
 │        ├─ domain.ts
 │        ├─ utils/
 │        │  └─ path.ts
-│        └─ loaders/
-│           ├─ projectLoader.ts
-│           └─ projectLoader.test.ts
+│        ├─ loaders/
+│        │  ├─ projectLoader.ts
+│        │  └─ projectLoader.test.ts
+│        └─ db/
+│           ├─ sqlite.ts
+│           ├─ store.ts
+│           └─ migrations/
+│              └─ 0001_init.sql
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
@@ -121,4 +131,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/telemetry/telemetry.ts module which tracks telemetry and enforces budgets.
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/db module which implements persistent run history with SQLite and migrations.

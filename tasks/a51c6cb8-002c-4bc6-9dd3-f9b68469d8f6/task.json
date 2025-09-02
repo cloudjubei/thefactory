@@ -69,7 +69,7 @@
     },
     {
       "id": "18406579-29ec-4c11-9ebd-eb36fd80bc98",
-      "status": "-",
+      "status": "+",
       "title": "Persistent run history store (SQLite)",
       "description": "Introduce a persistence layer using better-sqlite3 storing runs, steps, messages, usage snapshots, file proposals, and git commit metadata. Add migration system (e.g., SQL files or Kysely). Provide CRUD functions: createRun, appendStep, appendMessage, recordUsage, saveFileProposal, finalizeRun, getRunById, listRuns (filters by project/task/status), getRunArtifacts. Configurable database path with sensible defaults under Overseer data dir.",
       "plan": "",
