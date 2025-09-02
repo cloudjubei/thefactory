@@ -123,7 +123,7 @@
     },
     {
       "id": "31c5aa98-049f-44aa-84d3-2e9853ff1e7e",
-      "status": "-",
+      "status": "+",
       "title": "CLI bridge for backward compatibility",
       "description": "Create a Node CLI (scripts/runAgent.ts) that mirrors the Python entrypoint behavior: arguments for --project-id, --task-id, --feature-id (optional), --llm-config (path or JSON), --budget, --db-path, --project-root. Output JSONL event stream to stdout and exit code semantics (0 success, non-zero on error). Add npm script and minimal usage docs.",
       "plan": "",

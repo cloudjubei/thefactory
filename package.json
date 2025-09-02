@@ -1,0 +1,12 @@
+{
+  "name": "thefactory-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "run:agent": "tsx scripts/runAgent.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.4"
+  }
+}

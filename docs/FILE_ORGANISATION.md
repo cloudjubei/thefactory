@@ -6,7 +6,9 @@ This document describes how files and directories are organised in this reposito
 - docs/: Project documentation and specifications.
   - docs/tasks/: Canonical task schema and examples.
   - docs/PROJECTS_GUIDE.md: How child projects under projects/ are managed.
+  - docs/RUN_AGENT_CLI.md: Minimal usage documentation for the Node CLI bridge that streams JSONL events.
 - scripts/: Executables and tools used by the agent and CI.
+  - scripts/runAgent.ts: Node/TypeScript CLI to launch agents, subscribe to orchestrator events, and stream JSONL to stdout. Parses args like --project-id, --task-id, --feature-id, --llm-config, --budget, --db-path, and --project-root.
 - tasks/: Per-task workspaces containing task metadata and tests.
   - tasks/{id}/task.json: Canonical task definition for a single task.
   - tasks/{id}/tests/: Deterministic tests validating each feature in the task.
@@ -102,7 +104,8 @@ repo_root/
 │  ├─ git_manager.py
 │  ├─ run_local_agent.py
 │  ├─ run_tests.py
-│  └─ task_utils.py
+│  ├─ task_utils.py
+│  └─ runAgent.ts
 ├─ projects/
 │  └─ child-project-1.json
 ├─ packages/
@@ -134,4 +137,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram includes the new errors module, retry/abort utilities, and the DB errors table migration to support robust error handling with retries and cancellation throughout the TypeScript library.
+This diagram includes the new CLI bridge script (scripts/runAgent.ts) and its usage documentation in docs/RUN_AGENT_CLI.md for backward compatibility while migrating TheFactory to TypeScript.
