@@ -8,6 +8,7 @@ This document describes how files and directories are organised in this reposito
   - docs/PROJECTS_GUIDE.md: How child projects under projects/ are managed.
   - docs/RUN_AGENT_CLI.md: Minimal usage documentation for the Node CLI bridge that streams JSONL events.
   - docs/OVERSEER_INTEGRATION.md: How Overseer consumes the Electron adapter to launch runs and subscribe to progress and diffs.
+  - docs/CONFIGURATION.md: Central configuration for paths, provider keys, budgets, and default behaviors.
 - scripts/: Executables and tools used by the agent and CI.
   - scripts/runAgent.ts: Node/TypeScript CLI to launch agents, subscribe to orchestrator events, and stream JSONL to stdout. Parses args like --project-id, --task-id, --feature-id, --llm-config, --budget, --db-path, and --project-root.
 - tasks/: Per-task workspaces containing task metadata and tests.
@@ -20,6 +21,8 @@ This document describes how files and directories are organised in this reposito
       - index.ts: Public entry point exporting the library API.
       - adapters/
         - electronShim.ts: IPC-agnostic adapter exposing serializable events and utilities for JSONL streaming, EventSource-like consumption, and Observables.
+      - config/: Centralized configuration resolver used by all modules.
+        - index.ts: resolveConfig/getConfig/setConfig/applyRuntimeConfig APIs with env and default resolution.
       - events/: Typed run lifecycle event bus and RunHandle.
         - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces. Includes error/retry events. Now includes 'run/truncated' event for transcript caps.
         - runtime.ts: Lightweight typed event emitter and DefaultRunHandle implementation.
@@ -35,7 +38,7 @@ This document describes how files and directories are organised in this reposito
         - gitService.ts: Repo and commit helpers; records commit SHAs to the HistoryStore when provided.
         - index.ts: Barrel export for git module.
       - db/: Persistent run history (SQLite) module.
-        - store.ts: HistoryStore convenience factory.
+        - store.ts: HistoryStore convenience factory using centralized config.
       - artifacts/: Import/export of run archives for sharing and review.
         - types.ts: Archive schema (v1), export options, and imported run API.
         - recorder.ts: In-memory recorder that subscribes to a RunHandle and captures events, proposals, commits, usage, and metadata. Now enforces transcript size limits and inserts 'run/truncated' marker events. Tests in artifacts/recorder.test.ts.
@@ -83,7 +86,8 @@ repo_root/
 │  ├─ LOCAL_SETUP.md
 │  ├─ PROJECTS_GUIDE.md
 │  ├─ RUN_AGENT_CLI.md
-│  └─ OVERSEER_INTEGRATION.md
+│  ├─ OVERSEER_INTEGRATION.md
+│  └─ CONFIGURATION.md
 ├─ scripts/
 │  ├─ child_project_utils.py
 │  ├─ git_manager.py
@@ -99,6 +103,8 @@ repo_root/
 │        ├─ index.ts
 │        ├─ adapters/
 │        │  └─ electronShim.ts
+│        ├─ config/
+│        │  └─ index.ts
 │        ├─ events/
 │        │  ├─ index.ts
 │        │  ├─ runtime.ts
@@ -135,4 +141,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram now includes configurable redaction utilities, truncation markers for transcripts, and associated unit tests.
+This diagram now includes centralized configuration for paths, providers, budgets, and transcript limits, and the db store referencing the config module for future pluggable backends.

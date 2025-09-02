@@ -1,3 +1,5 @@
+import { getConfig } from '../config';
+
 export type RunId = string;
 export type ProposalId = string;
 export type ProposalState = 'open' | 'partiallyAccepted' | 'accepted' | 'rejected';
@@ -35,4 +37,13 @@ export class InMemoryHistoryStore implements HistoryStore {
   }
 }
 
-export const defaultHistoryStore = new InMemoryHistoryStore();
+// Default store remains in-memory for now. Consumers should acquire a store from
+// createHistoryStore() so config can later swap implementations (e.g., SQLite).
+export function createHistoryStore(): HistoryStore {
+  const cfg = getConfig();
+  // Placeholder: when a SQLite-backed store is introduced, use cfg.paths.dbPath here.
+  void cfg; // avoid unused warning
+  return new InMemoryHistoryStore();
+}
+
+export const defaultHistoryStore = createHistoryStore();

@@ -186,7 +186,7 @@
     },
     {
       "id": "74d05d2c-c9b9-44fc-aa81-dac984055442",
-      "status": "-",
+      "status": "+",
       "title": "Configuration management and defaults",
       "description": "Provide a configuration module to resolve database path, storage directories, provider keys (from env or Overseer config), budgets, and default behaviors. Allow overrides via function parameters and environment variables. Document precedence rules. Ensure all components consume config through this module for consistency.",
       "plan": "",
