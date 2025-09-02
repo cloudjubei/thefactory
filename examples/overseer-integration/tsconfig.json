@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": "../../",
+    "paths": {
+      "factory-ts/*": ["packages/factory-ts/src/*"]
+    },
+    "types": ["node"]
+  },
+  "include": ["./**/*.ts"]
+}

@@ -204,7 +204,7 @@
     },
     {
       "id": "41251fa6-9826-4f24-81c2-ab8dbbc34f1b",
-      "status": "-",
+      "status": "+",
       "title": "Developer example for Overseer integration",
       "description": "Add an examples/overseer-integration with a minimal Node/Electron-like mock showing how to launch a run, subscribe to events, present diffs, and accept changes. Include a React hook useAgentRun for convenience. This serves as runnable documentation for Overseer developers.",
       "plan": "",

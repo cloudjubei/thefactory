@@ -46,6 +46,8 @@ This document describes how files and directories are organised in this reposito
         - recorder.test.ts: Tests for recorder behavior.
         - exporter.ts: exportRun(runId, options) produces a redacted JSON archive with optional file snapshots and size limits; uses deepRedact.
         - importer.ts: importRun(filePath) validates and loads an archive and can replay events.
+- examples/: Developer-facing runnable examples and integration references.
+  - examples/overseer-integration/: Minimal Node/Electron-like mock demonstrating how to launch a run, subscribe to events, present diffs, and accept changes. Includes a React hook useAgentRun.
 
 Notes:
 - All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
@@ -133,14 +135,13 @@ repo_root/
 │           ├─ recorder.test.ts
 │           ├─ exporter.ts
 │           └─ importer.ts
-└─ tasks/
-   ├─ 1/
-   │  ├─ task.json
-   │  └─ tests/
-   │     └─ test_1_3.py
-   └─ 2/
-      ├─ task.json
-      └─ tests/
+└─ examples/
+   └─ overseer-integration/
+      ├─ README.md
+      ├─ tsconfig.json
+      ├─ index.ts
+      ├─ orchestrator.ts
+      └─ diffPresenter.ts
 ```
 
-This diagram includes a backpressure-aware events module to keep streaming responsive, plus a snapshot event for efficient UI updates.
+This update adds an examples/ directory with a runnable Overseer integration sample.
