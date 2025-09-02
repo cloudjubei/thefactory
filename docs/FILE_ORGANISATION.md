@@ -50,8 +50,9 @@ This document describes how files and directories are organised in this reposito
   - examples/overseer-integration/: Minimal Node/Electron-like mock demonstrating how to launch a run, subscribe to events, present diffs, and accept changes. Includes a React hook useAgentRun.
 
 Notes:
-- All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
-- Documentation in docs/ is the single source of truth for specs and formats.
+- The TypeScript implementation (packages/factory-ts and scripts/runAgent.ts) is the primary orchestration path.
+- Python entrypoints (run.py, scripts/run_local_agent.py) are deprecated and now print a deprecation banner. They will attempt to bridge to the Node CLI automatically when available and otherwise fall back to the legacy Python flow.
+- Use env flags FACTORY_FORCE_PYTHON=1 or FACTORY_BRIDGE_TO_NODE=0 to disable auto-bridge.
 
 ## File Naming Conventions
 - Tasks and features:
@@ -144,4 +145,4 @@ repo_root/
       └─ diffPresenter.ts
 ```
 
-This update adds an examples/ directory with a runnable Overseer integration sample.
+This update notes that Python entrypoints are now deprecated and bridged to the Node CLI.

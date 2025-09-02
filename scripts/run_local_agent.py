@@ -8,10 +8,23 @@ from dotenv import load_dotenv
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Callable, Tuple
 import tempfile
+import shutil
+import subprocess
 
 # Add project root (framework root) to sys.path
 framework_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(framework_root))
+
+DEPRECATION_BANNER = """
+[DEPRECATION NOTICE]
+This Python orchestrator (scripts/run_local_agent.py) is deprecated.
+Prefer the Node CLI:
+  npx -y tsx scripts/runAgent.ts --project-root . --task-id <id>
+See docs/RUN_AGENT_CLI.md for details.
+
+This script will attempt to delegate to the Node CLI automatically when available.
+Set FACTORY_FORCE_PYTHON=1 or FACTORY_BRIDGE_TO_NODE=0 to skip delegation.
+""".strip()
 
 # Lazy-safe import for litellm
 try:
@@ -47,6 +60,46 @@ Your response will be parsed as JSON. Do not include any text outside of this JS
 """
 
 NEWLINE = "\n"
+
+# --- Bridge helper ---
+
+def try_bridge_to_node(project_dir: Optional[str], task_id: Optional[str]) -> bool:
+    """
+    Attempt to delegate to the Node CLI from this script.
+    Returns True if we launched Node and should exit this path (success or handled failure),
+    False if delegation was not attempted or should continue with Python.
+    """
+    if os.getenv("FACTORY_FORCE_PYTHON") == "1" or os.getenv("FACTORY_BRIDGE_TO_NODE") == "0":
+        return False
+
+    node_cmd_override = os.getenv("FACTORY_NODE_CMD")
+    if node_cmd_override:
+        base_cmd = node_cmd_override.split()
+    else:
+        base_cmd = ["npx", "-y", "tsx", "scripts/runAgent.ts"]
+
+    args: List[str] = []
+    # project-root: if project_dir was provided, prefer it; otherwise use CWD
+    project_root = Path(project_dir).resolve() if project_dir else Path.cwd().resolve()
+    args += ["--project-root", str(project_root)]
+    if task_id:
+        args += ["--task-id", str(task_id)]
+
+    print("\n[Bridge] Delegating to Node CLI from run_local_agent.py:")
+    print(" ", " ".join(base_cmd + args))
+
+    try:
+        result = subprocess.run(base_cmd + args, cwd=Path.cwd(), check=False)
+        if result.returncode == 0:
+            print("[Bridge] Node CLI completed successfully. Exiting legacy orchestrator.")
+            return True
+        else:
+            print(f"[Bridge] Node CLI exited with code {result.returncode}. Continuing with Python orchestrator.")
+            return False
+    except FileNotFoundError:
+        print("[Bridge] Node tooling (npx/tsx) not found. Continuing with Python orchestrator.")
+        return False
+
 # --- Tool Mapping ---
 
 def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[str, Callable], List[str]]:
@@ -165,6 +218,7 @@ def run_agent_on_feature(model: str, agent_type: str, task: Task, feature: Featu
 
     available_tools, tool_signatures = get_available_tools(agent_type, git_manager)
     context = task_utils.read_files(feature_context_files)
+
     system_prompt = construct_system_prompt(agent_type, task, feature, agent_system_prompt, context, tool_signatures)
 
     if agent_type == 'developer':
@@ -297,13 +351,21 @@ def run_orchestrator(model: str, agent_type: str, task_id: Optional[str], projec
         print("------------------------\n")
 
 def main():
-    parser = argparse.ArgumentParser(description="Run an autonomous AI agent.")
-    parser.add_argument("--model", type=str, default="gpt-5", help="LLM model name.")
-    parser.add_argument("--agent", type=str, required=True, choices=['developer', 'tester', 'planner', 'contexter', 'speccer'], help="Agent persona.")
+    parser = argparse.ArgumentParser(description="Run an autonomous AI agent (deprecated Python orchestrator).")
+    parser.add_argument("--model", type=str, default="gpt-5", help="LLM model name (legacy only).")
+    parser.add_argument("--agent", type=str, required=True, choices=['developer', 'tester', 'planner', 'contexter', 'speccer'], help="Agent persona (legacy only).")
     parser.add_argument("--task", type=str, help="Optional: Specify a task ID to work on.")
     parser.add_argument("--project-dir", type=str, help="Optional: Target child project directory.")
     
     args = parser.parse_args()
+
+    print(DEPRECATION_BANNER)
+
+    # Attempt to bridge to Node CLI (only pass minimal args that map clearly)
+    bridged = try_bridge_to_node(args.project_dir, args.task)
+    if bridged:
+        return
+
     if args.project_dir:
         load_dotenv(args.project_dir + "/.env")
     else:
