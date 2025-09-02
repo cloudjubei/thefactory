@@ -195,7 +195,7 @@
     },
     {
       "id": "570f7495-cf5c-4f77-b356-4302207bfb48",
-      "status": "-",
+      "status": "+",
       "title": "Performance and streaming backpressure handling",
       "description": "Ensure LLM streaming and event emission handle backpressure: buffer with limits, drop/merge strategies for high-frequency events (e.g., token streams) configurable for UI. Provide high-level progress snapshots at intervals. Add micro-benchmarks or stress tests to validate throughput without blocking the event loop.",
       "plan": "",

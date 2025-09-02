@@ -45,6 +45,7 @@ export type ProposalState = 'open' | 'accepted' | 'rejected' | 'partial';
 export type RunEvent =
   | (EventBase<'run/started'> & { payload: { taskId?: string; featureId?: string; projectId: string; meta?: Record<string, unknown>; } })
   | (EventBase<'run/progress'> & { payload: { message: string; step?: string; progress?: number; usage?: UsagePayload; } })
+  | (EventBase<'run/progress/snapshot'> & { payload: { message: string; step?: string; progress?: number; usage?: UsagePayload; } })
   | (EventBase<'run/usage'> & { payload: UsagePayload })
   | (EventBase<'run/budget-exceeded'> & { payload: UsagePayload })
   | (EventBase<'run/error'> & { payload: ErrorPayload })

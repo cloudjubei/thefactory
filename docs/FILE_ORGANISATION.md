@@ -24,8 +24,9 @@ This document describes how files and directories are organised in this reposito
       - config/: Centralized configuration resolver used by all modules.
         - index.ts: resolveConfig/getConfig/setConfig/applyRuntimeConfig APIs with env and default resolution.
       - events/: Typed run lifecycle event bus and RunHandle.
-        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces. Includes error/retry events. Now includes 'run/truncated' event for transcript caps.
+        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces. Includes error/retry events. Now includes 'run/truncated' event for transcript caps, and 'run/progress/snapshot' for periodic, coalesced progress updates.
         - runtime.ts: Lightweight typed event emitter and DefaultRunHandle implementation.
+        - backpressure.ts: BufferedEventBus with async batching, bounded queue, drop/coalesce strategies, progress snapshot helper, and JSONL buffered streaming utility.
         - index.ts: Barrel export for events module.
       - errors/: Common, typed error utilities.
         - types.ts: FactoryError class, error codes, classification utilities, and conversions from unknown.
@@ -41,7 +42,8 @@ This document describes how files and directories are organised in this reposito
         - store.ts: HistoryStore convenience factory using centralized config.
       - artifacts/: Import/export of run archives for sharing and review.
         - types.ts: Archive schema (v1), export options, and imported run API.
-        - recorder.ts: In-memory recorder that subscribes to a RunHandle and captures events, proposals, commits, usage, and metadata. Now enforces transcript size limits and inserts 'run/truncated' marker events. Tests in artifacts/recorder.test.ts.
+        - recorder.ts: In-memory recorder that subscribes to a RunHandle and captures events, proposals, commits, usage, and metadata. Enforces transcript size limits and inserts 'run/truncated' marker events when caps are exceeded.
+        - recorder.test.ts: Tests for recorder behavior.
         - exporter.ts: exportRun(runId, options) produces a redacted JSON archive with optional file snapshots and size limits; uses deepRedact.
         - importer.ts: importRun(filePath) validates and loads an archive and can replay events.
 
@@ -86,8 +88,7 @@ repo_root/
 │  ├─ LOCAL_SETUP.md
 │  ├─ PROJECTS_GUIDE.md
 │  ├─ RUN_AGENT_CLI.md
-│  ├─ OVERSEER_INTEGRATION.md
-│  └─ CONFIGURATION.md
+│  └─ OVERSEER_INTEGRATION.md
 ├─ scripts/
 │  ├─ child_project_utils.py
 │  ├─ git_manager.py
@@ -108,7 +109,8 @@ repo_root/
 │        ├─ events/
 │        │  ├─ index.ts
 │        │  ├─ runtime.ts
-│        │  └─ types.ts
+│        │  ├─ types.ts
+│        │  └─ backpressure.ts
 │        ├─ review/
 │        │  └─ reviewService.ts
 │        ├─ files/
@@ -141,4 +143,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram now includes centralized configuration for paths, providers, budgets, and transcript limits, and the db store referencing the config module for future pluggable backends.
+This diagram includes a backpressure-aware events module to keep streaming responsive, plus a snapshot event for efficient UI updates.

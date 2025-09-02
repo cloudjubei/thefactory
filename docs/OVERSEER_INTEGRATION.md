@@ -14,33 +14,40 @@ Key goals:
 - RunEvent: Typed, IPC-serializable events for lifecycle, usage, errors, file proposals/diffs, and git commits.
 - Adapter utilities: Convert RunHandle events into JSONL streams, EventSource-like streams, Observables, or bridge them to an IPC sender.
 
-## Minimal Wiring in Electron
+## Performance and Backpressure
 
-Example: main process creates a run and bridges events to renderer via ipcMain.
+High-frequency events (token streams, progress spam) can overwhelm the UI. Use the buffered bus and snapshots to keep the UI responsive:
+
+- BufferedEventBus: async batching with bounded queues and drop/coalesce strategies.
+- Coalescing: by default, run/progress and run/usage are coalesced within a short window.
+- Truncation markers: when drops occur, a run/truncated event is inserted for transparency.
+- Progress snapshots: subscribe to run/progress/snapshot for periodic, high-level updates at a fixed cadence.
+
+Example wiring in Electron main:
 
 ```ts
-// main.ts (Electron main)
 import { electronShim, events } from 'factory-ts';
 
-// Assume createRun returns a RunHandle from your orchestrator.
 function createRunFromTask(params): events.RunHandle { /* your orchestrator */ throw new Error('wire me'); }
 
 ipcMain.handle('factory/run/start', async (evt, args) => {
   const run = createRunFromTask(args);
-  const unsubscribe = electronShim.bridgeToSender(run, 'factory/run/event', (channel, payload) => {
-    evt.sender.send(channel, payload); // relay to renderer
+
+  // Wrap with buffered bus for smoother streaming to renderer
+  const buffered = new events.BufferedEventBus({
+    maxQueueSize: 1000,
+    maxQueueBytes: 500_000,
+    flushIntervalMs: 16,
+    dropStrategy: 'coalesce',
   });
 
-  // Optional: cancel binding
-  const webContentsId = evt.sender.id;
-  const cleanup = () => { unsubscribe(); };
-  evt.sender.once('destroyed', cleanup);
+  const unsubscribe = run.onEvent((e) => buffered.emit(e));
+  const unsubBridge = electronShim.bridgeToSender({ on: (l) => buffered.on(l) }, 'factory/run/event', (channel, payload) => {
+    evt.sender.send(channel, payload);
+  });
 
+  evt.sender.once('destroyed', () => { unsubscribe(); unsubBridge(); });
   return { runId: run.id };
-});
-
-ipcMain.handle('factory/run/cancel', async (_evt, { runId }) => {
-  // Lookup your RunHandle by runId and call cancel()
 });
 ```
 
@@ -65,10 +72,11 @@ ipcRenderer.on('factory/run/event', (_e, event) => {
 
 ## JSONL Streaming
 
-The adapter can expose a JSONL stream of events, suitable for piping to logs or devtools.
+The adapter can expose a JSONL stream of events, suitable for piping to logs or devtools. Use streamJSONLBuffered to avoid unbounded memory growth.
 
 ```ts
-const stream = electronShim.streamJSONL(runHandle);
+import { events } from 'factory-ts';
+const stream = events.streamJSONLBuffered(runHandle);
 (async () => {
   for await (const line of stream) {
     process.stdout.write(line);
@@ -98,5 +106,4 @@ Example UI flow in renderer:
 - The adapter contains no Electron-specific code. It only shapes data and consumption utilities.
 - Use the db/store HistoryStore to persist runs, steps, and errors if you need historical views.
 - For LLM usage and budgets, wire your orchestrator to emit run/usage and run/budget-exceeded events using the provided event types.
-- Errors should be serialized via the adapter (message, code, stack) — avoid sending raw Error instances across IPC.
-```
+- Backpressure handling is configurable; choose strategies that match your UI's needs.
