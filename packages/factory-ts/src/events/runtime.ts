@@ -1,63 +1,63 @@
-import { EventBus, RunEvent, RunHandle, UUID } from './types'
+import { EventBus, RunEvent, RunEventListener, RunHandle, RunId, toISO } from './types';
 
-export class SimpleEventBus implements EventBus<RunEvent> {
-  private listeners = new Map<string, Set<Function>>()
+export class SimpleEventBus implements EventBus {
+  private listeners = new Set<RunEventListener>();
 
-  on<T extends RunEvent['type']>(type: T, listener: (event: Extract<RunEvent, { type: T }>) => void): () => void {
-    let set = this.listeners.get(type)
-    if (!set) {
-      set = new Set()
-      this.listeners.set(type, set)
-    }
-    set.add(listener)
-    return () => {
-      set!.delete(listener)
+  emit(event: RunEvent): void {
+    for (const l of Array.from(this.listeners)) {
+      try {
+        l(event);
+      } catch (_) {
+        // swallow listener errors to keep bus resilient
+      }
     }
   }
 
-  emit(event: RunEvent): void {
-    const set = this.listeners.get(event.type)
-    if (set) {
-      for (const l of Array.from(set)) {
-        try {
-          ;(l as any)(event)
-        } catch (err) {
-          // avoid breaking emitter due to listener error
-          // eslint-disable-next-line no-console
-          console.error('Event listener error', err)
-        }
-      }
-    }
+  on(listener: RunEventListener): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
   }
 }
 
 export class DefaultRunHandle implements RunHandle {
-  runId: UUID
-  bus: EventBus<RunEvent>
-  private controller: AbortController
+  public id: RunId;
+  private bus: EventBus;
+  private cancelled = false;
+  private abortController: AbortController;
 
-  constructor(runId?: UUID, bus?: EventBus<RunEvent>, controller?: AbortController) {
-    this.runId = runId ?? randomId()
-    this.bus = bus ?? new SimpleEventBus()
-    this.controller = controller ?? new AbortController()
+  constructor(id: RunId, bus?: EventBus, abortController?: AbortController) {
+    this.id = id;
+    this.bus = bus ?? new SimpleEventBus();
+    this.abortController = abortController ?? new AbortController();
+  }
+
+  onEvent(listener: RunEventListener): () => void {
+    return this.bus.on(listener);
+  }
+
+  cancel(reason?: string): void {
+    if (this.cancelled) return;
+    this.cancelled = true;
+    this.abortController.abort(reason ? new Error(reason) : undefined);
+    this.bus.emit({ type: 'run/cancelled', runId: this.id, time: toISO(), payload: { reason } });
+  }
+
+  isCancelled(): boolean {
+    return this.cancelled || this.abortController.signal.aborted;
   }
 
   get signal(): AbortSignal {
-    return this.controller.signal
+    return this.abortController.signal;
   }
 
-  stop(reason?: string): void {
-    if (!this.controller.signal.aborted) {
-      try {
-        // @ts-expect-error reason is supported in newer runtimes
-        this.controller.abort(reason ?? 'aborted')
-      } catch {
-        this.controller.abort()
-      }
-    }
+  get eventBus(): EventBus {
+    return this.bus;
   }
 }
 
-export function randomId(): UUID {
-  return 'run_' + Math.random().toString(36).slice(2, 10)
+export function makeRunId(prefix = 'run'): RunId {
+  // Simple unique ID generator suitable for local runs.
+  const rand = Math.random().toString(36).slice(2, 8);
+  const ts = Date.now().toString(36);
+  return `${prefix}_${ts}_${rand}`;
 }

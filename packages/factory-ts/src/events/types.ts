@@ -1,54 +1,82 @@
-export type UUID = string
+/*
+ * Serializable event types and RunHandle interfaces suitable for IPC.
+ */
+
+export type RunId = string;
+export type Timestamp = string; // ISO string for IPC-safe serialization
+
+export type EventBase<T extends string> = {
+  type: T;
+  time: Timestamp;
+  runId: RunId;
+};
+
+export type ErrorPayload = {
+  message: string;
+  name?: string;
+  code?: string;
+  stack?: string; // May be redacted/truncated
+  data?: Record<string, unknown>;
+};
+
+export type UsagePayload = {
+  requests: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  costUSD?: number;
+};
+
+export type FileChangeSummary = {
+  added: number;
+  modified: number;
+  deleted: number;
+};
+
+export type FileDiffHunk = {
+  filePath: string;            // normalized relative to project root
+  oldPath?: string;            // for renames
+  status: 'added' | 'modified' | 'deleted' | 'renamed';
+  unifiedDiff: string;         // unified diff text
+};
+
+export type ProposalState = 'open' | 'accepted' | 'rejected' | 'partial';
 
 export type RunEvent =
-  | { type: 'run/started'; runId: UUID; at: number }
-  | { type: 'run/stopped'; runId: UUID; at: number; reason: 'budget-exceeded' | 'aborted' | 'completed' | 'error'; details?: string }
-  | { type: 'budget/exceeded'; runId: UUID; at: number; metric: 'cost' | 'tokens'; value: number; limit: number }
-  | { type: 'telemetry/updated'; runId: UUID; at: number; snapshot: TelemetrySnapshot }
-  | { type: 'llm/request/started'; runId: UUID; at: number; requestId: UUID; model: string }
-  | { type: 'llm/request/stream'; runId: UUID; at: number; requestId: UUID; model: string; deltaTokensOut: number }
-  | { type: 'llm/request/finished'; runId: UUID; at: number; requestId: UUID; model: string; usage: LLMUsage }
-  | { type: 'error/occurred'; runId: UUID; at: number; code: string; message: string; stepIndex?: number | null }
-  | { type: 'error/retry'; runId: UUID; at: number; attempt: number; delayMs: number; code: string; message: string; stepIndex?: number | null }
+  | (EventBase<'run/started'> & { payload: { taskId?: string; featureId?: string; projectId: string; meta?: Record<string, unknown>; } })
+  | (EventBase<'run/progress'> & { payload: { message: string; step?: string; progress?: number; usage?: UsagePayload; } })
+  | (EventBase<'run/usage'> & { payload: UsagePayload })
+  | (EventBase<'run/budget-exceeded'> & { payload: UsagePayload })
+  | (EventBase<'run/error'> & { payload: ErrorPayload })
+  | (EventBase<'error/retry'> & { payload: { error: ErrorPayload; attempt: number; nextDelayMs: number; } })
+  | (EventBase<'file/proposal'> & { payload: { proposalId: string; title?: string; summary?: FileChangeSummary; } })
+  | (EventBase<'file/diff'> & { payload: { proposalId: string; files: FileDiffHunk[]; summary: FileChangeSummary; } })
+  | (EventBase<'file/proposal-state'> & { payload: { proposalId: string; state: ProposalState; } })
+  | (EventBase<'git/branch-created'> & { payload: { branchName: string; base?: string; } })
+  | (EventBase<'git/commit'> & { payload: { proposalId: string; commitSha: string; message: string; } })
+  | (EventBase<'run/completed'> & { payload: { success: boolean; usage?: UsagePayload; message?: string; } })
+  | (EventBase<'run/cancelled'> & { payload: { reason?: string; } });
 
-export interface EventBus<E extends { type: string } = RunEvent> {
-  on<T extends E['type']>(type: T, listener: (event: Extract<E, { type: T }>) => void): () => void
-  emit(event: E): void
+export type RunEventType = RunEvent['type'];
+
+export interface RunEventListener {
+  (event: RunEvent): void;
+}
+
+export interface EventBus {
+  emit(event: RunEvent): void;
+  on(listener: RunEventListener): () => void; // returns unsubscribe
 }
 
 export interface RunHandle {
-  runId: UUID
-  bus: EventBus<RunEvent>
-  signal: AbortSignal
-  stop(reason?: string): void
+  id: RunId;
+  onEvent: (listener: RunEventListener) => () => void;
+  cancel: (reason?: string) => void;
+  isCancelled: () => boolean;
 }
 
-export interface LLMUsage {
-  promptTokens: number
-  completionTokens: number
-  totalTokens?: number
-}
+export type JsonlEncoder = (e: RunEvent) => string;
 
-export interface TelemetrySnapshot {
-  startedAt: number
-  updatedAt: number
-  totalRequests: number
-  totalPromptTokens: number
-  totalCompletionTokens: number
-  totalTokens: number
-  costUsd: number
-  perModel: Record<string, {
-    requests: number
-    promptTokens: number
-    completionTokens: number
-    costUsd: number
-  }>
-  status: 'running' | 'stopped'
-  stopReason?: string
-  budget?: RunBudget
-}
-
-export interface RunBudget {
-  maxTokens?: number
-  maxCostUsd?: number
+export function toISO(date: Date = new Date()): Timestamp {
+  return date.toISOString();
 }

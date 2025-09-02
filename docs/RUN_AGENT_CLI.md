@@ -1,44 +1,17 @@
-# Run Agent CLI (TypeScript)
+# Node CLI Bridge: runAgent.ts
 
-This CLI acts as a backward-compatible bridge to launch agents (replacing the Python entrypoint). It streams run events as JSONL to stdout, so Overseer or other tools can observe progress and outcomes.
+This repository provides a Node/TypeScript CLI (scripts/runAgent.ts) to launch agents and stream JSONL events to stdout. While Overseer integrates directly via the Electron adapter, this CLI remains for backward compatibility and debugging.
 
-Usage
-- Install deps (once):
-  - npm install
-- Run:
-  - npm run run:agent -- \
-    --project-id child-project-1 \
-    --task-id 42 \
-    --feature-id 1 \
-    --llm-config ./overseer_llm.json \
-    --budget 5 \
-    --db-path ./.thefactory/history.sqlite \
-    --project-root .
+Basic usage:
 
-Arguments
-- --project-id (required): ID of the project (matches projects/{project_id}.json in Overseer).
-- --task-id (required): Task ID within the project to run.
-- --feature-id (optional): Specific feature within the task to run.
-- --llm-config (optional): Either a path to a JSON file or inline JSON string. If not provided, the library may use defaults.
-- --budget (optional): Numeric dollar budget (e.g., 5 for $5). Enforced by the telemetry module where supported.
-- --db-path (optional): SQLite database path for run history; if omitted, the library may use defaults.
-- --project-root (optional): Root of the target project workspace. Defaults to current working directory.
+- --project-id: The project configuration ID
+- --task-id: Task ID to run
+- --feature-id: Optional feature ID
+- --llm-config: JSON string or path for the LLM provider configuration
+- --budget: Max USD budget for the run
+- --db-path: Optional path to SQLite DB for run history
+- --project-root: Path to the project root where files will be read/written
 
-Output
-- JSON Lines on stdout representing lifecycle and orchestrator events.
-- Example:
-  {"type":"cli/started","ts":"...","payload":{...}}
-  {"type":"run/progress","ts":"...","payload":{...}}
-  {"type":"run/completed","ts":"...","payload":{"status":"success"}}
+Output protocol: Each line is a JSON event matching packages/factory-ts/src/events/types.ts (RunEvent).
 
-Exit codes
-- 0: success
-- 1: run error
-- 2: invalid/missing arguments
-- 3: orchestrator import error
-
-Signals
-- SIGINT (Ctrl+C) cancels the running agent via AbortController and emits a run/aborting event.
-
-Notes
-- The CLI attempts to dynamically import the orchestrator from packages/factory-ts. It tries common dist and src paths, as well as a package import. Adjust paths as needed if your layout differs.
+The Electron adapter uses the same serializable event shapes for IPC.

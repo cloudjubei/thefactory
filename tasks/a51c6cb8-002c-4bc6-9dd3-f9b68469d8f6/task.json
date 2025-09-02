@@ -132,7 +132,7 @@
     },
     {
       "id": "f59cf389-9d71-41fe-aed5-062602ae68de",
-      "status": "-",
+      "status": "+",
       "title": "Electron Overseer integration shim",
       "description": "Provide a lightweight integration module exposing serializable event types and a factory to create runs suitable for Electron IPC. Include utilities to convert RunHandle into an EventSource-like stream or an observable for React. Document how Overseer consumes this to launch agents, subscribe to progress, and display diffs. Keep IPC specifics out of core; this is an adapter only.",
       "plan": "",

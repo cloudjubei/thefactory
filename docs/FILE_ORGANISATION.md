@@ -7,6 +7,7 @@ This document describes how files and directories are organised in this reposito
   - docs/tasks/: Canonical task schema and examples.
   - docs/PROJECTS_GUIDE.md: How child projects under projects/ are managed.
   - docs/RUN_AGENT_CLI.md: Minimal usage documentation for the Node CLI bridge that streams JSONL events.
+  - docs/OVERSEER_INTEGRATION.md: How Overseer consumes the Electron adapter to launch runs and subscribe to progress and diffs.
 - scripts/: Executables and tools used by the agent and CI.
   - scripts/runAgent.ts: Node/TypeScript CLI to launch agents, subscribe to orchestrator events, and stream JSONL to stdout. Parses args like --project-id, --task-id, --feature-id, --llm-config, --budget, --db-path, and --project-root.
 - tasks/: Per-task workspaces containing task metadata and tests.
@@ -17,44 +18,24 @@ This document describes how files and directories are organised in this reposito
   - packages/factory-ts/: TypeScript library for Overseer agent orchestration (build via tsup, ESM+CJS).
     - src/
       - index.ts: Public entry point exporting the library API.
-      - orchestrator.ts: Orchestrator API exposing runTask and runFeature that wire loaders, LLM client, and the typed event bus. Returns a RunHandle, supports cancellation with AbortController.
+      - adapters/
+        - electronShim.ts: IPC-agnostic adapter exposing serializable events and utilities for JSONL streaming, EventSource-like consumption, and Observables.
       - events/: Typed run lifecycle event bus and RunHandle.
-        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces. Includes error/occurred and error/retry events.
+        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces. Includes error/retry events.
         - runtime.ts: Lightweight typed event emitter and DefaultRunHandle implementation.
         - index.ts: Barrel export for events module.
       - errors/: Common, typed error utilities.
         - types.ts: FactoryError class, error codes, classification utilities, and conversions from unknown.
         - redact.ts: Safe redaction helpers for messages and objects.
-      - utils/
-        - path.ts: Cross-platform path helpers, root resolution.
-        - abort.ts: Abort helpers (abortableDelay, withAbort, throwIfAborted).
-        - retry.ts: Exponential backoff retry with jitter, transient classification, and AbortSignal support. Emits error/retry events via hooks.
-      - llm/: Provider-agnostic LLM client interfaces and adapters.
-        - types.ts: Core types (LLMClient, streaming, usage, costs utils).
-        - config.ts: Overseer LLMConfig and normalization helpers.
-        - costs.ts: Model cost tables (OpenAI to start).
-        - openaiClient.ts: OpenAI adapter using official SDK (dynamic import).
-        - factory.ts: makeLLMClient that adapts LLMConfig -> LLMClient and supports DI.
-      - telemetry/: Telemetry and budgets.
-        - telemetry.ts: Tracks token usage (prompt/completion), requests, duration timestamps, and computes costs from provider pricing (OpenAI). Supports streaming updates and budget enforcement with AbortController and typed events.
-      - domain.ts: Zod schemas and types for ProjectConfig and TaskDefinition.
-      - loaders/projectLoader.ts: Project and task loader with validation.
-      - loaders/projectLoader.test.ts: Vitest tests for the loader.
-      - db/: Persistent run history (SQLite) module.
-        - sqlite.ts: DB connection, migrations runner, and HistoryStore implementation. Includes errors table for error snapshots.
-        - store.ts: Convenience factory for creating the store with an opened DB handle.
-        - migrations/
-          - 0001_init.sql: Initial schema for runs, steps, messages, usage, file proposals, and git commit metadata.
-          - 0002_errors.sql: Schema upgrade adding errors table to persist error snapshots.
       - files/: File change proposals and diffs (in-memory patchsets; no workspace mutation).
-        - fileChangeManager.ts: Accepts proposed changes (writes/renames/deletes), validates path safety under a project root, and computes diffs against the working tree using git plumbing when available (git diff --no-index), with a simple unified diff fallback. Exposes API createProposal, getProposalDiff, updateProposal, discardProposal, and emits file:proposal and file:diff events.
-        - sandboxOverlay.ts: Sandboxed filesystem overlay where agent writes first land. Enforces safe normalized paths and allowlist checks, stores writes in a project-scoped temp directory, and only merges into the git working tree upon acceptance. Provides configurable temp location, per-run IDs, and automatic cleanup on run completion or cancellation.
+        - fileChangeManager.ts: Accepts proposed changes, validates path safety, and computes diffs.
+        - sandboxOverlay.ts: Sandboxed filesystem overlay for safe writes before acceptance.
         - index.ts: Barrel export for files module.
       - git/: Git integration layer used by Overseer to manage feature branches and apply/commit/revert changes.
-        - gitService.ts: Provides ensureRepo, createFeatureBranch(runId), applyProposalToBranch(proposalId), commitProposal(proposalId, message, metadata), revertProposal(proposalId). It uses simple-git (dynamic import) and records commit SHAs to the HistoryStore when provided.
+        - gitService.ts: Repo and commit helpers; records commit SHAs to the HistoryStore when provided.
         - index.ts: Barrel export for git module.
-      - review/: Change review workflow high-level APIs bridging files, git, and history.
-        - reviewService.ts: Exposes listProposalFiles(proposalId), acceptAll(proposalId), acceptFiles(proposalId, files[]), rejectFiles(proposalId, files[]), rejectAll(proposalId). Provides per-file diff hunks and summary counts (added/modified/deleted). On accept, commits using gitService and records commit in HistoryStore; on reject, updates proposal state and history without workspace mutation.
+      - db/: Persistent run history (SQLite) module.
+        - store.ts: HistoryStore convenience factory.
 
 Notes:
 - All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
@@ -96,15 +77,13 @@ repo_root/
 │  ├─ FILE_ORGANISATION.md
 │  ├─ LOCAL_SETUP.md
 │  ├─ PROJECTS_GUIDE.md
-│  └─ tasks/
-│     ├─ task_format.py
-│     └─ task_example.json
+│  ├─ RUN_AGENT_CLI.md
+│  └─ OVERSEER_INTEGRATION.md
 ├─ scripts/
 │  ├─ child_project_utils.py
 │  ├─ git_manager.py
 │  ├─ run_local_agent.py
 │  ├─ run_tests.py
-│  ├─ task_utils.py
 │  └─ runAgent.ts
 ├─ projects/
 │  └─ child-project-1.json
@@ -113,6 +92,12 @@ repo_root/
 │     ├─ package.json
 │     └─ src/
 │        ├─ index.ts
+│        ├─ adapters/
+│        │  └─ electronShim.ts
+│        ├─ events/
+│        │  ├─ index.ts
+│        │  ├─ runtime.ts
+│        │  └─ types.ts
 │        ├─ review/
 │        │  └─ reviewService.ts
 │        ├─ files/
@@ -137,4 +122,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram includes the new CLI bridge script (scripts/runAgent.ts) and its usage documentation in docs/RUN_AGENT_CLI.md for backward compatibility while migrating TheFactory to TypeScript.
+This diagram includes the Electron adapter under packages/factory-ts/src/adapters and the typed events/RunHandle infrastructure used by Overseer.
