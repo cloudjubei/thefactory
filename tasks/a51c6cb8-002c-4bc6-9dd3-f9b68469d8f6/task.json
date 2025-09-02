@@ -141,7 +141,7 @@
     },
     {
       "id": "9ee7e304-201c-498c-8a83-6eb4299bf7c6",
-      "status": "-",
+      "status": "+",
       "title": "Run artifact export and import",
       "description": "Add the ability to export a full run (metadata, messages, telemetry, diffs, and accepted commits) to a JSON archive (optionally with file snapshots). Implement import to rehydrate runs for sharing and review. Ensure secrets redaction and size limits. Expose APIs: exportRun(runId, options), importRun(filePath).",
       "plan": "",

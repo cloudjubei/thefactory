@@ -36,6 +36,11 @@ This document describes how files and directories are organised in this reposito
         - index.ts: Barrel export for git module.
       - db/: Persistent run history (SQLite) module.
         - store.ts: HistoryStore convenience factory.
+      - artifacts/: Import/export of run archives for sharing and review.
+        - types.ts: Archive schema (v1), export options, and imported run API.
+        - recorder.ts: In-memory recorder that subscribes to a RunHandle and captures events, proposals, commits, usage, and metadata.
+        - exporter.ts: exportRun(runId, options) produces a redacted JSON archive with optional file snapshots and size limits.
+        - importer.ts: importRun(filePath) validates and loads an archive and can replay events.
 
 Notes:
 - All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
@@ -103,15 +108,21 @@ repo_root/
 │        ├─ files/
 │        │  ├─ fileChangeManager.ts
 │        │  ├─ sandboxOverlay.ts
-│        │  └─ index.ts
+│        │  ├─ index.ts
+│        │  └─ *.test.ts
 │        ├─ git/
 │        │  ├─ gitService.ts
 │        │  └─ index.ts
 │        ├─ db/
 │        │  └─ store.ts
-│        └─ errors/
+│        ├─ errors/
+│        │  ├─ types.ts
+│        │  └─ redact.ts
+│        └─ artifacts/
 │           ├─ types.ts
-│           └─ redact.ts
+│           ├─ recorder.ts
+│           ├─ exporter.ts
+│           └─ importer.ts
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
@@ -122,4 +133,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram includes the Electron adapter under packages/factory-ts/src/adapters and the typed events/RunHandle infrastructure used by Overseer.
+This diagram now includes the artifacts export/import module used to share full run archives.

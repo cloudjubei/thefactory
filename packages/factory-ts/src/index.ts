@@ -6,3 +6,4 @@ export * from './errors/redact';
 export * from './files';
 export * from './git';
 export * from './db/store';
+export * as artifacts from './artifacts';
