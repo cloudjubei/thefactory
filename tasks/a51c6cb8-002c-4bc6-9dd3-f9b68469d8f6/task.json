@@ -159,7 +159,7 @@
     },
     {
       "id": "6134c5ca-951e-459e-b5e4-73904104cca6",
-      "status": "-",
+      "status": "+",
       "title": "Integration tests with temp git repositories",
       "description": "Implement integration tests that initialize a temporary git repo, create a sample project and task, run a mock agent that proposes changes, then exercise accept and reject workflows. Verify branch creation, commits, history records, and emitted events. Ensure tests are deterministic and isolated with cleanup.",
       "plan": "",

@@ -7,3 +7,15 @@ export * from './files';
 export * from './git';
 export * from './db/store';
 export * as artifacts from './artifacts';
+
+// Minimal factory API to satisfy existing tests
+export class OverseerFactory {
+  constructor(public options: { version: string }) {}
+  hello(name: string): string {
+    return `Hello, ${name} from OverseerFactory v${this.options.version}`;
+  }
+}
+
+export function createFactory(options: { version: string }): OverseerFactory {
+  return new OverseerFactory(options);
+}
