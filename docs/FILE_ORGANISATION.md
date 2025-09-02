@@ -15,6 +15,10 @@ This document describes how files and directories are organised in this reposito
   - packages/factory-ts/: TypeScript library for Overseer agent orchestration (build via tsup, ESM+CJS).
     - src/
       - index.ts: Public entry point exporting the library API.
+      - events/: Typed run lifecycle event bus and RunHandle.
+        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces.
+        - runtime.ts: Lightweight typed event emitter and DefaultRunHandle implementation.
+        - index.ts: Barrel export for events module.
       - llm/: Provider-agnostic LLM client interfaces and adapters.
         - types.ts: Core types (LLMClient, streaming, usage, costs utils).
         - config.ts: Overseer LLMConfig and normalization helpers.
@@ -85,6 +89,10 @@ repo_root/
 │     ├─ vitest.config.ts
 │     └─ src/
 │        ├─ index.ts
+│        ├─ events/
+│        │  ├─ index.ts
+│        │  ├─ runtime.ts
+│        │  └─ types.ts
 │        ├─ llm/
 │        │  ├─ types.ts
 │        │  ├─ config.ts
@@ -107,4 +115,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/llm directory containing the provider-agnostic LLM client and the OpenAI adapter used by Overseer.
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/events directory, which contains the typed lifecycle event bus and RunHandle used by Overseer.

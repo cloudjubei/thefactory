@@ -42,7 +42,7 @@
     },
     {
       "id": "29960350-464d-409f-91a4-617a92b11bbc",
-      "status": "-",
+      "status": "+",
       "title": "Run lifecycle event bus and typed events",
       "description": "Implement a typed event emitter for agent runs with events: run:started, run:updated, step:started, step:updated, llm:message, llm:stream, usage:updated, file:proposal, file:diff, error, run:completed, run:cancelled. Provide TypeScript types for payloads to be IPC-serializable. Include a RunHandle that exposes event subscription and control methods (pause, resume, cancel).",
       "plan": "",

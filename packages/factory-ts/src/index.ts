@@ -1,8 +1,10 @@
-export * from './llm/types';
-export * from './llm/costs';
-export * from './llm/config';
-export * from './llm/factory';
-
-// Future exports from other parts of the library can be added here, e.g.:
-// export * from './domain';
-// export * from './loaders/projectLoader';
+// Public entry point exporting the library API.
+export * as LLM from "./llm/types";
+export * from "./llm/config";
+export * from "./llm/costs";
+export * from "./llm/openaiClient";
+export * from "./llm/factory";
+export * from "./domain";
+export * from "./utils/path";
+export * from "./loaders/projectLoader";
+export * from "./events";
