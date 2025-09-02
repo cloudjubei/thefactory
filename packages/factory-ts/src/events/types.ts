@@ -54,6 +54,7 @@ export type RunEvent =
   | (EventBase<'file/proposal-state'> & { payload: { proposalId: string; state: ProposalState; } })
   | (EventBase<'git/branch-created'> & { payload: { branchName: string; base?: string; } })
   | (EventBase<'git/commit'> & { payload: { proposalId: string; commitSha: string; message: string; } })
+  | (EventBase<'run/truncated'> & { payload: { where: 'head' | 'tail'; dropped: number; reason: 'maxEvents' | 'maxBytes'; } })
   | (EventBase<'run/completed'> & { payload: { success: boolean; usage?: UsagePayload; message?: string; } })
   | (EventBase<'run/cancelled'> & { payload: { reason?: string; } });
 

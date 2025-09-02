@@ -21,12 +21,12 @@ This document describes how files and directories are organised in this reposito
       - adapters/
         - electronShim.ts: IPC-agnostic adapter exposing serializable events and utilities for JSONL streaming, EventSource-like consumption, and Observables.
       - events/: Typed run lifecycle event bus and RunHandle.
-        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces. Includes error/retry events.
+        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces. Includes error/retry events. Now includes 'run/truncated' event for transcript caps.
         - runtime.ts: Lightweight typed event emitter and DefaultRunHandle implementation.
         - index.ts: Barrel export for events module.
       - errors/: Common, typed error utilities.
         - types.ts: FactoryError class, error codes, classification utilities, and conversions from unknown.
-        - redact.ts: Safe redaction helpers for messages and objects.
+        - redact.ts: Configurable redaction helpers (configureRedaction, redactString, redactObject, deepRedact) and truncation utility (truncateString). Includes tests in errors/redact.test.ts.
       - files/: File change proposals and diffs (in-memory patchsets; no workspace mutation).
         - fileChangeManager.ts: Accepts proposed changes, validates path safety, and computes diffs.
         - sandboxOverlay.ts: Sandboxed filesystem overlay for safe writes before acceptance.
@@ -38,8 +38,8 @@ This document describes how files and directories are organised in this reposito
         - store.ts: HistoryStore convenience factory.
       - artifacts/: Import/export of run archives for sharing and review.
         - types.ts: Archive schema (v1), export options, and imported run API.
-        - recorder.ts: In-memory recorder that subscribes to a RunHandle and captures events, proposals, commits, usage, and metadata.
-        - exporter.ts: exportRun(runId, options) produces a redacted JSON archive with optional file snapshots and size limits.
+        - recorder.ts: In-memory recorder that subscribes to a RunHandle and captures events, proposals, commits, usage, and metadata. Now enforces transcript size limits and inserts 'run/truncated' marker events. Tests in artifacts/recorder.test.ts.
+        - exporter.ts: exportRun(runId, options) produces a redacted JSON archive with optional file snapshots and size limits; uses deepRedact.
         - importer.ts: importRun(filePath) validates and loads an archive and can replay events.
 
 Notes:
@@ -117,10 +117,12 @@ repo_root/
 │        │  └─ store.ts
 │        ├─ errors/
 │        │  ├─ types.ts
-│        │  └─ redact.ts
+│        │  ├─ redact.ts
+│        │  └─ redact.test.ts
 │        └─ artifacts/
 │           ├─ types.ts
 │           ├─ recorder.ts
+│           ├─ recorder.test.ts
 │           ├─ exporter.ts
 │           └─ importer.ts
 └─ tasks/
@@ -133,4 +135,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram now includes the artifacts export/import module used to share full run archives.
+This diagram now includes configurable redaction utilities, truncation markers for transcripts, and associated unit tests.

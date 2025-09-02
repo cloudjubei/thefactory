@@ -177,7 +177,7 @@
     },
     {
       "id": "f9cea88b-8630-4f57-ab88-ddecd2dcc721",
-      "status": "-",
+      "status": "+",
       "title": "Secrets redaction and data hygiene",
       "description": "Implement a redaction utility to scrub API keys and secrets from stored messages and exported artifacts. Add configuration for redaction patterns. Enforce max transcript sizes and truncation strategies (with markers) to prevent UI stalls. Add unit tests for redaction and truncation behavior.",
       "plan": "",

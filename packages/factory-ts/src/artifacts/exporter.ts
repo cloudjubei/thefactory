@@ -1,20 +1,10 @@
 import { readFileSync, statSync } from 'node:fs';
 import { join, normalize } from 'node:path';
-import { redactObject, redactString } from '../errors/redact';
+import { deepRedact } from '../errors/redact';
 import { FactoryError } from '../errors/types';
 import { RunEvent } from '../events/types';
 import { ExportOptions, RunArchive, RunArchiveV1 } from './types';
 import { getRecordedRun } from './recorder';
-
-function deepRedact<T>(obj: T): T {
-  try {
-    if (obj && typeof obj === 'object') return redactObject(obj as any) as any as T;
-    if (typeof obj === 'string') return redactString(obj) as any as T;
-    return obj;
-  } catch {
-    return obj;
-  }
-}
 
 function redactedEvents(events: RunEvent[], enable: boolean | undefined): RunEvent[] {
   if (!enable) return events.slice();
