@@ -1,0 +1,10 @@
+{
+  "id": "a51c6cb8-002c-4bc6-9dd3-f9b68469d8f6",
+  "status": "-",
+  "title": "Combine with Overseer - by rewriting to TypeScript",
+  "description": "This project has a child project overseer-local (Overseer) which created an Electron app (TypeScript, React + Vite) for managing tasks for any project. It makes it very easy for a user to manage tasks of any kind. \nIt's done by each project under the projects folder having a config json file of the form '{project_id}.json' that specifies some basic information, such as the relative path of the project, a list of its tasks (which are located in that project's folder under tasks).\n\nCurrently, this project - TheFactory (python) - orchestrates and runs agents to carry out the tasks that are specified in these json files for these projects. We want to combine the two projects by writing the whole TheFactory project in typescript as a library/module that Overseer can use. We want the following requirements are possible:\n- allow launching agents from within the Overseer on a specific feature or task (currently LLMConfigs are specified for chat - those can be reused)\n- allow monitoring their progress and performance (speed, token usage and cost).\n- we require as much history and information as possible about each agent, so that a user can share if a given run was satisfactory or not. This way a user will be able to gauge the performance of an agent in terms of work done.\n- most of the time the agents perform file changes (writes, deletions, renames, moves) and we want to allow a user to accept or reject the changes that an agent has submitted. Currently, this is done by utilising git and feature branches - it works well, but requires an external terminal or app setup for it - whereas it would have to be integrated into the Overseer.\n\nAdditional info:\nLaunching agents right now in TheFactory is done by executing a python script from the console. It allows running these agents on arbitrary project paths that have the appropriate task schemas.",
+  "features": [
+  ],
+  "featureIdToDisplayIndex": {
+  }
+}
