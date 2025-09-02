@@ -1,55 +1,98 @@
-import { describe, it, expect } from 'vitest';
-import { FileChangeManager } from './fileChangeManager';
-import path from 'node:path';
-import fs from 'node:fs';
-import os from 'node:os';
+import { describe, it, expect } from 'vitest'
+import { FileChangeManager, type FileChange } from './fileChangeManager'
 
-function makeTempProject() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'factory-ts-proj-'));
-  fs.mkdirSync(path.join(dir, 'src'));
-  fs.writeFileSync(path.join(dir, 'src', 'hello.txt'), 'hello\nworld\n', 'utf8');
-  return dir;
+function makeChanges(): FileChange[] {
+  return [
+    {
+      path: 'src/new.txt',
+      status: 'added',
+      newContent: 'hello\n',
+    },
+    {
+      path: 'src/old.txt',
+      status: 'deleted',
+      oldContent: 'remove me\n',
+    },
+    {
+      path: 'src/edit.txt',
+      status: 'modified',
+      oldContent: 'line1\nline2\n',
+      newContent: 'line1\nLINE-2\n',
+    },
+  ]
 }
 
-describe('FileChangeManager', () => {
-  it('creates proposal and computes diff without mutating workspace', async () => {
-    const root = makeTempProject();
-    const mgr = new FileChangeManager({ projectRoot: root });
+describe('FileChangeManager diffs and state', () => {
+  it('creates proposal with computed unified diffs and hunks', () => {
+    const mgr = new FileChangeManager()
+    const changes = makeChanges()
+    const p = mgr.createProposal('/proj', changes, 'p1')
 
-    const proposal = mgr.createProposal([
-      { action: 'write', path: 'src/hello.txt', content: 'hello\nfriend\n' },
-      { action: 'write', path: 'src/new.txt', content: 'new file\n' },
-      { action: 'delete', path: 'src/hello.txt' }, // delete original (just to test multi changes)
-    ]);
+    expect(p.id).toBe('p1')
+    expect(p.state).toBe('open')
 
-    expect(proposal.status).toBe('open');
-    expect(fs.readFileSync(path.join(root, 'src', 'hello.txt'), 'utf8')).toBe('hello\nworld\n');
+    const files = mgr.listProposalFiles(p.id)
+    expect(files).toHaveLength(3)
 
-    const diff = await mgr.getProposalDiff(proposal.id);
-    expect(typeof diff).toBe('string');
-    expect(diff).toContain('src/hello.txt');
-    expect(diff).toContain('src/new.txt');
-  });
+    const added = files.find(f => f.path === 'src/new.txt')!
+    expect(added.status).toBe('added')
+    expect(added.diff).toContain('+++ b')
+    expect(added.hunks && added.hunks[0].lines.some(l => l.startsWith('+hello'))).toBe(true)
 
-  it('emits events for proposal and diff', async () => {
-    const root = makeTempProject();
-    const mgr = new FileChangeManager({ projectRoot: root });
+    const deleted = files.find(f => f.path === 'src/old.txt')!
+    expect(deleted.status).toBe('deleted')
+    expect(deleted.diff).toContain('--- a')
+    expect(deleted.hunks && deleted.hunks[0].lines.some(l => l.startsWith('-remove me'))).toBe(true)
 
-    let created = false;
-    let diffed = false;
-    mgr.on('file:proposal', (e) => { if (e.op === 'created') created = true; });
-    mgr.on('file:diff', () => { diffed = true; });
+    const modified = files.find(f => f.path === 'src/edit.txt')!
+    expect(modified.status).toBe('modified')
+    expect(modified.hunks && modified.hunks[0].header.startsWith('@@ ')).toBe(true)
+    expect(modified.hunks && modified.hunks[0].lines).toEqual([
+      '-line2',
+      '+LINE-2',
+    ])
 
-    const proposal = mgr.createProposal([{ action: 'write', path: 'src/a.txt', content: 'A' }]);
-    await mgr.getProposalDiff(proposal.id);
+    const { files: diffFiles } = mgr.getProposalDiff(p.id)
+    expect(diffFiles.map(f => f.path).sort()).toEqual(['src/edit.txt', 'src/new.txt', 'src/old.txt'])
 
-    expect(created).toBe(true);
-    expect(diffed).toBe(true);
-  });
+    const summary = mgr.getSummary(p.id)
+    expect(summary.counts).toEqual({ added: 1, modified: 1, deleted: 1, total: 3 })
+    expect(summary.state).toBe('open')
+  })
 
-  it('validates path safety', () => {
-    const root = makeTempProject();
-    const mgr = new FileChangeManager({ projectRoot: root });
-    expect(() => mgr.createProposal([{ action: 'write', path: '../escape.txt', content: 'x' }])).toThrow();
-  });
-});
+  it('accepts and rejects files updating proposal state', () => {
+    const mgr = new FileChangeManager()
+    const p = mgr.createProposal('/proj', makeChanges(), 'p2')
+
+    mgr.acceptFiles(p.id, ['src/new.txt'])
+    let summary = mgr.getSummary(p.id)
+    expect(summary.accepted).toEqual(['src/new.txt'])
+    expect(summary.state).toBe('partiallyAccepted')
+
+    mgr.rejectFiles(p.id, ['src/old.txt', 'src/edit.txt'])
+    summary = mgr.getSummary(p.id)
+    expect(new Set(summary.rejected)).toEqual(new Set(['src/old.txt', 'src/edit.txt']))
+    expect(summary.state).toBe('partiallyAccepted')
+
+    // Accept remaining file -> all accepted
+    mgr.acceptFiles(p.id, ['src/old.txt', 'src/edit.txt'])
+    summary = mgr.getSummary(p.id)
+    expect(summary.state).toBe('accepted')
+  })
+
+  it('errors when accepting/rejecting unknown file', () => {
+    const mgr = new FileChangeManager()
+    const p = mgr.createProposal('/proj', makeChanges(), 'p3')
+    expect(() => mgr.acceptFiles(p.id, ['nope.txt'])).toThrow(/File not in proposal/)
+    expect(() => mgr.rejectFiles(p.id, ['nope.txt'])).toThrow(/File not in proposal/)
+  })
+
+  it('discarding proposal marks all as rejected', () => {
+    const mgr = new FileChangeManager()
+    const p = mgr.createProposal('/proj', makeChanges(), 'p4')
+    mgr.discardProposal(p.id)
+    const summary = mgr.getSummary(p.id)
+    expect(summary.state).toBe('rejected')
+    expect(summary.rejected.sort()).toEqual(['src/edit.txt', 'src/new.txt', 'src/old.txt'].sort())
+  })
+})

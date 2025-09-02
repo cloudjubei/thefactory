@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "run:agent": "tsx scripts/runAgent.ts"
+    "run:agent": "tsx scripts/runAgent.ts",
+    "test": "npm --prefix packages/factory-ts run test",
+    "test:watch": "npm --prefix packages/factory-ts run test:watch"
   },
   "devDependencies": {
     "tsx": "^4.15.7",

@@ -150,7 +150,7 @@
     },
     {
       "id": "2e6bc944-f1e3-4431-83f2-6b4d315e86cc",
-      "status": "-",
+      "status": "+",
       "title": "Unit tests for loaders, schemas, telemetry, and diffs",
       "description": "Write vitest unit tests covering: project/task loaders with valid/invalid inputs, schema validations, LLM usage accounting (mock provider), cost calculations with multiple models, file diff generation for various change types, and path safety validation. Use temp directories and fixtures under tasks/ for deterministic tests.",
       "plan": "",

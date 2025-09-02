@@ -89,4 +89,17 @@ describe('ProjectLoader', () => {
   it('provides helpful errors for missing task', async () => {
     await expect(loadTask('acme', '999')).rejects.toThrow(/Task directory not found/);
   });
+
+  it('validates invalid project schema', async () => {
+    // write invalid project file
+    const bad = { name: 'bad' } as any
+    await fs.writeFile(path.join(FIX_ROOT, 'projects', 'bad.json'), JSON.stringify(bad))
+    await expect(loadProject('bad')).rejects.toThrow(/Invalid project config/)
+  })
+
+  it('validates invalid task schema', async () => {
+    // overwrite task 2 with invalid payload (missing id)
+    await fs.writeFile(path.join(FIX_ROOT, 'child', 'acme', 'tasks', '2', 'task.json'), JSON.stringify({ title: 'no id' }))
+    await expect(loadTask('acme', '2')).rejects.toThrow(/Invalid task definition/)
+  })
 });
