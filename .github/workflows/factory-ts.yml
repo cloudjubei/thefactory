@@ -1,0 +1,35 @@
+name: Factory TS - Build and Test
+
+on:
+  push:
+    paths:
+      - 'packages/factory-ts/**'
+      - '.github/workflows/factory-ts.yml'
+  pull_request:
+    paths:
+      - 'packages/factory-ts/**'
+      - '.github/workflows/factory-ts.yml'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: packages/factory-ts/package-lock.json
+      - name: Install dependencies
+        working-directory: packages/factory-ts
+        run: npm install
+      - name: Lint
+        working-directory: packages/factory-ts
+        run: npm run lint
+      - name: Build
+        working-directory: packages/factory-ts
+        run: npm run build
+      - name: Test
+        working-directory: packages/factory-ts
+        run: npm test

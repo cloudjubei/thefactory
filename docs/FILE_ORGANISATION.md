@@ -11,6 +11,8 @@ This document describes how files and directories are organised in this reposito
   - tasks/{id}/task.json: Canonical task definition for a single task.
   - tasks/{id}/tests/: Deterministic tests validating each feature in the task.
 - projects/: Child project configurations.
+- packages/: JavaScript/TypeScript packages maintained in this repo.
+  - packages/factory-ts/: TypeScript library for Overseer agent orchestration (build via tsup, ESM+CJS).
 - .github/, .env, and other setup files may exist as needed.
 
 Notes:
@@ -23,7 +25,7 @@ Notes:
   - Tests are named per-feature: tasks/{task_id}/tests/test_{task_id}_{feature_number}.py (e.g., tasks/15/tests/test_15_3.py).
 - Python modules: snake_case.py (e.g., task_format.py, run_local_agent.py).
 - Documentation files: UPPERCASE or Title_Case for project-wide specs (e.g., TESTING.md, FILE_ORGANISATION.md). Place task-related docs under docs/tasks/.
-- Javascript modules: camelCase.js (e.g., taskFormat.js, runLocalAgent.js).
+- Javascript/TypeScript modules: camelCase.js/ts (e.g., taskFormat.js, runLocalAgent.ts).
 - JSON examples/templates: Use .json with clear, descriptive names (e.g., task_example.json).
 
 ## Evolution Guidance
@@ -64,6 +66,17 @@ repo_root/
 │  └─ task_utils.py
 ├─ projects/
 │  └─ child-project-1.json
+├─ packages/
+│  └─ factory-ts/
+│     ├─ package.json
+│     ├─ tsconfig.json
+│     ├─ tsup.config.ts
+│     ├─ vitest.config.ts
+│     ├─ .eslintrc.cjs
+│     ├─ .prettierrc
+│     └─ src/
+│        ├─ index.ts
+│        └─ index.test.ts
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
@@ -74,4 +87,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including where tests for each feature live and where child project configs reside under projects/.
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/ directory containing the TypeScript-based @overseer/factory library used by Overseer.

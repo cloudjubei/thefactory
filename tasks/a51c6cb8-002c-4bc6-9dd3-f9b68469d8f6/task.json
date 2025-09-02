@@ -6,7 +6,7 @@
   "features": [
     {
       "id": "4fcf7de2-041e-4286-8993-a60e5bb6122f",
-      "status": "-",
+      "status": "+",
       "title": "Initialize TypeScript package for @overseer/factory",
       "description": "Create a new TypeScript package under packages/factory-ts (or libs/factory-ts) with tsconfig, tsup (or esbuild) build setup, ESM+CJS outputs, type declarations, eslint/prettier config, and vitest setup. Add minimal entrypoints index.ts and package.json with proper name @overseer/factory. Include basic CI script for build and test.",
       "plan": "",
