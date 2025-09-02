@@ -4,7 +4,247 @@
   "title": "Combine with Overseer - by rewriting to TypeScript",
   "description": "This project has a child project overseer-local (Overseer) which created an Electron app (TypeScript, React + Vite) for managing tasks for any project. It makes it very easy for a user to manage tasks of any kind. \nIt's done by each project under the projects folder having a config json file of the form '{project_id}.json' that specifies some basic information, such as the relative path of the project, a list of its tasks (which are located in that project's folder under tasks).\n\nCurrently, this project - TheFactory (python) - orchestrates and runs agents to carry out the tasks that are specified in these json files for these projects. We want to combine the two projects by writing the whole TheFactory project in typescript as a library/module that Overseer can use. We want the following requirements are possible:\n- allow launching agents from within the Overseer on a specific feature or task (currently LLMConfigs are specified for chat - those can be reused)\n- allow monitoring their progress and performance (speed, token usage and cost).\n- we require as much history and information as possible about each agent, so that a user can share if a given run was satisfactory or not. This way a user will be able to gauge the performance of an agent in terms of work done.\n- most of the time the agents perform file changes (writes, deletions, renames, moves) and we want to allow a user to accept or reject the changes that an agent has submitted. Currently, this is done by utilising git and feature branches - it works well, but requires an external terminal or app setup for it - whereas it would have to be integrated into the Overseer.\n\nAdditional info:\nLaunching agents right now in TheFactory is done by executing a python script from the console. It allows running these agents on arbitrary project paths that have the appropriate task schemas.",
   "features": [
+    {
+      "id": "4fcf7de2-041e-4286-8993-a60e5bb6122f",
+      "status": "-",
+      "title": "Initialize TypeScript package for @overseer/factory",
+      "description": "Create a new TypeScript package under packages/factory-ts (or libs/factory-ts) with tsconfig, tsup (or esbuild) build setup, ESM+CJS outputs, type declarations, eslint/prettier config, and vitest setup. Add minimal entrypoints index.ts and package.json with proper name @overseer/factory. Include basic CI script for build and test.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "d45ef493-6a68-4c43-b57e-14458dc3c64d",
+      "status": "-",
+      "title": "Define core domain types and schemas",
+      "description": "Add TypeScript types and Zod schemas for ProjectConfig, TaskDefinition, FeatureDefinition, AgentRun, AgentStep, Message, UsageMetrics, CostBreakdown, FileChange (write, delete, move, rename), DiffHunk, RunStatus, and Error types. Export from the package entrypoint. Ensure schemas support validation and parsing of existing project/task JSON formats under projects/ and tasks/.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "576ef03e-c801-4deb-80d1-9429ebf315f2",
+      "status": "-",
+      "title": "Implement project and task loaders with validation",
+      "description": "Create a ProjectLoader module that reads projects/{project_id}.json and resolves project paths, then loads task definitions from the target project's tasks folder. Validate using Zod schemas. Expose functions: loadProject(projectId), listProjects(), loadTask(projectId, taskId), listTasks(projectId). Include robust error messages and path normalization.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "5b410176-489e-4f57-9fc5-a97ed1ec47e6",
+      "status": "-",
+      "title": "LLMConfig adapter for Overseer and provider-agnostic client",
+      "description": "Define a provider-agnostic LLMClient interface (chatCompletionStream, chatCompletionOnce, getUsage). Implement an adapter that consumes Overseer LLMConfig to construct the appropriate client. Provide an OpenAI adapter initially (using official SDK) with token usage reporting and model cost metadata. Design the interface to accept external clients (dependency injection) if Overseer provides one directly.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "29960350-464d-409f-91a4-617a92b11bbc",
+      "status": "-",
+      "title": "Run lifecycle event bus and typed events",
+      "description": "Implement a typed event emitter for agent runs with events: run:started, run:updated, step:started, step:updated, llm:message, llm:stream, usage:updated, file:proposal, file:diff, error, run:completed, run:cancelled. Provide TypeScript types for payloads to be IPC-serializable. Include a RunHandle that exposes event subscription and control methods (pause, resume, cancel).",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "c5efe54b-5b8a-4eb9-9e68-fdfeeae5d563",
+      "status": "-",
+      "title": "Agent orchestrator API (runTask, runFeature)",
+      "description": "Implement an Orchestrator that can run a task or a specific feature for a project. API: runTask({projectId, taskId, llmConfig, options}), runFeature({projectId, taskId, featureId, llmConfig, options}). The orchestrator wires loaders, LLM client, and event bus. Support concurrency-safe execution and return a RunHandle. Include cancellation via AbortController.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "fd833159-3bb2-4ccc-b019-8213ee28cb60",
+      "status": "-",
+      "title": "Telemetry collection and cost tracking",
+      "description": "Add a Telemetry module to measure durations per step, tokens in/out, requests, and compute costs using provider pricing tables (starting with OpenAI). Update telemetry on streamed tokens and end-of-call usage. Support configurable budgets per run (maxTokens, maxCost); enforce early stop when exceeding budgets and emit appropriate events and statuses.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "18406579-29ec-4c11-9ebd-eb36fd80bc98",
+      "status": "-",
+      "title": "Persistent run history store (SQLite)",
+      "description": "Introduce a persistence layer using better-sqlite3 storing runs, steps, messages, usage snapshots, file proposals, and git commit metadata. Add migration system (e.g., SQL files or Kysely). Provide CRUD functions: createRun, appendStep, appendMessage, recordUsage, saveFileProposal, finalizeRun, getRunById, listRuns (filters by project/task/status), getRunArtifacts. Configurable database path with sensible defaults under Overseer data dir.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "a700cc86-7563-4897-8d13-8b0ed32dd913",
+      "status": "-",
+      "title": "File change proposal and diff generation API",
+      "description": "Create a FileChangeManager that accepts proposed changes (writes/renames/deletes) from agents and constructs a patchset without mutating the workspace. Compute diffs against the working tree using fast-diff or git diff plumbing APIs. Expose functions: createProposal(changes), getProposalDiff(proposalId), updateProposal, discardProposal. Emit file:proposal and file:diff events. Validate path safety (no traversal outside project root).",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "b7987994-041b-4431-9f44-55db68a634cf",
+      "status": "-",
+      "title": "Git integration layer for feature branches and staging",
+      "description": "Integrate with Git using simple-git (Node) or isomorphic-git to support feature branch creation per run, applying patchsets to a branch, staging, and committing upon acceptance. Functions: ensureRepo(projectPath), createFeatureBranch(runId), applyProposalToBranch(proposalId), commitProposal(proposalId, message, metadata), revertProposal(proposalId). Track commit SHAs and link to run history records. Handle detached head and unclean working tree safely.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "0fab7bb2-c7da-4cf0-b81f-fc66e44f309f",
+      "status": "-",
+      "title": "Change review workflow APIs (accept/reject with partial selection)",
+      "description": "Expose high-level APIs to present and resolve proposed file changes: listProposalFiles(proposalId), acceptAll(proposalId), acceptFiles(proposalId, files[]), rejectFiles(proposalId, files[]), rejectAll(proposalId). On accept, commit and update run history; on reject, discard staged changes and update run state. Provide metadata for UI (added/modified/deleted counts, diff hunks per file).",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "347b7865-f832-40b3-9a1a-d6d6334d411e",
+      "status": "-",
+      "title": "Sandboxed filesystem overlay for safe writes",
+      "description": "Implement a filesystem overlay (temp dir within project) where agent writes first land. Ensure no path escapes via normalization and allowlist checks. Only upon acceptance are writes merged into the git working tree. Provide configurable temp location and automatic cleanup on run completion or cancellation.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "a1312892-7a22-409f-aeff-755314252728",
+      "status": "-",
+      "title": "Robust error handling, retries, and cancellation",
+      "description": "Add a common error handling layer that provides typed errors, retries with exponential backoff for transient LLM/network errors, and respects cancellation via AbortSignal. Ensure all provider calls and IO are abortable. Emit error events with redacted details and persist error snapshots in the run history.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "31c5aa98-049f-44aa-84d3-2e9853ff1e7e",
+      "status": "-",
+      "title": "CLI bridge for backward compatibility",
+      "description": "Create a Node CLI (scripts/runAgent.ts) that mirrors the Python entrypoint behavior: arguments for --project-id, --task-id, --feature-id (optional), --llm-config (path or JSON), --budget, --db-path, --project-root. Output JSONL event stream to stdout and exit code semantics (0 success, non-zero on error). Add npm script and minimal usage docs.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "f59cf389-9d71-41fe-aed5-062602ae68de",
+      "status": "-",
+      "title": "Electron Overseer integration shim",
+      "description": "Provide a lightweight integration module exposing serializable event types and a factory to create runs suitable for Electron IPC. Include utilities to convert RunHandle into an EventSource-like stream or an observable for React. Document how Overseer consumes this to launch agents, subscribe to progress, and display diffs. Keep IPC specifics out of core; this is an adapter only.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "9ee7e304-201c-498c-8a83-6eb4299bf7c6",
+      "status": "-",
+      "title": "Run artifact export and import",
+      "description": "Add the ability to export a full run (metadata, messages, telemetry, diffs, and accepted commits) to a JSON archive (optionally with file snapshots). Implement import to rehydrate runs for sharing and review. Ensure secrets redaction and size limits. Expose APIs: exportRun(runId, options), importRun(filePath).",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "2e6bc944-f1e3-4431-83f2-6b4d315e86cc",
+      "status": "-",
+      "title": "Unit tests for loaders, schemas, telemetry, and diffs",
+      "description": "Write vitest unit tests covering: project/task loaders with valid/invalid inputs, schema validations, LLM usage accounting (mock provider), cost calculations with multiple models, file diff generation for various change types, and path safety validation. Use temp directories and fixtures under tasks/ for deterministic tests.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "6134c5ca-951e-459e-b5e4-73904104cca6",
+      "status": "-",
+      "title": "Integration tests with temp git repositories",
+      "description": "Implement integration tests that initialize a temporary git repo, create a sample project and task, run a mock agent that proposes changes, then exercise accept and reject workflows. Verify branch creation, commits, history records, and emitted events. Ensure tests are deterministic and isolated with cleanup.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "d0dd42b6-dfa6-43a5-8773-75f65a087c0d",
+      "status": "-",
+      "title": "Documentation: Factory TS overview and migration guide",
+      "description": "Add docs/FACTORY_TS_OVERVIEW.md describing architecture, APIs, event model, and integration steps for Overseer. Create docs/MIGRATION_FROM_PY_FACTORY.md guiding the transition from the Python script to the TS library/CLI, including example commands and how to map LLMConfigs. Update docs/PROJECTS_GUIDE.md to reference the new TS orchestrator and any schema clarifications if needed.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "f9cea88b-8630-4f57-ab88-ddecd2dcc721",
+      "status": "-",
+      "title": "Secrets redaction and data hygiene",
+      "description": "Implement a redaction utility to scrub API keys and secrets from stored messages and exported artifacts. Add configuration for redaction patterns. Enforce max transcript sizes and truncation strategies (with markers) to prevent UI stalls. Add unit tests for redaction and truncation behavior.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "74d05d2c-c9b9-44fc-aa81-dac984055442",
+      "status": "-",
+      "title": "Configuration management and defaults",
+      "description": "Provide a configuration module to resolve database path, storage directories, provider keys (from env or Overseer config), budgets, and default behaviors. Allow overrides via function parameters and environment variables. Document precedence rules. Ensure all components consume config through this module for consistency.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "570f7495-cf5c-4f77-b356-4302207bfb48",
+      "status": "-",
+      "title": "Performance and streaming backpressure handling",
+      "description": "Ensure LLM streaming and event emission handle backpressure: buffer with limits, drop/merge strategies for high-frequency events (e.g., token streams) configurable for UI. Provide high-level progress snapshots at intervals. Add micro-benchmarks or stress tests to validate throughput without blocking the event loop.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "41251fa6-9826-4f24-81c2-ab8dbbc34f1b",
+      "status": "-",
+      "title": "Developer example for Overseer integration",
+      "description": "Add an examples/overseer-integration with a minimal Node/Electron-like mock showing how to launch a run, subscribe to events, present diffs, and accept changes. Include a React hook useAgentRun for convenience. This serves as runnable documentation for Overseer developers.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    },
+    {
+      "id": "aaab8421-5f81-4f90-bb53-f2376254d164",
+      "status": "-",
+      "title": "Deprecate Python orchestrator and provide bridge notice",
+      "description": "Update the Python entrypoint scripts to print a deprecation notice and optionally shell out to the new Node CLI when available. Update repository README to reflect the TS implementation as the primary path forward. Ensure users can still run existing flows during transition.",
+      "plan": "",
+      "context": [],
+      "acceptance": []
+    }
   ],
   "featureIdToDisplayIndex": {
+    "4fcf7de2-041e-4286-8993-a60e5bb6122f": 1,
+    "d45ef493-6a68-4c43-b57e-14458dc3c64d": 2,
+    "576ef03e-c801-4deb-80d1-9429ebf315f2": 3,
+    "5b410176-489e-4f57-9fc5-a97ed1ec47e6": 4,
+    "29960350-464d-409f-91a4-617a92b11bbc": 5,
+    "c5efe54b-5b8a-4eb9-9e68-fdfeeae5d563": 6,
+    "fd833159-3bb2-4ccc-b019-8213ee28cb60": 7,
+    "18406579-29ec-4c11-9ebd-eb36fd80bc98": 8,
+    "a700cc86-7563-4897-8d13-8b0ed32dd913": 9,
+    "b7987994-041b-4431-9f44-55db68a634cf": 10,
+    "0fab7bb2-c7da-4cf0-b81f-fc66e44f309f": 11,
+    "347b7865-f832-40b3-9a1a-d6d6334d411e": 12,
+    "a1312892-7a22-409f-aeff-755314252728": 13,
+    "31c5aa98-049f-44aa-84d3-2e9853ff1e7e": 14,
+    "f59cf389-9d71-41fe-aed5-062602ae68de": 15,
+    "9ee7e304-201c-498c-8a83-6eb4299bf7c6": 16,
+    "2e6bc944-f1e3-4431-83f2-6b4d315e86cc": 17,
+    "6134c5ca-951e-459e-b5e4-73904104cca6": 18,
+    "d0dd42b6-dfa6-43a5-8773-75f65a087c0d": 19,
+    "f9cea88b-8630-4f57-ab88-ddecd2dcc721": 20,
+    "74d05d2c-c9b9-44fc-aa81-dac984055442": 21,
+    "570f7495-cf5c-4f77-b356-4302207bfb48": 22,
+    "41251fa6-9826-4f24-81c2-ab8dbbc34f1b": 23,
+    "aaab8421-5f81-4f90-bb53-f2376254d164": 24
   }
 }
