@@ -13,7 +13,12 @@ This document describes how files and directories are organised in this reposito
 - projects/: Child project configurations.
 - packages/: JavaScript/TypeScript packages maintained in this repo.
   - packages/factory-ts/: TypeScript library for Overseer agent orchestration (build via tsup, ESM+CJS).
-- .github/, .env, and other setup files may exist as needed.
+    - src/
+      - index.ts: Public entry point exporting the library API.
+      - domain.ts: Zod schemas and types for ProjectConfig and TaskDefinition.
+      - utils/path.ts: Cross-platform path helpers, root resolution.
+      - loaders/projectLoader.ts: Project and task loader with validation.
+      - loaders/projectLoader.test.ts: Vitest tests for the loader.
 
 Notes:
 - All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
@@ -76,7 +81,12 @@ repo_root/
 │     ├─ .prettierrc
 │     └─ src/
 │        ├─ index.ts
-│        └─ index.test.ts
+│        ├─ domain.ts
+│        ├─ utils/
+│        │  └─ path.ts
+│        └─ loaders/
+│           ├─ projectLoader.ts
+│           └─ projectLoader.test.ts
 └─ tasks/
    ├─ 1/
    │  ├─ task.json

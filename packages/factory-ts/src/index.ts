@@ -18,3 +18,6 @@ export default OverseerFactory;
 
 // Domain types and schemas
 export * from './domain';
+
+// Project/task loader API
+export * from './loaders/projectLoader';

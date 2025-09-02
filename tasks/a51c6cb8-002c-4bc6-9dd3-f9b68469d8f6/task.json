@@ -24,7 +24,7 @@
     },
     {
       "id": "576ef03e-c801-4deb-80d1-9429ebf315f2",
-      "status": "-",
+      "status": "+",
       "title": "Implement project and task loaders with validation",
       "description": "Create a ProjectLoader module that reads projects/{project_id}.json and resolves project paths, then loads task definitions from the target project's tasks folder. Validate using Zod schemas. Expose functions: loadProject(projectId), listProjects(), loadTask(projectId, taskId), listTasks(projectId). Include robust error messages and path normalization.",
       "plan": "",
