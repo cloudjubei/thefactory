@@ -43,6 +43,8 @@ This document describes how files and directories are organised in this reposito
       - git/: Git integration layer used by Overseer to manage feature branches and apply/commit/revert changes.
         - gitService.ts: Provides ensureRepo, createFeatureBranch(runId), applyProposalToBranch(proposalId), commitProposal(proposalId, message, metadata), revertProposal(proposalId). It uses simple-git (dynamic import) and records commit SHAs to the HistoryStore when provided.
         - index.ts: Barrel export for git module.
+      - review/: Change review workflow high-level APIs bridging files, git, and history.
+        - reviewService.ts: Exposes listProposalFiles(proposalId), acceptAll(proposalId), acceptFiles(proposalId, files[]), rejectFiles(proposalId, files[]), rejectAll(proposalId). Provides per-file diff hunks and summary counts (added/modified/deleted). On accept, commits using gitService and records commit in HistoryStore; on reject, updates proposal state and history without workspace mutation.
 
 Notes:
 - All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
@@ -98,41 +100,18 @@ repo_root/
 ├─ packages/
 │  └─ factory-ts/
 │     ├─ package.json
-│     ├─ tsconfig.json
-│     ├─ tsup.config.ts
-│     ├─ vitest.config.ts
 │     └─ src/
 │        ├─ index.ts
-│        ├─ orchestrator.ts
-│        ├─ events/
-│        │  ├─ index.ts
-│        │  ├─ runtime.ts
-│        │  └─ types.ts
-│        ├─ llm/
-│        │  ├─ types.ts
-│        │  ├─ config.ts
-│        │  ├─ costs.ts
-│        │  └─ openaiClient.ts
-│        │  └─ factory.ts
-│        ├─ telemetry/
-│        │  └─ telemetry.ts
-│        ├─ domain.ts
-│        ├─ utils/
-│        │  └─ path.ts
-│        ├─ loaders/
-│        │  ├─ projectLoader.ts
-│        │  └─ projectLoader.test.ts
-│        ├─ db/
-│        │  ├─ sqlite.ts
-│        │  ├─ store.ts
-│        │  └─ migrations/
-│        │     └─ 0001_init.sql
+│        ├─ review/
+│        │  └─ reviewService.ts
 │        ├─ files/
 │        │  ├─ fileChangeManager.ts
 │        │  └─ index.ts
-│        └─ git/
-│           ├─ gitService.ts
-│           └─ index.ts
+│        ├─ git/
+│        │  ├─ gitService.ts
+│        │  └─ index.ts
+│        └─ db/
+│           └─ store.ts
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
@@ -143,4 +122,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/git module which implements feature-branch workflows and proposal application/commit/revert integrated with run history.
+This diagram includes the new review/ module, which centralizes the change review workflow and exposes APIs used by Overseer to present and resolve proposed file changes within its UI.

@@ -96,7 +96,7 @@
     },
     {
       "id": "0fab7bb2-c7da-4cf0-b81f-fc66e44f309f",
-      "status": "-",
+      "status": "+",
       "title": "Change review workflow APIs (accept/reject with partial selection)",
       "description": "Expose high-level APIs to present and resolve proposed file changes: listProposalFiles(proposalId), acceptAll(proposalId), acceptFiles(proposalId, files[]), rejectFiles(proposalId, files[]), rejectAll(proposalId). On accept, commit and update run history; on reject, discard staged changes and update run state. Provide metadata for UI (added/modified/deleted counts, diff hunks per file).",
       "plan": "",

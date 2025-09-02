@@ -1,10 +1,38 @@
-import { openDatabase, HistoryStore, type DBOptions } from './sqlite';
+export type RunId = string;
+export type ProposalId = string;
+export type ProposalState = 'open' | 'partiallyAccepted' | 'accepted' | 'rejected';
 
-// Convenience factory that opens DB and returns HistoryStore with handle attached.
-export function createHistoryStore(opts: DBOptions = {}) {
-  const handle = openDatabase(opts);
-  const store = new HistoryStore(handle);
-  return { store, handle };
+export interface CommitRecord {
+  runId?: RunId;
+  proposalId: ProposalId;
+  commitSha: string;
+  message?: string;
+  files: string[];
+  counts: { added: number; modified: number; deleted: number; total: number };
+  createdAt: number;
 }
 
-export * from './sqlite';
+export interface HistoryStore {
+  recordCommit(rec: CommitRecord): Promise<void>;
+  updateProposalState(proposalId: ProposalId, state: ProposalState): Promise<void>;
+  getCommitsByProposal(proposalId: ProposalId): Promise<CommitRecord[]>;
+}
+
+export class InMemoryHistoryStore implements HistoryStore {
+  private commits: CommitRecord[] = [];
+  private proposalStates = new Map<ProposalId, ProposalState>();
+
+  async recordCommit(rec: CommitRecord): Promise<void> {
+    this.commits.push(rec);
+  }
+
+  async updateProposalState(proposalId: ProposalId, state: ProposalState): Promise<void> {
+    this.proposalStates.set(proposalId, state);
+  }
+
+  async getCommitsByProposal(proposalId: ProposalId): Promise<CommitRecord[]> {
+    return this.commits.filter(c => c.proposalId === proposalId);
+  }
+}
+
+export const defaultHistoryStore = new InMemoryHistoryStore();
