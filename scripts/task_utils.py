@@ -148,6 +148,79 @@ def delete_file(filename: str):
     print(f"File securely deleted: {filename}")
 
 
+def search_files(query: str, path: str = ".") -> List[str]:
+    """
+    Search for files under the given path (relative to the project root) whose filename OR textual content
+    contains the query (case-insensitive). Returns a list of matching file paths relative to the project root.
+
+    Notes:
+    - Stays sandboxed within the project root. Paths outside are rejected.
+    - Skips common large or vendor directories (e.g., .git, node_modules, .venv, dist, build).
+    - Skips very large files (>2MB) for content scanning. Filename checks still apply.
+    - Attempts to read files as UTF-8 with errors ignored; binary files may be skipped.
+    """
+    root = get_project_root()
+    start_path = (root / path).resolve()
+
+    try:
+        start_path.relative_to(root)
+    except ValueError:
+        # Access outside project root is not allowed
+        return []
+
+    ignore_dirs = {".git", "node_modules", ".venv", "venv", "dist", "build", "out", ".next", ".cache"}
+    max_content_bytes = 2 * 1024 * 1024  # 2 MB
+
+    q = (query or "").lower()
+    if not q:
+        return []
+
+    matches: List[str] = []
+    seen = set()
+
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        # Prune ignored directories in-place
+        dirnames[:] = [d for d in dirnames if d not in ignore_dirs]
+
+        for fname in filenames:
+            full_path = Path(dirpath) / fname
+            try:
+                rel_path = str(full_path.relative_to(root))
+            except Exception:
+                continue
+
+            added = False
+            # Filename match (case-insensitive substring)
+            if q in fname.lower():
+                if rel_path not in seen:
+                    matches.append(rel_path)
+                    seen.add(rel_path)
+                added = True
+
+            # Content match (if not already added)
+            if not added:
+                try:
+                    size = full_path.stat().st_size
+                    if size <= max_content_bytes:
+                        # Best-effort text read
+                        with open(full_path, "rb") as f:
+                            data = f.read(max_content_bytes)
+                        text = data.decode("utf-8", errors="ignore").lower()
+                        if q in text:
+                            if rel_path not in seen:
+                                matches.append(rel_path)
+                                seen.add(rel_path)
+                except Exception:
+                    # Non-readable/binary/permission issues -> skip
+                    pass
+
+        # Optional: cap results to avoid huge outputs
+        if len(matches) >= 500:
+            break
+
+    return matches
+
+
 def update_feature_status(task_id: str, feature_id: str, status: Status) -> Optional[Feature]:
     """Updates the status of a specific feature."""
     task = get_task(task_id)

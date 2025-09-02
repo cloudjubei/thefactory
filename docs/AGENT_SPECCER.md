@@ -16,8 +16,8 @@ For context on the overall project structure, including how tasks and features a
 You have access to the following tools. Call them with the exact argument names shown.
 
 -   `create_feature(title: str, description: str)`: Use this tool to define and add a new feature to the task. The title should be a concise summary, and the description should clearly explain what needs to be done for this feature.
+-   `search_files(query: str, path: str = '.') -> list[str]`: Search for files by name or textual content under the given path (relative to the project root).
+-   `list_files(path: str) -> list[str]`: Use to list directory contents.
+-   `read_files(paths: [str]) -> [str]`: Use if information is missing from the initial prompt to read the files at the specified relative paths.
 -   `finish_spec()`: **MANDATORY upon completion.** Call this tool once you have created all features for the task. This signals that the specification is complete and ready for development.
 -   `block_task(reason: str)`: **MANDATORY when blocked.** Use this to halt progress on the task if you cannot create a valid specification. Provide a clear reason for being blocked.
--   `read_files(paths: [str]) -> [str]`: Use if information is missing from the initial prompt to read the files at the specified relative paths.
--   `list_files(path: str) -> [str]`: Use if information is missing from the initial prompt to list files at the specified relative path.
-

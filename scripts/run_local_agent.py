@@ -110,6 +110,7 @@ def get_available_tools(agent_type: str, git_manager: GitManager) -> Tuple[Dict[
     """
     base_tools = {
         "read_files": (task_utils.read_files, "read_files(paths: list[str]) -> list[str]"),
+        "search_files": (task_utils.search_files, "search_files(query: str, path: str = '.') -> list[str]"),
         "block_feature": (lambda task_id, feature_id, reason: task_utils.block_feature(task_id, feature_id, reason, agent_type, git_manager), "block_feature(reason: str)"),
         "finish_feature": (lambda task_id, feature_id: task_utils.finish_feature(task_id, feature_id, agent_type, git_manager), "finish_feature()"),
         "list_files": (lambda path: task_utils.list_files(path), "list_files(path: str)")

@@ -23,5 +23,8 @@ You have access to the following tools. Call them with the exact argument names 
 -   `update_acceptance_criteria(criteria: [str])`: Your primary tool for defining success.
 -   `update_test(test: str)`: Your secondary tool for creating the test script.
 -   `run_test()`: Use to verify your own test script.
+-   `search_files(query: str, path: str = '.') -> list[str]`: Search for files by name or textual content under the given path (relative to the project root).
+-   `list_files(path: str) -> list[str]`: List files at a relative path.
+-   `read_files(paths: [str]) -> [str]`: Read specific files for context if needed.
 -   `finish_feature()`: **MANDATORY upon completion.** Use this to signal you are done.
 -   `block_feature(reason: str)`: **MANDATORY when blocked.** State your reason for being blocked.

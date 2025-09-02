@@ -1,12 +1,12 @@
 {
   "id": "8b4faa9d-3094-447a-93d0-d1c4f06bc776",
-  "status": "-",
+  "status": "+",
   "title": "Improvements",
   "description": "Various improvements to the project",
   "features": [
     {
       "id": "04bf7b01-b958-429f-81b0-b3f11343dd68",
-      "status": "-",
+      "status": "+",
       "title": "Agents need a search_files tool.",
       "description": "This tool should be as standard available to all agents. They should all have it explained in their markdown files.",
       "plan": "",

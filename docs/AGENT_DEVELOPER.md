@@ -17,6 +17,8 @@ You have access to the following tools. Call them with the exact argument names 
 -   `write_file(filename: str, content: str)`: Create or overwrite a file.
 -   `rename_file(filename: str, new_filename: str)`: Renames or moves a file.
 -   `delete_file(filename: str)`: Deletes a file.
+-   `search_files(query: str, path: str = '.') -> list[str]`: Search for files by name or textual content under the given path (relative to the project root). Returns matching relative file paths.
+-   `list_files(path: str) -> list[str]`: List files at a relative path.
+-   `read_files(paths: [str]) -> [str]`: Use only if critical information is missing from the initial prompt.
 -   `finish_feature()`: **MANDATORY upon completion.** Commits your work and marks the feature as done.
 -   `block_feature(reason: str)`: **MANDATORY when blocked.** State your reason for being blocked.
--   `read_files(paths: [str]) -> [str]`: Use only if critical information is missing from the initial prompt.
