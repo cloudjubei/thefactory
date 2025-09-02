@@ -8,6 +8,8 @@ export type RunEvent =
   | { type: 'llm/request/started'; runId: UUID; at: number; requestId: UUID; model: string }
   | { type: 'llm/request/stream'; runId: UUID; at: number; requestId: UUID; model: string; deltaTokensOut: number }
   | { type: 'llm/request/finished'; runId: UUID; at: number; requestId: UUID; model: string; usage: LLMUsage }
+  | { type: 'error/occurred'; runId: UUID; at: number; code: string; message: string; stepIndex?: number | null }
+  | { type: 'error/retry'; runId: UUID; at: number; attempt: number; delayMs: number; code: string; message: string; stepIndex?: number | null }
 
 export interface EventBus<E extends { type: string } = RunEvent> {
   on<T extends E['type']>(type: T, listener: (event: Extract<E, { type: T }>) => void): () => void

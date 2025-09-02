@@ -114,7 +114,7 @@
     },
     {
       "id": "a1312892-7a22-409f-aeff-755314252728",
-      "status": "-",
+      "status": "+",
       "title": "Robust error handling, retries, and cancellation",
       "description": "Add a common error handling layer that provides typed errors, retries with exponential backoff for transient LLM/network errors, and respects cancellation via AbortSignal. Ensure all provider calls and IO are abortable. Emit error events with redacted details and persist error snapshots in the run history.",
       "plan": "",

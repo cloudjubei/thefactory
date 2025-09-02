@@ -176,6 +176,16 @@ export type GitCommitMeta = {
   createdAt: number;
 };
 
+export type ErrorSnapshot = {
+  id: string;
+  runId: string;
+  stepIndex: number | null;
+  code: string;
+  message: string;
+  occurredAt: number;
+  details?: any | null; // redacted JSON payload
+}
+
 // CRUD API
 export class HistoryStore {
   private db: Database.Database;
@@ -368,6 +378,42 @@ export class HistoryStore {
     return row ?? null;
   }
 
+  // Errors
+  saveError(runId: string, e: { stepIndex?: number | null; code: string; message: string; occurredAt?: number; details?: any | null }): ErrorSnapshot {
+    const id = randomId();
+    const occurredAt = e.occurredAt ?? Date.now();
+    this.db.prepare(`
+      INSERT INTO errors (id, run_id, step_index, code, message, occurred_at, details_json)
+      VALUES (@id, @runId, @stepIndex, @code, @message, @occurredAt, @details)
+    `).run({ id, runId, stepIndex: e.stepIndex ?? null, code: e.code, message: e.message, occurredAt, details: e.details ? JSON.stringify(e.details) : null });
+    return this.getErrorById(id)!;
+  }
+
+  getErrorById(id: string): ErrorSnapshot | null {
+    const row = this.db.prepare(`
+      SELECT id, run_id as runId, step_index as stepIndex, code, message, occurred_at as occurredAt, details_json as details
+      FROM errors WHERE id = ?
+    `).get(id) as any;
+    if (!row) return null
+    if (row.details) {
+      try { row.details = JSON.parse(row.details) } catch {}
+    }
+    return row as ErrorSnapshot
+  }
+
+  listErrors(runId: string): ErrorSnapshot[] {
+    const rows = this.db.prepare(`
+      SELECT id, run_id as runId, step_index as stepIndex, code, message, occurred_at as occurredAt, details_json as details
+      FROM errors WHERE run_id = ? ORDER BY occurred_at ASC
+    `).all(runId) as any[]
+    return rows.map(r => {
+      if (r.details) {
+        try { r.details = JSON.parse(r.details) } catch {}
+      }
+      return r as ErrorSnapshot
+    })
+  }
+
   // Aggregates
   getRunArtifacts(runId: string): {
     steps: StepRecord[];
@@ -375,6 +421,7 @@ export class HistoryStore {
     usage: UsageSnapshot[];
     fileProposals: FileProposal[];
     commits: GitCommitMeta[];
+    errors: ErrorSnapshot[];
   } {
     const steps = this.db.prepare(`
       SELECT id, run_id as runId, idx as index, kind, label, started_at as startedAt, ended_at as endedAt, meta_json as meta
@@ -398,11 +445,13 @@ export class HistoryStore {
     `).all(runId) as FileProposal[];
 
     const commits = this.db.prepare(`
-      SELECT id, run_id as runId, step_index as stepIndex, commit_hash as commitHash, branch, title, body, created_at as createdAt
+      SELECT id, run_id as RunId, step_index as stepIndex, commit_hash as commitHash, branch, title, body, created_at as createdAt
       FROM git_commits WHERE run_id = ? ORDER BY created_at ASC
     `).all(runId) as GitCommitMeta[];
 
-    return { steps, messages, usage, fileProposals, commits };
+    const errors = this.listErrors(runId)
+
+    return { steps, messages, usage, fileProposals, commits, errors };
   }
 }
 

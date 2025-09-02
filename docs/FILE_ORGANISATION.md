@@ -17,9 +17,16 @@ This document describes how files and directories are organised in this reposito
       - index.ts: Public entry point exporting the library API.
       - orchestrator.ts: Orchestrator API exposing runTask and runFeature that wire loaders, LLM client, and the typed event bus. Returns a RunHandle, supports cancellation with AbortController.
       - events/: Typed run lifecycle event bus and RunHandle.
-        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces.
+        - types.ts: IPC-serializable event payload types and EventBus/RunHandle interfaces. Includes error/occurred and error/retry events.
         - runtime.ts: Lightweight typed event emitter and DefaultRunHandle implementation.
         - index.ts: Barrel export for events module.
+      - errors/: Common, typed error utilities.
+        - types.ts: FactoryError class, error codes, classification utilities, and conversions from unknown.
+        - redact.ts: Safe redaction helpers for messages and objects.
+      - utils/
+        - path.ts: Cross-platform path helpers, root resolution.
+        - abort.ts: Abort helpers (abortableDelay, withAbort, throwIfAborted).
+        - retry.ts: Exponential backoff retry with jitter, transient classification, and AbortSignal support. Emits error/retry events via hooks.
       - llm/: Provider-agnostic LLM client interfaces and adapters.
         - types.ts: Core types (LLMClient, streaming, usage, costs utils).
         - config.ts: Overseer LLMConfig and normalization helpers.
@@ -29,14 +36,14 @@ This document describes how files and directories are organised in this reposito
       - telemetry/: Telemetry and budgets.
         - telemetry.ts: Tracks token usage (prompt/completion), requests, duration timestamps, and computes costs from provider pricing (OpenAI). Supports streaming updates and budget enforcement with AbortController and typed events.
       - domain.ts: Zod schemas and types for ProjectConfig and TaskDefinition.
-      - utils/path.ts: Cross-platform path helpers, root resolution.
       - loaders/projectLoader.ts: Project and task loader with validation.
       - loaders/projectLoader.test.ts: Vitest tests for the loader.
       - db/: Persistent run history (SQLite) module.
-        - sqlite.ts: DB connection, migrations runner, and HistoryStore implementation.
+        - sqlite.ts: DB connection, migrations runner, and HistoryStore implementation. Includes errors table for error snapshots.
         - store.ts: Convenience factory for creating the store with an opened DB handle.
         - migrations/
           - 0001_init.sql: Initial schema for runs, steps, messages, usage, file proposals, and git commit metadata.
+          - 0002_errors.sql: Schema upgrade adding errors table to persist error snapshots.
       - files/: File change proposals and diffs (in-memory patchsets; no workspace mutation).
         - fileChangeManager.ts: Accepts proposed changes (writes/renames/deletes), validates path safety under a project root, and computes diffs against the working tree using git plumbing when available (git diff --no-index), with a simple unified diff fallback. Exposes API createProposal, getProposalDiff, updateProposal, discardProposal, and emits file:proposal and file:diff events.
         - sandboxOverlay.ts: Sandboxed filesystem overlay where agent writes first land. Enforces safe normalized paths and allowlist checks, stores writes in a project-scoped temp directory, and only merges into the git working tree upon acceptance. Provides configurable temp location, per-run IDs, and automatic cleanup on run completion or cancellation.
@@ -112,8 +119,11 @@ repo_root/
 │        ├─ git/
 │        │  ├─ gitService.ts
 │        │  └─ index.ts
-│        └─ db/
-│           └─ store.ts
+│        ├─ db/
+│        │  └─ store.ts
+│        └─ errors/
+│           ├─ types.ts
+│           └─ redact.ts
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
@@ -124,4 +134,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram includes the new files/sandboxOverlay.ts module, which provides a sandboxed filesystem overlay to stage and review agent writes safely before merging them into the git working tree from within Overseer.
+This diagram includes the new errors module, retry/abort utilities, and the DB errors table migration to support robust error handling with retries and cancellation throughout the TypeScript library.
