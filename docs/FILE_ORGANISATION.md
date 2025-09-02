@@ -39,6 +39,7 @@ This document describes how files and directories are organised in this reposito
           - 0001_init.sql: Initial schema for runs, steps, messages, usage, file proposals, and git commit metadata.
       - files/: File change proposals and diffs (in-memory patchsets; no workspace mutation).
         - fileChangeManager.ts: Accepts proposed changes (writes/renames/deletes), validates path safety under a project root, and computes diffs against the working tree using git plumbing when available (git diff --no-index), with a simple unified diff fallback. Exposes API createProposal, getProposalDiff, updateProposal, discardProposal, and emits file:proposal and file:diff events.
+        - sandboxOverlay.ts: Sandboxed filesystem overlay where agent writes first land. Enforces safe normalized paths and allowlist checks, stores writes in a project-scoped temp directory, and only merges into the git working tree upon acceptance. Provides configurable temp location, per-run IDs, and automatic cleanup on run completion or cancellation.
         - index.ts: Barrel export for files module.
       - git/: Git integration layer used by Overseer to manage feature branches and apply/commit/revert changes.
         - gitService.ts: Provides ensureRepo, createFeatureBranch(runId), applyProposalToBranch(proposalId), commitProposal(proposalId, message, metadata), revertProposal(proposalId). It uses simple-git (dynamic import) and records commit SHAs to the HistoryStore when provided.
@@ -106,6 +107,7 @@ repo_root/
 │        │  └─ reviewService.ts
 │        ├─ files/
 │        │  ├─ fileChangeManager.ts
+│        │  ├─ sandboxOverlay.ts
 │        │  └─ index.ts
 │        ├─ git/
 │        │  ├─ gitService.ts
@@ -122,4 +124,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram includes the new review/ module, which centralizes the change review workflow and exposes APIs used by Overseer to present and resolve proposed file changes within its UI.
+This diagram includes the new files/sandboxOverlay.ts module, which provides a sandboxed filesystem overlay to stage and review agent writes safely before merging them into the git working tree from within Overseer.

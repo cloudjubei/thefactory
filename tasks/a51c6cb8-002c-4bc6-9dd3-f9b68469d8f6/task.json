@@ -105,7 +105,7 @@
     },
     {
       "id": "347b7865-f832-40b3-9a1a-d6d6334d411e",
-      "status": "-",
+      "status": "+",
       "title": "Sandboxed filesystem overlay for safe writes",
       "description": "Implement a filesystem overlay (temp dir within project) where agent writes first land. Ensure no path escapes via normalization and allowlist checks. Only upon acceptance are writes merged into the git working tree. Provide configurable temp location and automatic cleanup on run completion or cancellation.",
       "plan": "",
