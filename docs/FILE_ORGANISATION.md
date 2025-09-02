@@ -37,6 +37,8 @@ This document describes how files and directories are organised in this reposito
         - store.ts: Convenience factory for creating the store with an opened DB handle.
         - migrations/
           - 0001_init.sql: Initial schema for runs, steps, messages, usage, file proposals, and git commit metadata.
+      - files/: File change proposals and diffs (in-memory patchsets; no workspace mutation).
+        - fileChangeManager.ts: Accepts proposed changes (writes/renames/deletes), validates path safety under a project root, and computes diffs against the working tree using git plumbing when available (git diff --no-index), with a simple unified diff fallback. Exposes API createProposal, getProposalDiff, updateProposal, discardProposal, and emits file:proposal and file:diff events.
 
 Notes:
 - All changes should be localized to the smallest reasonable scope (task- or doc-specific) to reduce coupling.
@@ -116,11 +118,13 @@ repo_root/
 │        ├─ loaders/
 │        │  ├─ projectLoader.ts
 │        │  └─ projectLoader.test.ts
-│        └─ db/
-│           ├─ sqlite.ts
-│           ├─ store.ts
-│           └─ migrations/
-│              └─ 0001_init.sql
+│        ├─ db/
+│        │  ├─ sqlite.ts
+│        │  ├─ store.ts
+│        │  └─ migrations/
+│        │     └─ 0001_init.sql
+│        └─ files/
+│           └─ fileChangeManager.ts
 └─ tasks/
    ├─ 1/
    │  ├─ task.json
@@ -131,4 +135,4 @@ repo_root/
       └─ tests/
 ```
 
-This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/db module which implements persistent run history with SQLite and migrations.
+This diagram shows how documentation, scripts, and per-task artifacts are arranged, including the new packages/factory-ts/src/files module which implements in-memory file change proposals and diff generation.

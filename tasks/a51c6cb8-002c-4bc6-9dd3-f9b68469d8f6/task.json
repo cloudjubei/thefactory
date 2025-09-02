@@ -78,7 +78,7 @@
     },
     {
       "id": "a700cc86-7563-4897-8d13-8b0ed32dd913",
-      "status": "-",
+      "status": "+",
       "title": "File change proposal and diff generation API",
       "description": "Create a FileChangeManager that accepts proposed changes (writes/renames/deletes) from agents and constructs a patchset without mutating the workspace. Compute diffs against the working tree using fast-diff or git diff plumbing APIs. Expose functions: createProposal(changes), getProposalDiff(proposalId), updateProposal, discardProposal. Emit file:proposal and file:diff events. Validate path safety (no traversal outside project root).",
       "plan": "",
