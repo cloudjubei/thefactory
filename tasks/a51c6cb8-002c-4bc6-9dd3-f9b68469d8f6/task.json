@@ -15,7 +15,7 @@
     },
     {
       "id": "d45ef493-6a68-4c43-b57e-14458dc3c64d",
-      "status": "-",
+      "status": "+",
       "title": "Define core domain types and schemas",
       "description": "Add TypeScript types and Zod schemas for ProjectConfig, TaskDefinition, FeatureDefinition, AgentRun, AgentStep, Message, UsageMetrics, CostBreakdown, FileChange (write, delete, move, rename), DiffHunk, RunStatus, and Error types. Export from the package entrypoint. Ensure schemas support validation and parsing of existing project/task JSON formats under projects/ and tasks/.",
       "plan": "",

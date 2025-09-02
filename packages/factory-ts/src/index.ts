@@ -15,3 +15,6 @@ export function createFactory(options: FactoryOptions = {}) {
 }
 
 export default OverseerFactory;
+
+// Domain types and schemas
+export * from './domain';
