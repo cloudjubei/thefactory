@@ -21,9 +21,22 @@
       ],
       "acceptance": [],
       "dependencies": []
+    },
+    {
+      "id": "a2ad0ce4-b71a-40bc-baa7-3550153bef88",
+      "status": "-",
+      "title": "When running the orchestrator, finding the next feature for a task should be based on the feature index",
+      "description": "the Task.featureIdToDisplayIndex is the means by which the features should be sorted for this.",
+      "plan": "",
+      "context": [
+        "scripts/run_local_agent.py"
+      ],
+      "acceptance": [],
+      "dependencies": []
     }
   ],
   "featureIdToDisplayIndex": {
-    "04bf7b01-b958-429f-81b0-b3f11343dd68": 1
+    "04bf7b01-b958-429f-81b0-b3f11343dd68": 1,
+    "a2ad0ce4-b71a-40bc-baa7-3550153bef88": 2
   }
 }
