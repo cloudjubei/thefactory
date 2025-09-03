@@ -472,19 +472,41 @@ def find_next_available_feature(task: Task, exclude_ids: set = set(), ignore_dep
     """
     Finds the first pending feature in a task whose dependencies are all met,
     EXCLUDING any feature IDs passed in the `exclude_ids` set.
+
+    Selection order is determined by Task.featureIdToDisplayIndex. Features with
+    missing indices fall back to their original order in task["features"].
     """
-
-    # TODO: use task.featureIdToDisplayIndex for ordering
-
+    # Build quick lookup for completion status
     completed_feature_ids = {f.get("id") for f in task.get("features") if f.get("status") == "+"}
-    
-    for feature in task["features"]:
-        if feature.get("id") in exclude_ids:
-            continue
-        if feature.get("status") == "-":
-            dependencies = feature.get("dependencies", [])
-            if ignore_depedencies or all(dep_id in completed_feature_ids for dep_id in dependencies):
-                return feature
+
+    # Prepare ordering maps
+    feature_id_to_display_index = task.get("featureIdToDisplayIndex", {}) or {}
+    fallback_order = {f.get("id"): idx for idx, f in enumerate(task.get("features", []))}
+
+    def sort_key(f: Feature):
+        fid = f.get("id")
+        display_idx = feature_id_to_display_index.get(fid)
+        # Use a tuple to ensure stable ordering: first by display index (or large), then by fallback index
+        return (
+            display_idx if isinstance(display_idx, int) else 10**9,
+            fallback_order.get(fid, 10**9)
+        )
+
+    # Filter to candidate features (pending and not excluded)
+    candidates = [
+        f for f in task.get("features", [])
+        if f.get("id") not in exclude_ids and f.get("status") == "-"
+    ]
+
+    for feature in sorted(candidates, key=sort_key):
+        if ignore_depedencies:
+            return feature
+        dependencies = feature.get("dependencies", [])
+        # Only consider dependencies that are plain feature IDs within this task
+        required_ids = [dep_id for dep_id in dependencies if isinstance(dep_id, str) and "." not in dep_id]
+        if all(dep_id in completed_feature_ids for dep_id in required_ids):
+            return feature
+
     return None
 
 
