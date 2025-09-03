@@ -20,7 +20,7 @@
         "docs/AGENT_TESTER.md"
       ],
       "acceptance": [],
-      "dependencies": []
+      "blockers": []
     },
     {
       "id": "a2ad0ce4-b71a-40bc-baa7-3550153bef88",
@@ -32,7 +32,7 @@
         "scripts/run_local_agent.py"
       ],
       "acceptance": [],
-      "dependencies": []
+      "blockers": []
     }
   ],
   "featureIdToDisplayIndex": {

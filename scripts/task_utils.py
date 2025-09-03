@@ -470,7 +470,7 @@ def find_next_pending_task() -> Optional[Task]: # TODO needs to be updated to ta
 
 def find_next_available_feature(task: Task, exclude_ids: set = set(), ignore_depedencies: bool = False) -> Optional[Feature]:
     """
-    Finds the first pending feature in a task whose dependencies are all met,
+    Finds the first pending feature in a task whose blockers are all met,
     EXCLUDING any feature IDs passed in the `exclude_ids` set.
 
     Selection order is determined by Task.featureIdToDisplayIndex. Features with
@@ -501,9 +501,9 @@ def find_next_available_feature(task: Task, exclude_ids: set = set(), ignore_dep
     for feature in sorted(candidates, key=sort_key):
         if ignore_depedencies:
             return feature
-        dependencies = feature.get("dependencies", [])
-        # Only consider dependencies that are plain feature IDs within this task
-        required_ids = [dep_id for dep_id in dependencies if isinstance(dep_id, str) and "." not in dep_id]
+        blockers = feature.get("blockers", [])
+        # Only consider blockers that are plain feature IDs within this task
+        required_ids = [dep_id for dep_id in blockers if isinstance(dep_id, str) and "." not in dep_id]
         if all(dep_id in completed_feature_ids for dep_id in required_ids):
             return feature
 

@@ -26,7 +26,7 @@
     Action: Implement orchestration logic to manage multiple agents simultaneously.
     Acceptance: The file `docs/ORCHESTration.md` exists detailing the implementation details and strategies for orchestrating multiple agents concurrently.
     Notes: This involves coordinating resources, scheduling tasks, monitoring performance, and ensuring seamless communication between agents. It may require distributed systems concepts and advanced programming techniques.
-    Dependencies: 14
+    Blockers: 14
 
 20) ? iOS app
     Action: Develop an iOS application that allows users to interact with the project and thus the agents it runs. Similarly to the Local app project - this is yet another project.

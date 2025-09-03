@@ -50,7 +50,7 @@
         "The content documents the '--task-id' option (or '--task_id'), including an example invocation using it.",
         "The content clearly explains what '--task-id' does (e.g., that it seeds the child project's tasks/1 from tasks/{id} and rewrites task.json IDs to start with 1)."
       ],
-      "dependencies": [
+      "blockers": [
         "ee912307-546d-4a50-8201-9472e164e27b.137f2025-1e50-46dc-9985-c3df847fcb96"
       ]
     },
@@ -72,7 +72,7 @@
         "Agent execution can be invoked without referencing the parent repository paths when running from a child directory (i.e., orchestrator can proceed to agent execution stage without path errors).",
         "Backwards compatibility: When run from the repository root, the orchestrator still scopes Git operations to the repository root and uses the same features/<task_id> branching convention."
       ],
-      "dependencies": [
+      "blockers": [
         "ee912307-546d-4a50-8201-9472e164e27b.137f2025-1e50-46dc-9985-c3df847fcb96"
       ]
     },
@@ -95,7 +95,7 @@
         "The documentation file docs/PROJECTS_GUIDE.md is updated to describe that the .env file is copied from the parent project and that GIT_REPO_URL is overridden if the --repo-url argument is used, including an example in the script usage section.",
         "If an error occurs during the .env file copying process, the script prints an error message and exits with a non-zero exit code."
       ],
-      "dependencies": [
+      "blockers": [
         "ee912307-546d-4a50-8201-9472e164e27b.137f2025-1e50-46dc-9985-c3df847fcb96",
         "ee912307-546d-4a50-8201-9472e164e27b.3e98a331-db72-455b-8c6f-a6c87d72e7e2",
         "ee912307-546d-4a50-8201-9472e164e27b.91500a98-7d6e-4075-9560-95e9c14a2420"
@@ -121,7 +121,7 @@
         "The parent's 'docs/FILE_ORGANISATION.md' includes a new section describing the standard child project structure.",
         "The parent's 'docs/FILE_ORGANISATION.md' includes or updates an example tree to reflect the child project structure."
       ],
-      "dependencies": [
+      "blockers": [
         "ee912307-546d-4a50-8201-9472e164e27b.137f2025-1e50-46dc-9985-c3df847fcb96",
         "ee912307-546d-4a50-8201-9472e164e27b.3e98a331-db72-455b-8c6f-a6c87d72e7e2",
         "ee912307-546d-4a50-8201-9472e164e27b.91500a98-7d6e-4075-9560-95e9c14a2420",

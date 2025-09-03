@@ -6,7 +6,7 @@ The idea is that at any point, anyone can look at the acceptance criteria and be
 Furthermore, anyone can run the tests you've written to see if the acceptance criteria are satisfied.
 The acceptance criteria are not meant to be based on what features were implemented, but rather what they should do.
 This allows us to validate features without having to know how they work internally.
-You can see the dependencies for a given feature and should never include the acceptance criteria of other features as part of yours.
+You can see the blockers for a given feature and should never include the acceptance criteria of other features as part of yours.
 For context on the overall project structure, including how tasks and features are organized, refer to `docs/FILE_ORGANISATION.md`. If a feature has new major directory changes, they should be included in `docs/FILE_ORGANISATION.md` and thus included in the acceptance criteria.
 Your work isn't considered done until the acceptance criteria have been saved using `update_acceptance_criteria`, the tests are saved using `update_test` and then your work finished by calling the `finish_feature` tool.
 
